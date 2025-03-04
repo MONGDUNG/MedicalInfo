@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>주변 병원 찾기</title>
+    <style>
+        #map { width: 75%; height: 800px; float: right; }
+        #hospitalList { width: 25%; height: 800px; overflow-y: scroll; float: left; background: #f8f9fa; padding: 10px; box-sizing: border-box; }
+        .hospital-item { cursor: pointer; padding: 10px; border-bottom: 1px solid #ddd; }
+        .hospital-item:hover { background-color: #e9ecef; }
+    </style>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1b1fa6d69135cfce980c3daf91775a4b&libraries=services"></script>
+</head>
+<body>
+    <div id="hospitalList"></div>
+    <div id="map"></div>
+
+    <script th:inline="javascript">
+        var map = new kakao.maps.Map(document.getElementById('map'), {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), //서울시청 좌표(나중에 변경)
+            level: 4
+        });
+		
+        // 서버에서 전달된 병원 데이터 파싱
+        var hospitals = /*[[${hospitals}]]*/ [];
+    	hospitals = JSON.parse(hospitals);  // 서버에서 JSON String으로 넘겨주면 안전하게 파싱 가능
+    	hospitals.sort((a, b) => a.distance - b.distance); 
+
+        var listElement = document.getElementById('hospitalList');
+
+        hospitals.forEach(function(hospital) {
+            var position = new kakao.maps.LatLng(hospital.latitude, hospital.longitude);
+
+            var marker = new kakao.maps.Marker({
+                position: position,
+                map: map
+            });
+
+            var item = document.createElement('div');
+            item.className = 'hospital-item';
+            item.innerText = `${hospital.hospitalName} - ${hospital.distance.toFixed(0)}m`;
+            item.onclick = function() {
+                map.setCenter(position);
+            };
+            listElement.appendChild(item);
+        });
+        
+    </script>
+</body>
+</html>

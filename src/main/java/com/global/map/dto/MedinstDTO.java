@@ -24,4 +24,5 @@ public class MedinstDTO {
     private double latitude;        // 위도 (double로 변환 추천)
     private double longitude;       // 경도 (double로 변환 추천)
     private double distance;        // 현재 위치(서울시청 등)와의 거리 (추가 필드)
+    //테스트
 }

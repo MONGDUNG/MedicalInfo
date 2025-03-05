@@ -23,7 +23,6 @@ public class MapController {
     @GetMapping("kakaoMap")
     public String kakaoMap(Model model) throws JsonProcessingException {
         List<MedinstDTO> hospitals = mapService.getNearbyHospitals();
-        System.out.println(hospitals.size());
         String hospitalsJson = objectMapper.writeValueAsString(hospitals);  // JSON 직렬화
         model.addAttribute("hospitals", hospitalsJson);
         return "map/kakaoMapTest";  // Thymeleaf 뷰 반환

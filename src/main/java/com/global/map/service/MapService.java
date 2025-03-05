@@ -31,7 +31,7 @@ public class MapService {
 	                        Double.parseDouble(entity.getLatitude()),
 	                        Double.parseDouble(entity.getLongitude())
 	                )))
-	                .limit(1000)  // 최대 100개
+	                .limit(1000)  // 최대 갯수
 	                .toList();
 	    }
 	    
@@ -65,4 +65,5 @@ public class MapService {
 	            .distance(distance)  // 계산된 거리 추가
 	            .build();
 	}
+	//push 확인용
 }

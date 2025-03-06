@@ -30,8 +30,8 @@ public class MapService {
 	 private final ConvenienceStoreRepository conveniencestorerepository;
 	 private final EmergencyRepository emergencyrepository;
 		
-	    private final double centerLat = 37.4784;  // 서울시청 (회원 주소로 변경 가능)
-	    private final double centerLng = 126.9516;
+	    private final double centerLat = 37.5665;  // 서울시청 (회원 주소로 변경 가능)
+	    private final double centerLng = 126.9780;
 
 	    public List<MedinstDTO> getNearbyHospitals() {
 	        List<MedinstEntity> hospitals = repository.findNearbyHospitals(centerLat, centerLng);
@@ -60,11 +60,11 @@ public class MapService {
 	    }
 	    
 	    public List<ConvenienceStoreDTO> getNearbyConvenienceStores() {
-	        List<ConvenienceStoreEntity> conveniencestores = conveniencestorerepository.findNearbyConvenienceStores(37.4784, 126.9516);
+	        List<ConvenienceStoreEntity> conveniencestores = conveniencestorerepository.findNearbyConvenienceStores(centerLat, centerLng);
 	        System.out.println("조회된 편의점 개수: " + conveniencestores.size());
 	        return conveniencestores.stream()
 	                .map(entity -> convenienceStoreToDTO(entity, calculateDistance(
-	                		37.4784, 126.9516,
+	                        centerLat, centerLng,
 	                        Double.parseDouble(entity.getLatitude()),
 	                        Double.parseDouble(entity.getLongitude())
 	                )))

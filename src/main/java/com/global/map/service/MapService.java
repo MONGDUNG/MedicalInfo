@@ -5,9 +5,17 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.global.map.dto.MedinstDTO;
+import com.global.map.dto.PharmacyDTO;
+import com.global.map.dto.ConvenienceStoreDTO;
+import com.global.map.dto.EmergencyDTO;
 import com.global.map.entity.MedinstEntity;
+import com.global.map.entity.PharmacyEntity;
+import com.global.map.entity.ConvenienceStoreEntity;
+import com.global.map.entity.EmergencyEntity;
 import com.global.map.repository.MedinstRepository;
-
+import com.global.map.repository.PharmacyRepository;
+import com.global.map.repository.ConvenienceStoreRepository;
+import com.global.map.repository.EmergencyRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
@@ -18,15 +26,57 @@ import lombok.RequiredArgsConstructor;
 public class MapService {
 	
 	 private final MedinstRepository repository;
-
-	    private final double centerLat = 37.5665;  // 서울시청 (회원 주소로 변경 가능)
-	    private final double centerLng = 126.9780;
+	 private final PharmacyRepository pharmacyrepository;
+	 private final ConvenienceStoreRepository conveniencestorerepository;
+	 private final EmergencyRepository emergencyrepository;
+		
+	    private final double centerLat = 37.4784;  // 서울시청 (회원 주소로 변경 가능)
+	    private final double centerLng = 126.9516;
 
 	    public List<MedinstDTO> getNearbyHospitals() {
 	        List<MedinstEntity> hospitals = repository.findNearbyHospitals(centerLat, centerLng);
 
 	        return hospitals.stream()
 	                .map(entity -> medinstToDTO(entity, calculateDistance(
+	                        centerLat, centerLng,
+	                        Double.parseDouble(entity.getLatitude()),
+	                        Double.parseDouble(entity.getLongitude())
+	                )))
+	                .limit(1000)  // 최대 갯수
+	                .toList();
+	    }
+	    
+	    public List<PharmacyDTO> getNearbyPharmacies() {
+	        List<PharmacyEntity> pharmacies = pharmacyrepository. findNearbyPharmacies(centerLat, centerLng);
+
+	        return pharmacies.stream()
+	                .map(entity -> pharmacyToDTO(entity, calculateDistance(
+	                        centerLat, centerLng,
+	                        Double.parseDouble(entity.getLatitude()),
+	                        Double.parseDouble(entity.getLongitude())
+	                )))
+	                .limit(1000)  // 최대 갯수
+	                .toList();
+	    }
+	    
+	    public List<ConvenienceStoreDTO> getNearbyConvenienceStores() {
+	        List<ConvenienceStoreEntity> conveniencestores = conveniencestorerepository.findNearbyConvenienceStores(37.4784, 126.9516);
+	        System.out.println("조회된 편의점 개수: " + conveniencestores.size());
+	        return conveniencestores.stream()
+	                .map(entity -> convenienceStoreToDTO(entity, calculateDistance(
+	                		37.4784, 126.9516,
+	                        Double.parseDouble(entity.getLatitude()),
+	                        Double.parseDouble(entity.getLongitude())
+	                )))
+	                .limit(1000)  // 최대 갯수
+	                .toList();
+	    }
+	    
+	    public List<EmergencyDTO> getNearbyEmergencys() {
+	        List<EmergencyEntity> emergencys = emergencyrepository.findNearbyEmergencys(centerLat, centerLng);
+
+	        return emergencys.stream()
+	                .map(entity -> emergencyToDTO(entity, calculateDistance(
 	                        centerLat, centerLng,
 	                        Double.parseDouble(entity.getLatitude()),
 	                        Double.parseDouble(entity.getLongitude())
@@ -63,6 +113,54 @@ public class MapService {
 	            .latitude(Double.parseDouble(entity.getLatitude()))
 	            .longitude(Double.parseDouble(entity.getLongitude()))
 	            .distance(distance)  // 계산된 거리 추가
+	            .build();
+	}
+	
+	private PharmacyDTO pharmacyToDTO(PharmacyEntity entity, double distance) {
+	    return PharmacyDTO.builder()
+	            .id(entity.getId())
+	            .pharmacyName(entity.getPharmacyName())
+	            .address(entity.getAddress())
+	            .phoneNumber(entity.getPhoneNumber())
+	            .postalCode(entity.getPostalcode())
+	            .latitude(Double.parseDouble(entity.getLatitude()))
+	            .longitude(Double.parseDouble(entity.getLongitude()))	            
+	            .establishedDate(entity.getEstablishedDate() != null ? entity.getEstablishedDate().toString() : null)
+	            .distance(distance)  // 계산된 거리 추가
+	            .build();
+	}
+	
+	private ConvenienceStoreDTO convenienceStoreToDTO(ConvenienceStoreEntity entity, double distance) {
+	    return ConvenienceStoreDTO.builder()
+	            .id(entity.getId())
+	            .storeCode(entity.getStoreCode())
+	            .licenseDate(entity.getLicenseDate()!= null ? entity.getLicenseDate().toString() : null)
+	            .phoneNumber(entity.getPhoneNumber())
+	            .address(entity.getAddress())
+	            .postalCode(entity.getPostalCode())
+	            .storeName(entity.getStoreName())
+	            .latitude(Double.parseDouble(entity.getLatitude()))
+	            .longitude(Double.parseDouble(entity.getLongitude()))
+	            .distance(distance)  // 계산된 거리 추가
+	            .build();
+	}   
+	
+	private EmergencyDTO emergencyToDTO(EmergencyEntity entity, double distance) {
+	    return EmergencyDTO.builder()
+	            .erId(entity.getErId())
+	            .hospitalName(entity.getHospitalName())
+	            .phoneNumber(entity.getPhoneNumber())
+	            .address(entity.getAddress())
+	            .mon(entity.getMon())
+	            .tues(entity.getTues())
+	            .wednes(entity.getWednes())
+	            .thurs(entity.getThurs())
+	            .fri(entity.getFri())
+	            .satur(entity.getSatur())
+	            .sun(entity.getSun())
+	            .holi(entity.getHoli())
+	            .latitude(Double.parseDouble(entity.getLatitude()))
+	            .longitude(Double.parseDouble(entity.getLongitude()))
 	            .build();
 	}
 	//push 확인용

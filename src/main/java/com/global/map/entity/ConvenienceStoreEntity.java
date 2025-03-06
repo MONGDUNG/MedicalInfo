@@ -34,7 +34,7 @@ public class ConvenienceStoreEntity {
     
     // 인허가날짜
     @Column(name = "LICENSE_DATE", nullable = false)
-    private LocalDate licensedate;
+    private LocalDate licenseDate;
     
     // 전화번호
     @Column(name = "PHONE_NUMBER", length = 20)

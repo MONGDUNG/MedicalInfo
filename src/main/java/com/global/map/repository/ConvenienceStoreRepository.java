@@ -12,7 +12,7 @@ import com.global.map.entity.ConvenienceStoreEntity;
 @Repository
 public interface ConvenienceStoreRepository extends JpaRepository<ConvenienceStoreEntity, Long>{
 	 @Query(value = """
-	            SELECT * FROM ConvenienceStore 
+	            SELECT * FROM CONVENIENCESTORE
 	            WHERE (6371 * 1000 * acos(
 	                cos(radians(:centerLat)) * cos(radians(CAST(LATITUDE AS DOUBLE))) * 
 	                cos(radians(CAST(LONGITUDE AS DOUBLE)) - radians(:centerLng)) + 

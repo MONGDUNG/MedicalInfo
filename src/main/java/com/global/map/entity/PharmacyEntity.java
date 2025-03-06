@@ -44,7 +44,7 @@ public class PharmacyEntity {
 	
 	//위도
 	@Column(name = "LATITUDE", length = 20, nullable = false)
-	private String latitide;
+	private String latitude;
 	
 	// 경도
 	@Column(name = "LONGITUDE", length = 20, nullable = false)

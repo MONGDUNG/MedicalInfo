@@ -163,5 +163,5 @@ public class MapService {
 	            .longitude(Double.parseDouble(entity.getLongitude()))
 	            .build();
 	}
-	//push 확인용
+	//push 확인
 }

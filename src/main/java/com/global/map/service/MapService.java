@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor // final이 붙은 필드를 파라미터로 받는 생성자를 만들어줌
 public class MapService {
-	
+   
     private final MedinstRepository medinstRepository;
     private final PharmacyRepository pharmacyRepository;
     private final EmergencyRepository emergencyRepository;
@@ -131,7 +131,7 @@ public class MapService {
                 .longitude(Double.parseDouble(entity.getLongitude()))
                 .distance(distance)
                 .build();
-    } //sex
+    }
 
     private ConvenienceStoreDTO storeToDTO(ConvenienceStoreEntity entity, double distance) {
         return ConvenienceStoreDTO.builder()

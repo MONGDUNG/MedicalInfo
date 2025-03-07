@@ -12,7 +12,7 @@ import com.global.map.entity.PharmacyEntity;
 @Repository
 public interface PharmacyRepository extends JpaRepository<PharmacyEntity, Long>{
 	 @Query(value = """
-	            SELECT * FROM Pharmacy 
+	            SELECT * FROM PHARMACY
 	            WHERE (6371 * 1000 * acos(
 	                cos(radians(:centerLat)) * cos(radians(CAST(LATITUDE AS DOUBLE))) * 
 	                cos(radians(CAST(LONGITUDE AS DOUBLE)) - radians(:centerLng)) + 

@@ -12,7 +12,7 @@ import com.global.map.entity.EmergencyEntity;
 @Repository
 public interface EmergencyRepository extends JpaRepository<EmergencyEntity, Long> {
 	 @Query(value = """
-	            SELECT * FROM Emergency
+	            SELECT * FROM EMERGENCY
 	            WHERE (6371 * 1000 * acos(
 	                cos(radians(:centerLat)) * cos(radians(CAST(LATITUDE AS DOUBLE))) * 
 	                cos(radians(CAST(LONGITUDE AS DOUBLE)) - radians(:centerLng)) + 

@@ -131,7 +131,7 @@ public class MapService {
                 .longitude(Double.parseDouble(entity.getLongitude()))
                 .distance(distance)
                 .build();
-    }
+    } //sex
 
     private ConvenienceStoreDTO storeToDTO(ConvenienceStoreEntity entity, double distance) {
         return ConvenienceStoreDTO.builder()

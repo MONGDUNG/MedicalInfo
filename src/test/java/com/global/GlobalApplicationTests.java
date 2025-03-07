@@ -9,5 +9,4 @@ class GlobalApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

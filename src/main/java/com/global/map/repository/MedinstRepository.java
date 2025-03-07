@@ -7,7 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.global.map.entity.ConvenienceStoreEntity;
+import com.global.map.entity.EmergencyEntity;
 import com.global.map.entity.MedinstEntity;
+import com.global.map.entity.PharmacyEntity;
 
 @Repository
 public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
@@ -20,10 +23,4 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
             )) <= 1000
             """, nativeQuery = true)
     List<MedinstEntity> findNearbyHospitals(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng);
-    
-    
-    
-    
-    
-    
 }

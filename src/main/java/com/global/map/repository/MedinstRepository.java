@@ -26,4 +26,5 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
     
     
     
+    
 }

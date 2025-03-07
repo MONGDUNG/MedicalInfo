@@ -14,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "\"MEDINST\"")
+@Table(name = "MEDINST")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,7 +25,7 @@ public class MedinstEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ID는 AUTO_INCREMENT니까 이거 맞춰줌
     @Column(name = "ID")
     private Long id;
-
+	
     @Column(name = "HOSPITAL_CODE", length = 100, nullable = false)
     private String hospitalCode;
 

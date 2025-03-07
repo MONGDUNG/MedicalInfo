@@ -20,11 +20,4 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
             )) <= 1000
             """, nativeQuery = true)
     List<MedinstEntity> findNearbyHospitals(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng);
-    
-    
-    
-    
-    
-    
-    
 }

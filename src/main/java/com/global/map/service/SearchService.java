@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,18 +26,17 @@ public class SearchService {
             List<Set<String>> resultIdSets = new ArrayList<>();
 
             for (String k : keywords) {
-                var searchResponse = elasticsearchClient.search(s -> s
-                        .index("item")
-                        .size(100000)
-                        .query(q -> q
-                            .multiMatch(m -> m
-                                .query(k)
-                                .fields("NAME", "ADDRESS", "CATEGORY_NAME", "DEPT_NAME")
-                                .operator(co.elastic.clients.elasticsearch._types.query_dsl.Operator.And)
-                            )
-                        ),
-                        Map.class
-                );
+                var searchResponse = elasticsearchClient.search(s -> {
+                    var searchBuilder = s.index("item").size(100000);
+
+                    searchBuilder = searchBuilder.query(q -> q.multiMatch(m -> m
+                        .query(k)
+                        .fields("NAME", "ADDRESS", "CATEGORY_NAME", "DEPT_NAME")
+                        .operator(Operator.And)
+                    ));
+
+                    return searchBuilder;
+                }, Map.class);
 
                 Set<String> ids = searchResponse.hits().hits().stream()
                         .map(hit -> hit.id())
@@ -58,8 +58,12 @@ public class SearchService {
 
             var finalSearchResponse = elasticsearchClient.search(s -> s
                     .index("item")
-                    .size(1000)
-                    .query(q -> q.ids(v -> v.values(new ArrayList<>(finalIds)))),
+                    .size(100000)
+                    .query(q -> q.bool(b -> b
+                        .must(m -> m.ids(v -> v.values(new ArrayList<>(finalIds))))
+                        .mustNot(mn -> mn.term(t -> t.field("CATEGORY_NAME").value("의원")))
+                        .mustNot(mn -> mn.term(t -> t.field("CATEGORY_NAME").value("치과의원")))
+                    )),
                     Map.class
             );
 

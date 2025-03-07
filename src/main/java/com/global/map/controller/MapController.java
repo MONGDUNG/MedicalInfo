@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -26,5 +27,12 @@ public class MapController {
         String hospitalsJson = objectMapper.writeValueAsString(hospitals);  // JSON 직렬화
         model.addAttribute("hospitals", hospitalsJson);
         return "map/kakaoMapTest";  // Thymeleaf 뷰 반환
+    }     
+        
+    @GetMapping("/api/nearby")
+    @ResponseBody
+    public List<Object> getNearbyAll(){
+    	
+    	 return mapService.getNearbyPlaces();
     }
 }

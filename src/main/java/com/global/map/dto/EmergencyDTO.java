@@ -24,4 +24,6 @@ public class EmergencyDTO {
     private String holi; 				// 공휴일 진료
     private double latitude;       	 	// 위도 (double로 변환 추천)
     private double longitude;       	// 경도 (double로 변환 추천)
+    private double distance;
+    
 }

@@ -1,50 +1,157 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>주변 병원 찾기</title>
     <style>
         #map { width: 75%; height: 800px; float: right; }
-        #hospitalList { width: 25%; height: 800px; overflow-y: scroll; float: left; background: #f8f9fa; padding: 10px; box-sizing: border-box; }
-        .hospital-item { cursor: pointer; padding: 10px; border-bottom: 1px solid #ddd; }
+        #hospitalList { 
+            width: 25%; 
+            height: 750px;  /* 버튼 공간 확보 */
+            overflow-y: scroll; 
+            float: left; 
+            background: #f8f9fa; 
+            padding: 10px; 
+            box-sizing: border-box; 
+        }
+        .hospital-item { 
+            cursor: pointer; 
+            padding: 12px; 
+            border-bottom: 1px solid #ddd; 
+            font-size: 14px;
+        }
         .hospital-item:hover { background-color: #e9ecef; }
+        
+        /* 강조 표시 스타일 */
+        .highlight {
+            background-color: #ffeb3b; /* 노란색 */
+            font-weight: bold;
+        }
+
+        /* 길찾기 버튼 (하단 고정) */
+        .directions-container {
+            width: 25%;
+            height: 50px;
+            background: #e0e0e0; /* 튀지 않는 연한 회색 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+        .directions-btn {
+            background: #d6d6d6; /* 연한 회색 버튼 */
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .directions-btn:hover {
+            background: #bfbfbf; /* 마우스 올리면 살짝 어두운 회색 */
+        }
     </style>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1b1fa6d69135cfce980c3daf91775a4b&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
 </head>
 <body>
     <div id="hospitalList"></div>
     <div id="map"></div>
 
-    <script th:inline="javascript">
+    <!-- 길찾기 버튼 (리스트 하단) -->
+    <div class="directions-container">
+        <button class="directions-btn" onclick="openKakaoDirections()">길찾기</button>
+    </div>
+
+    <script>
         var map = new kakao.maps.Map(document.getElementById('map'), {
-            center: new kakao.maps.LatLng(37.5665, 126.9780), //서울시청 좌표(나중에 변경)
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울시청 좌표 (변경 가능)
             level: 4
         });
-		
-        // 서버에서 전달된 병원 데이터 파싱
-        var hospitals = /*[[${hospitals}]]*/ [];
-    	hospitals = JSON.parse(hospitals);  // 서버에서 JSON String으로 넘겨주면 안전하게 파싱 가능
-    	hospitals.sort((a, b) => a.distance - b.distance); 
 
         var listElement = document.getElementById('hospitalList');
+        var selectedMarker = null; // 현재 클릭된 마커 저장
 
-        hospitals.forEach(function(hospital) {
-            var position = new kakao.maps.LatLng(hospital.latitude, hospital.longitude);
+        fetch("/map/api/nearby")
+            .then(response => response.json())
+            .then(data => {
+                data.sort((a, b) => a.distance - b.distance); // 거리순 정렬
 
-            var marker = new kakao.maps.Marker({
-                position: position,
-                map: map
+                data.forEach(function(place) {
+                    var position = new kakao.maps.LatLng(place.latitude, place.longitude);
+
+                    var normalImage = new kakao.maps.MarkerImage(
+                        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+                        new kakao.maps.Size(33, 36)
+                    );
+
+                    var overImage = new kakao.maps.MarkerImage(
+                        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+                        new kakao.maps.Size(40, 42)
+                    );
+
+                    var clickImage = new kakao.maps.MarkerImage(
+                        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                        new kakao.maps.Size(33, 36)
+                    );
+
+                    var marker = new kakao.maps.Marker({
+                        position: position,
+                        map: map,
+                        image: normalImage
+                    });
+
+                    var infowindow = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:5px;">${place.hospitalName || place.pharmacyName || place.storeName || "장소"}</div>`
+                    });
+
+                    kakao.maps.event.addListener(marker, 'mouseover', function() {
+                        if (selectedMarker !== marker) {
+                            marker.setImage(overImage);
+                        }
+                        infowindow.open(map, marker);
+                    });
+
+                    kakao.maps.event.addListener(marker, 'mouseout', function() {
+                        if (selectedMarker !== marker) {
+                            marker.setImage(normalImage);
+                        }
+                        infowindow.close();
+                    });
+
+                    kakao.maps.event.addListener(marker, 'click', function() {
+                        if (selectedMarker) {
+                            selectedMarker.setImage(normalImage);
+                        }
+                        marker.setImage(clickImage);
+                        selectedMarker = marker;
+                        map.setCenter(position); // 🏥 클릭 시 지도 중앙 이동
+
+                        // 리스트에서 해당 병원 강조 표시 및 스크롤 이동
+                        document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+                        let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item => 
+                            item.innerText.includes(place.hospitalName || place.pharmacyName || place.storeName || "장소")
+                        );
+                        if (targetItem) {
+                            targetItem.classList.add('highlight');
+                            targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    });
+
+                    var item = document.createElement('div');
+                    item.className = 'hospital-item';
+                    item.innerText = `${place.hospitalName || place.pharmacyName || place.storeName || "장소"} - ${place.distance.toFixed(0)}m`;
+                    item.onclick = function() {
+                        window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.hospitalName || place.pharmacyName || place.storeName || "장소")}&address=${encodeURIComponent(place.address)}&lat=${place.latitude}&lng=${place.longitude}&phone=${place.phoneNumber}`;
+                    };
+                    listElement.appendChild(item);
+                });
             });
 
-            var item = document.createElement('div');
-            item.className = 'hospital-item';
-            item.innerText = `${hospital.hospitalName} - ${hospital.distance.toFixed(0)}m`;
-            item.onclick = function() {
-                map.setCenter(position);
-            };
-            listElement.appendChild(item);
-        });
-        
+        function openKakaoDirections() {
+            window.open("https://map.kakao.com", "_blank");
+        }
     </script>
 </body>
 </html>

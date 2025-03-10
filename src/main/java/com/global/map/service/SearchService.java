@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -22,10 +23,14 @@ public class SearchService {
     public List<Map<String, Object>> searchItems(String keyword) {
         try {
             String[] keywords = keyword.split(" ");
-
+            AtomicBoolean isContainHanUiwon = new AtomicBoolean(false);
             List<Set<String>> resultIdSets = new ArrayList<>();
 
             for (String k : keywords) {
+                if (k.equals("한의원")) {
+                    isContainHanUiwon.set(true);
+                }
+
                 var searchResponse = elasticsearchClient.search(s -> {
                     var searchBuilder = s.index("item").size(100000);
 
@@ -55,17 +60,17 @@ public class SearchService {
             if (finalIds.isEmpty()) {
                 return List.of();
             }
-
-            var finalSearchResponse = elasticsearchClient.search(s -> s
-                    .index("item")
-                    .size(100000)
-                    .query(q -> q.bool(b -> b
-                        .must(m -> m.ids(v -> v.values(new ArrayList<>(finalIds))))
-                        .mustNot(mn -> mn.term(t -> t.field("CATEGORY_NAME").value("의원")))
-                        .mustNot(mn -> mn.term(t -> t.field("CATEGORY_NAME").value("치과의원")))
-                    )),
-                    Map.class
-            );
+            var finalSearchResponse = elasticsearchClient.search(s -> {
+                var searchBuilder = s.index("item").size(100000).query(q -> q.bool(b -> {
+                    b.must(m -> m.ids(v -> v.values(new ArrayList<>(finalIds))));
+                    if (isContainHanUiwon.get()) {
+                        b.mustNot(mn -> mn.term(t -> t.field("CATEGORY_NAME").value("의원")));
+                        b.mustNot(mn -> mn.term(t -> t.field("CATEGORY_NAME").value("치과의원")));
+                    }
+                    return b;
+                }));
+                return searchBuilder;
+            }, Map.class);
 
             return finalSearchResponse.hits().hits().stream()
                     .map(hit -> (Map<String, Object>) hit.source())

@@ -3,6 +3,7 @@ package com.global.map.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.global.map.dto.MedinstDTO;
+import com.global.map.dto.PharmacyDTO;
 import com.global.map.service.MapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -34,5 +35,11 @@ public class MapController {
 	public List<MedinstDTO> getNearbyHospitals() {
 		return mapService.getNearbyHospitals();
 	}
+    @GetMapping("nearbyPharmacies")
+    @ResponseBody
+    public List<PharmacyDTO> getNearbyPharmacies() {
+    	return mapService.getNearbyPharmacies();
+    	        	
+    }
 
 }

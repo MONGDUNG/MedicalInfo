@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>주변 병원 찾기</title>
+    <style>
+        #map { width: 75%; height: 800px; float: right; }
+        #sidebar {
+            width: 25%;
+            height: 750px;
+            float: left;
+            background: #f8f9fa;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        #searchContainer {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        #searchInput {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #searchButton {
+            padding: 8px;
+            font-size: 14px;
+            margin-left: 5px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+        #hospitalList {
+            flex-grow: 1;
+            overflow-y: scroll;
+        }
+        .hospital-item {
+            cursor: pointer;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .hospital-item:hover { background-color: #e9ecef; }
+        .highlight {
+            background-color: #ffeb3b;
+            font-weight: bold;
+        }
+        .directions-container {
+            width: 100%;
+            height: 50px;
+            background: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .directions-btn {
+            background: #d6d6d6;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .directions-btn:hover {
+            background: #bfbfbf;
+        }
+    </style>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
+</head>
+<body>
+    <div id="sidebar">
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="병원 이름 검색">
+            <button id="searchButton" onclick="fetchSearchResults()">검색</button>
+        </div>
+        <div id="hospitalList"></div>
+        <div class="directions-container">
+            <button class="directions-btn" onclick="openKakaoDirections()">길찾기</button>
+        </div>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        var map;
+        var selectedMarker = null;
+        var listElement = document.getElementById('hospitalList');
+
+        function initMap() {
+            map = new kakao.maps.Map(document.getElementById('map'), {
+                center: new kakao.maps.LatLng(37.5665, 126.9780),
+                level: 4
+            });
+
+            fetchHospitals();
+        }
+
+        function fetchNearbyHospitals() {
+            fetch("/map/nearbyHospitals")
+            .then(response => response.json())
+            .then(data => {
+                updateHospitalList(data);
+            });
+        }
+
+        function fetchSearchResults() {
+            let keyword = document.getElementById('searchInput').value.trim();
+            if (keyword === "") {
+                fetchHospitals();  // 검색어 없으면 전체 목록 다시 로드
+                return;
+            }
+
+            fetch(`/map/search/item?keyword=${encodeURIComponent(keyword)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Search results:', data);  // 콘솔에 검색 결과 출력
+                updateHospitalList(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+
+        function updateHospitalList(data) {
+            listElement.innerHTML = ""; // Clear existing list
+
+            if (data.length > 0) {
+                // Move the map to the location of the first search result
+                var firstPlace = data[0];
+                var position = new kakao.maps.LatLng(firstPlace.LAT, firstPlace.LNG);
+                map.setCenter(position);
+            }
+
+            data.forEach(place => {
+                var marker = createMarker(place);
+                var listItem = createSearchListItem(place);
+                listElement.appendChild(listItem);
+
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    selectMarker(marker, place);
+                });
+            });
+        }
+
+        function createMarker(place) {
+            var position = new kakao.maps.LatLng(place.LAT, place.LNG);
+
+            var normalImage = new kakao.maps.MarkerImage(
+                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+                new kakao.maps.Size(33, 36)
+            );
+
+            var clickImage = new kakao.maps.MarkerImage(
+                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                new kakao.maps.Size(33, 36)
+            );
+
+            var marker = new kakao.maps.Marker({
+                position: position,
+                map: map,
+                image: normalImage
+            });
+
+            kakao.maps.event.addListener(marker, 'click', function() {
+                selectMarker(marker, place);
+            });
+
+            return marker;
+        }
+
+        function createSearchListItem(place) {
+            var item = document.createElement('div');
+            item.className = 'hospital-item';
+            var distanceText = place.distance !== undefined ? `${place.distance.toFixed(0)}m` : "거리 정보 없음";
+            item.innerText = `${place.NAME || "장소"} - ${distanceText}`;
+
+            item.onclick = function() {
+                window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.NAME || "장소")}&address=${encodeURIComponent(place.ADDRESS)}&lat=${place.LAT}&lng=${place.LNG}&phone=${place.PHONE}`;
+            };
+            return item;
+        }
+        function createNearbyListItem(place) {
+				var item = document.createElement('div');
+				item.className = 'hospital-item';
+				var distanceText = place.distance !== undefined ? `${place.distance.toFixed(0)}m` : "거리 정보 없음";
+				item.innerText = `${place.hospitalName || "장소"} - ${distanceText}`;
+
+				item.onclick = function () {
+					window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.hospitalName || "장소")}&address=${encodeURIComponent(place.address)}&lat=${place.latitude}&lng=${place.longitude}&phone=${place.phoneNumber}`;
+				};
+				return item;
+			}
+
+        function selectMarker(marker, place) {
+            if (selectedMarker) selectedMarker.setImage(new kakao.maps.MarkerImage(
+                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+                new kakao.maps.Size(33, 36)
+            ));
+
+            marker.setImage(new kakao.maps.MarkerImage(
+                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                new kakao.maps.Size(33, 36)
+            ));
+
+            selectedMarker = marker;
+            map.setCenter(marker.getPosition());
+
+            highlightListItem(place);
+        }
+
+        function highlightListItem(place) {
+            document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+            let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
+                item.innerText.includes(place.hospitalName || "장소")
+            );
+            if (targetItem) {
+                targetItem.classList.add('highlight');
+                targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function openKakaoDirections() {
+            window.open("https://map.kakao.com", "_blank");
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+</html>

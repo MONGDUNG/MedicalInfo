@@ -1,4 +1,3 @@
-
 package com.global.map.service;
 
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class SearchService {
             }, Map.class);
 
             return finalSearchResponse.hits().hits().stream()
-                    .map(hit -> (Map<String, Object>) hit.source())
+                    .map(hit ->hit.source())
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("검색 실패", e);

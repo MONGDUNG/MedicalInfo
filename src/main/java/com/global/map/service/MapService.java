@@ -30,8 +30,7 @@ public class MapService {
     private final MedinstRepository medinstRepository;
     private final PharmacyRepository pharmacyRepository;
     private final EmergencyRepository emergencyRepository;
-    private final ConvenienceStoreRepository storeRepository;
-
+    
     private final double centerLat = 37.5665;  // 서울시청 (회원 주소로 변경 가능)
     private final double centerLng = 126.9780;
     

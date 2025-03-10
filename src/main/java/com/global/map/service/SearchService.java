@@ -31,7 +31,7 @@ public class SearchService {
                 }
 
                 var searchResponse = elasticsearchClient.search(s -> {
-                    var searchBuilder = s.index("item").size(100000);
+                    var searchBuilder = s.index("item").size(10000);
 
                     searchBuilder = searchBuilder.query(q -> q.multiMatch(m -> m
                         .query(k)
@@ -60,7 +60,7 @@ public class SearchService {
                 return List.of();
             }
             var finalSearchResponse = elasticsearchClient.search(s -> {
-                var searchBuilder = s.index("item").size(100000).query(q -> q.bool(b -> {
+                var searchBuilder = s.index("item").size(10000).query(q -> q.bool(b -> {
                     b.must(m -> m.ids(v -> v.values(new ArrayList<>(finalIds))));
                     if (isContainHanUiwon.get()) {
                         b.mustNot(mn -> mn.term(t -> t.field("CATEGORY_NAME").value("의원")));

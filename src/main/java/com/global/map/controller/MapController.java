@@ -21,7 +21,7 @@ public class MapController {
     private final MapService mapService;
     private final ObjectMapper objectMapper;
 
-    @GetMapping("kakaoMap")
+    @GetMapping("nearbyHospitals")
     public String kakaoMap(Model model) throws JsonProcessingException {
         List<MedinstDTO> hospitals = mapService.getNearbyHospitals();
         String hospitalsJson = objectMapper.writeValueAsString(hospitals);  // JSON 직렬화
@@ -29,10 +29,4 @@ public class MapController {
         return "map/kakaoMapTest";  // Thymeleaf 뷰 반환
     }     
         
-    @GetMapping("/api/nearby")
-    @ResponseBody
-    public List<Object> getNearbyAll(){
-    	
-    	 return mapService.getNearbyPlaces();
-    }
 }

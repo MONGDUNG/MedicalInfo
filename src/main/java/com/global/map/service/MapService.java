@@ -35,6 +35,7 @@ public class MapService {
     private final double centerLat = 37.5665;  // 서울시청 (회원 주소로 변경 가능)
     private final double centerLng = 126.9780;
     
+    
     public List<MedinstDTO> getNearbyHospitals() {
         List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(centerLat, centerLng);
 
@@ -48,46 +49,33 @@ public class MapService {
                 .toList();
     }
 
-    public List<Object> getNearbyPlaces() {
-        List<Object> result = new ArrayList<>();
+	public List<PharmacyDTO> getNearbyPharmacies() {
+		List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(centerLat, centerLng);
 
-        List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(centerLat, centerLng);
-        result.addAll(hospitals.stream()
-                .map(entity -> medinstToDTO(entity, calculateDistance(centerLat, centerLng, 
-                        Double.parseDouble(entity.getLatitude()), 
-                        Double.parseDouble(entity.getLongitude()))))
-                .limit(1000)
-                .toList());
+		return pharmacies.stream()
+				.map(entity -> pharmacyToDTO(entity, calculateDistance(centerLat, centerLng,
+						Double.parseDouble(entity.getLatitude()), 
+						Double.parseDouble(entity.getLongitude())
+					)))
+				.limit(1000).toList();
+	}
+	public List<EmergencyDTO> getNearbyEmergencies() {
+		List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(centerLat, centerLng);
 
-        List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(centerLat, centerLng);
-        result.addAll(pharmacies.stream()
-                .map(entity -> pharmacyToDTO(entity, calculateDistance(centerLat, centerLng, 
-                        Double.parseDouble(entity.getLatitude()), 
-                        Double.parseDouble(entity.getLongitude()))))
-                .limit(1000)
-                .toList());
+		return emergencies.stream()
+				.map(entity -> emergencyToDTO(entity, calculateDistance(centerLat, centerLng,
+						Double.parseDouble(entity.getLatitude()), Double.parseDouble(entity.getLongitude()))))
+				.limit(1000).toList();
+	}
 
-        List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(centerLat, centerLng);
-        result.addAll(emergencies.stream()
-                .map(entity -> emergencyToDTO(entity, calculateDistance(centerLat, centerLng, 
-                        Double.parseDouble(entity.getLatitude()), 
-                        Double.parseDouble(entity.getLongitude()))))
-                .limit(1000)
-                .toList());
+	public List<ConvenienceStoreDTO> getNearbyConvenienceStores() {
+		List<ConvenienceStoreEntity> stores = storeRepository.findNearbyConvenienceStores(centerLat, centerLng);
 
-        List<ConvenienceStoreEntity> stores = storeRepository.findNearbyConvenienceStores(centerLat, centerLng);
-        result.addAll(stores.stream()
-                .map(entity -> storeToDTO(entity, calculateDistance(centerLat, centerLng, 
-                        Double.parseDouble(entity.getLatitude()), 
-                        Double.parseDouble(entity.getLongitude()))))
-                .limit(1000)
-                .toList());
-
-        return result;
-    }
-    
-    
-    
+		return stores.stream()
+				.map(entity -> storeToDTO(entity, calculateDistance(centerLat, centerLng,
+						Double.parseDouble(entity.getLatitude()), Double.parseDouble(entity.getLongitude()))))
+				.limit(1000).toList();
+	}
     
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double R = 6371 * 1000; // 지구 반지름 (m)

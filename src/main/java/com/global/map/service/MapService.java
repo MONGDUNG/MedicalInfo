@@ -68,14 +68,6 @@ public class MapService {
 				.limit(1000).toList();
 	}
 
-	public List<ConvenienceStoreDTO> getNearbyConvenienceStores() {
-		List<ConvenienceStoreEntity> stores = storeRepository.findNearbyConvenienceStores(centerLat, centerLng);
-
-		return stores.stream()
-				.map(entity -> storeToDTO(entity, calculateDistance(centerLat, centerLng,
-						Double.parseDouble(entity.getLatitude()), Double.parseDouble(entity.getLongitude()))))
-				.limit(1000).toList();
-	}
     
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double R = 6371 * 1000; // 지구 반지름 (m)

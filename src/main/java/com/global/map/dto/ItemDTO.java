@@ -1,5 +1,7 @@
 package com.global.map.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +19,5 @@ public class ItemDTO {
 	    private Double lat;
 	    private Double lng;
 	    private String categoryName;
-	    private String deptName;
+	    private List<String> deptName;
 }

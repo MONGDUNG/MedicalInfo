@@ -3,7 +3,9 @@ package com.global.map.repository;
 import java.util.List;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+
 import org.springframework.stereotype.Repository;
+
 
 import com.global.map.etc.MedicalFacility;
 
@@ -12,4 +14,7 @@ public interface MedicalFacilityRepository extends ElasticsearchRepository<Medic
     List<MedicalFacility> findByName(String name);
     List<MedicalFacility> findByDeptName(String dept);
     List<MedicalFacility> findByAddressContaining(String address);
+    
+    List<MedicalFacility> findByNameAndLatAndLng(String name, Double lat, Double lng);
+    
 }

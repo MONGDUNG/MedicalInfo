@@ -44,7 +44,9 @@ public class MapService {
     private final double centerLng = 126.9780;
     
     
+
     public List<ItemDTO> getNearbyHospitals() {
+
         List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(centerLat, centerLng);
 
         return hospitals.stream()

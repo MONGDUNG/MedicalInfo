@@ -56,6 +56,23 @@
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
 </head>
 <body>
+    <div id="categoryContainer">
+        <button class="category-btn" onclick="filterCategory('상급종합병원')">🏥 상급종합병원</button>
+        <button class="category-btn" onclick="filterCategory('종합병원')">🏥 종합병원</button>
+        <button class="category-btn" onclick="filterCategory('병원')">🏥 병원</button>
+        <button class="category-btn" onclick="filterCategory('요양병원')">🏥 요양병원</button>
+        <button class="category-btn" onclick="filterCategory('정신병원')">🏥 정신병원</button>
+        <button class="category-btn" onclick="filterCategory('의원')">🏥 의원</button>
+        <button class="category-btn" onclick="filterCategory('치과병원')">🦷 치과병원</button>
+        <button class="category-btn" onclick="filterCategory('치과의원')">🦷 치과의원</button>
+        <button class="category-btn" onclick="filterCategory('한방병원')">🌿 한방병원</button>
+        <button class="category-btn" onclick="filterCategory('한의원')">🌿 한의원</button>
+        <button class="category-btn" onclick="filterCategory('보건소')">🏥 보건소</button>
+        <button class="category-btn" onclick="filterCategory('보건진료소')">🏥 보건진료소</button>
+        <button class="category-btn" onclick="filterCategory('보건지소')">🏥 보건지소</button>
+        <button class="category-btn" onclick="filterCategory('조산원')">🍼 조산원</button>
+        <button class="category-btn" onclick="filterCategory('응급실')">🚑 응급실</button>
+    </div>
     <div id="hospitalList"></div>
     <div id="map"></div>
 
@@ -72,6 +89,9 @@
 
         var listElement = document.getElementById('hospitalList');
         var selectedMarker = null; // 현재 클릭된 마커 저장
+        var center = map.getCenter();
+        var lat = center.getLat(); // 위도
+        var lng = center.getLng(); // 경도
 
         fetch("/map/nearbyHospitals")
         .then(response => response.json())

@@ -1,5 +1,6 @@
 package com.global.map.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HospitalController {
 	
-	 @GetMapping("hospitaldetail")
+	@GetMapping("hospitaldetail")
 	    public String hospitalDetail(@RequestParam("name") String name, 
 	                                 @RequestParam("address") String address, 
 	                                 @RequestParam("lat") String latitude, 

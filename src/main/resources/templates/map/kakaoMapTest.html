@@ -113,11 +113,25 @@
     </div>
     <div id="map">
     	<div id="category-btns">
-		  <button data-category="FD6">병원</button>
-		  <button data-category="CE7">응급실</button>
-		  <button data-category="CS2">약국</button>
+	        <button data-category="상급종합병원">🏥 상급종합병원</button>
+	        <button data-category="종합병원">🏥 종합병원</button>
+	        <button data-category="병원">🏥 병원</button>
+	        <button data-category="요양병원">🏥 요양병원</button>
+	        <button data-category="정신병원">🏥 정신병원</button>
+	        <button data-category="의원">🏥 의원</button>
+	        <button data-category="치과병원">🦷 치과병원</button>
+	        <button data-category="치과의원">🦷 치과의원</button>
+	        <button data-category="한방병원">🌿 한방병원</button>
+	        <button data-category="한의원">🌿 한의원</button>
+	        <button data-category="보건소">🏥 보건소</button>
+	        <button data-category="보건진료소">🏥 보건진료소</button>
+	        <button data-category="보건지소">🏥 보건지소</button>
+	        <button data-category="조산원">🍼 조산원</button>
+	        <button data-category="응급실">🚑 응급실</button>
+	        <button date-category="약국">💊 약국</button>
 		</div>
 	</div>
+
 
     <script>
 
@@ -132,11 +146,11 @@
             level: 4
         });
     }
-
     function fetchNearbyHospitals() {
         fetch("/map/nearbyHospitals")
         .then(response => response.json())
         .then(data => {
+            console.log(data); // 데이터 확인용 로그 추가
             listElement.innerHTML = ""; // 기존 목록 초기화
             clearMarkers(); // 기존 마커 제거
             data.sort((a, b) => a.distance - b.distance);
@@ -151,6 +165,9 @@
 
                 markers.push(marker); // 마커 배열에 추가
             });
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
         });
     }
     function fetchSearchResults() {

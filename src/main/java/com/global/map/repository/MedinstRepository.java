@@ -23,4 +23,9 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
             )) <= 1000
             """, nativeQuery = true)
     List<MedinstEntity> findNearbyHospitals(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng);
+    
+    @Query("SELECT m FROM MedinstEntity m WHERE m.categoryCode = : code") // 특정 종별코드만 조회하는 쿼리임.
+    List<MedinstEntity> findByCategoryCode(@Param("code") int code);
 }
+
+

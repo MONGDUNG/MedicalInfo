@@ -16,7 +16,7 @@ public class ConvenienceStoreDTO {
 	private String phoneNumber;     	// 전화번호
 	private String address;         	// 주소
     private Integer postalCode;     	// 우편번호
-    private String storeName;		 	// 개설일자
+    private String storeName;		 	// 상호명
     private double latitude;       	 	// 위도 (double로 변환 추천)
     private double longitude;       	// 경도 (double로 변환 추천)
     private double distance;        	// 현재 위치(서울시청 등)와의 거리 (추가 필드)

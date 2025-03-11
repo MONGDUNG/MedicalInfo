@@ -14,7 +14,7 @@ import com.global.map.service.SearchService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/search")
+@RequestMapping("/map/search")
 @RequiredArgsConstructor
 public class SearchController {
 

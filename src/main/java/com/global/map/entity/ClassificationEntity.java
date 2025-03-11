@@ -1,6 +1,5 @@
 package com.global.map.entity;
 
-import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "\"CLASSIFICATION\"")
+@Table(name = "CLASSIFICATION")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -82,17 +83,16 @@
             background: #bfbfbf;
         }
         #category-btns {
-		  position: absolute;
-		  top: 17px;
-		  left: 10px;
-		  z-index: 10;
-		}
-		
-		#category-btns button {
-		  padding: 8px;
-		  margin: 2px;
-		  cursor: pointer;
-		}
+            position: absolute;
+            top: 17px;
+            left: 10px;
+            z-index: 10;
+        }
+        #category-btns button {
+            padding: 8px;
+            margin: 2px;
+            cursor: pointer;
+        }
     </style>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
 </head>
@@ -112,15 +112,14 @@
         </div>
     </div>
     <div id="map">
-    	<div id="category-btns">
-		  <button data-category="FD6">병원</button>
-		  <button data-category="CE7">응급실</button>
-		  <button data-category="CS2">약국</button>
-		</div>
-	</div>
+        <div id="category-btns">
+            <button data-category="FD6">병원</button>
+            <button data-category="CE7">응급실</button>
+            <button data-category="CS2">약국</button>
+        </div>
+    </div>
 
     <script>
-
     var map;
     var selectedMarker = null;
     var listElement = document.getElementById('hospitalList');
@@ -137,6 +136,7 @@
         fetch("/map/nearbyHospitals")
         .then(response => response.json())
         .then(data => {
+            console.log(data); // 데이터 확인용 로그 추가
             listElement.innerHTML = ""; // 기존 목록 초기화
             clearMarkers(); // 기존 마커 제거
             data.sort((a, b) => a.distance - b.distance);
@@ -151,8 +151,12 @@
 
                 markers.push(marker); // 마커 배열에 추가
             });
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
         });
     }
+
     function fetchSearchResults() {
         let keyword = document.getElementById('searchInput').value.trim();
         if (keyword === "") {
@@ -193,7 +197,7 @@
     }
 
     function createMarker(place) {
-        var position = new kakao.maps.LatLng(place.LAT, place.LNG);
+        var position = new kakao.maps.LatLng(place.lat, place.lng);
 
         var normalImage = new kakao.maps.MarkerImage(
             "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
@@ -217,7 +221,7 @@
         });
 
         var infowindow = new kakao.maps.InfoWindow({
-            content: `<div style="padding:5px;">${place.NAME || "장소"}</div>`
+            content: `<div style="padding:5px;">${place.name || "장소"}</div>`
         });
 
         kakao.maps.event.addListener(marker, 'mouseover', function() {
@@ -236,10 +240,10 @@
     function createListItem(place) {
         var item = document.createElement('div');
         item.className = 'hospital-item';
-        item.innerText = `${place.NAME || "장소"}`;
+        item.innerText = `${place.name || "장소"}`;
 
         item.onclick = function() {
-        	window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.NAME || "장소")}&address=${encodeURIComponent(place.ADDRESS)}&lat=${place.LAT}&lng=${place.LNG}&phone=${place.PHONE}`;
+            window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.name || "장소")}&address=${encodeURIComponent(place.address)}&lat=${place.lat}&lng=${place.lng}&phone=${place.phone}`;
         };
         return item;
     }
@@ -264,7 +268,7 @@
     function highlightListItem(place) {
         document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
         let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
-            item.innerText.includes(place.NAME || "장소")
+            item.innerText.includes(place.name || "장소")
         );
         if (targetItem) {
             targetItem.classList.add('highlight');
@@ -275,12 +279,13 @@
     function openKakaoDirections() {
         window.open("https://map.kakao.com", "_blank");
     }
+
     function updateHospitalList(data) {
         listElement.innerHTML = ""; // 기존 목록 초기화
 
         if (data.length > 0) {
             var firstPlace = data[0];
-            var position = new kakao.maps.LatLng(firstPlace.LAT, firstPlace.LNG);
+            var position = new kakao.maps.LatLng(firstPlace.lat, firstPlace.lng);
             map.setCenter(position);
         }
 
@@ -298,7 +303,6 @@
     }
 
     window.onload = initMap;
-
     </script>
 </body>
 </html>

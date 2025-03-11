@@ -2,6 +2,7 @@ package com.global.map.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.global.map.dto.ItemDTO;
 import com.global.map.dto.MedinstDTO;
 import com.global.map.dto.PharmacyDTO;
 import com.global.map.service.MapService;
@@ -24,20 +25,21 @@ public class MapController {
 
     @GetMapping("main")
     public String mapMain(Model model) throws JsonProcessingException {
-        List<MedinstDTO> hospitals = mapService.getNearbyHospitals();
+        List<ItemDTO> hospitals = mapService.getNearbyHospitals();
         String hospitalsJson = objectMapper.writeValueAsString(hospitals);  // JSON 직렬화
         model.addAttribute("hospitals", hospitalsJson);
+        System.out.println(hospitals.size());
         return "map/kakaoMapTest";  // Thymeleaf 뷰 반환
     }     
     
     @GetMapping("nearbyHospitals")
     @ResponseBody
-	public List<MedinstDTO> getNearbyHospitals() {
+	public List<ItemDTO> getNearbyHospitals() {
 		return mapService.getNearbyHospitals();
 	}
     @GetMapping("nearbyPharmacies")
     @ResponseBody
-    public List<PharmacyDTO> getNearbyPharmacies() {
+    public List<ItemDTO> getNearbyPharmacies() {
     	return mapService.getNearbyPharmacies();
     	        	
     }

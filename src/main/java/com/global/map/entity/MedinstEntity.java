@@ -61,4 +61,5 @@ public class MedinstEntity {
     @Column(name = "LONGITUDE", length = 20, nullable = false)
     private String longitude;
 	
+
 }

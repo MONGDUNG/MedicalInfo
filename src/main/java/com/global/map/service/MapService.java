@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.global.map.dto.ConvenienceStoreDTO;
 import com.global.map.dto.EmergencyDTO;
+import com.global.map.dto.ItemDTO;
 import com.global.map.dto.MedinstDTO;
 import com.global.map.dto.PharmacyDTO;
 import com.global.map.entity.ConvenienceStoreEntity;
@@ -126,4 +127,52 @@ public class MapService {
                 .distance(distance)
                 .build();
     }
+    
+	private ItemDTO itemToDTO(MedinstEntity entity) {
+		String categoryName = null;
+		switch (entity.getCategoryCode()) {
+			case "1" : categoryName = "상급종합";
+			break;
+			case "11" : categoryName = "종합병원";
+			break;
+			case "21" : categoryName = "병원";
+			break;
+			case "28" : categoryName = "요양병원";
+			break;
+			case "29" : categoryName = "정신병원";
+			break;
+			case "31" : categoryName = "의원";
+			break;
+			case "41" : categoryName = "치과병원";
+			break;
+			case "51" : categoryName = "치과의원";
+			break;
+			case "61" : categoryName = "조산원";
+			break;
+			case "71" : categoryName = "보건소";
+			break;
+			case "72" : categoryName = "보건지소";
+			break;
+			case "73" : categoryName = "보건진료소";
+			break;
+			case "75" : categoryName = "보건의료원";
+			break;
+			case "92" : categoryName = "한방병원";
+			break;
+			case "93" : categoryName = "한의원";
+			break;
+			default : categoryName = "기타";
+			break;
+		}
+        return ItemDTO.builder()
+                .name(entity.getHospitalName())
+                .address(entity.getAddress())
+                .phone(entity.getPhoneNumber())
+                .lat(Double.parseDouble(entity.getLatitude()))
+                .lng(Double.parseDouble(entity.getLongitude()))
+                .categoryName(categoryName)
+                .build();
+	}
+	
+	
 }

@@ -2,6 +2,8 @@ package com.global.map.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +15,24 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ItemDTO {
 
-	    private String name;
-	    private String address;
-	    private String phone;
-	    private Double lat;
-	    private Double lng;
-	    private String categoryName;
-	    private List<String> deptName;
+    @JsonProperty("NAME")
+    private String name;
+
+    @JsonProperty("ADDRESS")
+    private String address;
+
+    @JsonProperty("PHONE")
+    private String phone;
+
+    @JsonProperty("LAT")
+    private double lat;
+
+    @JsonProperty("LNG")
+    private double lng;
+
+    @JsonProperty("DEPT_NAME")
+    private List<String> deptName;
+
+    @JsonProperty("CATEGORY_NAME")
+    private String categoryName;
 }

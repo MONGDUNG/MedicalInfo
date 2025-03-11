@@ -1,6 +1,5 @@
 package com.global.map.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,6 @@ import com.global.map.entity.EmergencyEntity;
 import com.global.map.entity.MedinstEntity;
 import com.global.map.entity.PharmacyEntity;
 import com.global.map.etc.MedicalFacility;
-import com.global.map.repository.ConvenienceStoreRepository;
 import com.global.map.repository.EmergencyRepository;
 import com.global.map.repository.MedicalFacilityRepository;
 import com.global.map.repository.MedinstRepository;
@@ -139,6 +137,7 @@ public class MapService {
             .phone(entity.getPhoneNumber())
             .lat(Double.parseDouble(entity.getLatitude()))
             .lng(Double.parseDouble(entity.getLongitude()))
+            .categoryName("편의점")
             .build();
    }
 
@@ -149,6 +148,7 @@ public class MapService {
             .phone(entity.getPhoneNumber())
             .lat(Double.parseDouble(entity.getLatitude()))
             .lng(Double.parseDouble(entity.getLongitude()))
+            .categoryName("응급실")
             .build();
    }
 
@@ -159,6 +159,7 @@ public class MapService {
             .phone(entity.getPhoneNumber())
             .lat(Double.parseDouble(entity.getLatitude()))
             .lng(Double.parseDouble(entity.getLongitude()))
+            .categoryName("약국")
             .build();
    }
 

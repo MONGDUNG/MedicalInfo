@@ -23,32 +23,30 @@ import java.util.List;
 public class MapController {
 
     private final MapService mapService;
-    private final ObjectMapper objectMapper;
 
     @GetMapping("main")
 
     public String mapMain(Model model) throws JsonProcessingException {
-        List<ItemDTO> hospitals = mapService.getNearbyHospitals();
 
-        String hospitalsJson = objectMapper.writeValueAsString(hospitals);  // JSON 직렬화
-        model.addAttribute("hospitals", hospitalsJson);
-        System.out.println(hospitals.size());
         return "map/kakaoMapTest";  // Thymeleaf 뷰 반환
     }     
     
+
     @GetMapping("nearbyHospitals")
     @ResponseBody
-
-	public List<ItemDTO> getNearbyHospitals() {
-		return mapService.getNearbyHospitals();
-
-
-	}
+    public List<ItemDTO> getNearbyHospitals(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
+        return mapService.getNearbyHospitals(lat, lng);
+    }
     @GetMapping("nearbyPharmacies")
     @ResponseBody
-    public List<ItemDTO> getNearbyPharmacies() {
-    	return mapService.getNearbyPharmacies();
+    public List<ItemDTO> getNearbyPharmacies(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
+    	return mapService.getNearbyPharmacies(lat, lng);
     	        	
     }
+    @GetMapping("nearbyEmergencies")
+    @ResponseBody
+	public List<ItemDTO> getNearbyEmergencies(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
+		return mapService.getNearbyEmergencies(lat, lng);
+	}
 
 }

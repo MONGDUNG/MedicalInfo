@@ -43,26 +43,27 @@ public class MapService {
     
     
 
-    public List<ItemDTO> getNearbyHospitals() {
-
-        List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(centerLat, centerLng);
-
+    // MapService.java
+    public List<ItemDTO> getNearbyHospitals(double lat, double lng) {
+        List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(lat, lng);
         return hospitals.stream()
                 .map(entity -> itemToDTO(entity))
-                .limit(1000)  // 최대 갯수
+                .limit(100000)  // 최대 갯수
                 .toList();
     }
-
-   public List<ItemDTO> getNearbyPharmacies() {
-      List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(centerLat, centerLng);
+    
+    
+    
+   public List<ItemDTO> getNearbyPharmacies(double lat, double lng) {
+      List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(lat, lng);
 
       return pharmacies.stream()
               .map(entity -> itemToDTO(entity))
               .limit(1000)  // 최대 갯수
               .toList();
    }
-   public List<ItemDTO> getNearbyEmergencies() {
-      List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(centerLat, centerLng);
+   public List<ItemDTO> getNearbyEmergencies(double lat, double lng) {
+      List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(lat, lng);
 
       return emergencies.stream()
               .map(entity -> itemToDTO(entity))

@@ -17,9 +17,6 @@ public class MedicalFacilityService {
 
     private final MedicalFacilityRepository repository;
 
-
-
-
     public void printAllData() {
         Iterable<MedicalFacility> facilitiesIterable = repository.findAll();
         List<MedicalFacility> facilities = new ArrayList<>();
@@ -27,3 +24,6 @@ public class MedicalFacilityService {
         facilities.forEach(System.out::println);
     }
 }
+
+
+

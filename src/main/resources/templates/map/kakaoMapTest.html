@@ -139,37 +139,62 @@
     var selectedMarker = null;
     var listElement = document.getElementById('hospitalList');
     var markers = []; // 마커를 저장할 배열
-
     function initMap() {
         map = new kakao.maps.Map(document.getElementById('map'), {
             center: new kakao.maps.LatLng(37.5665, 126.9780),
             level: 4
         });
     }
-    function fetchNearbyHospitals() {
-        fetch("/map/nearbyHospitals")
-        .then(response => response.json())
-        .then(data => {
-            console.log(data); // 데이터 확인용 로그 추가
-            listElement.innerHTML = ""; // 기존 목록 초기화
-            clearMarkers(); // 기존 마커 제거
-            data.sort((a, b) => a.distance - b.distance);
-            data.forEach(place => {
-                var marker = createMarker(place);
-                var listItem = createListItem(place);
-                listElement.appendChild(listItem);
-
-                kakao.maps.event.addListener(marker, 'click', function() {
-                    selectMarker(marker, place);
-                });
-
-                markers.push(marker); // 마커 배열에 추가
-            });
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
+    document.querySelectorAll('#category-btns button').forEach(button => {
+        button.addEventListener('click', function() {
+            var category = this.getAttribute('data-category');
+            fetchNearbyHospitals(category);
         });
+    });
+
+    function fetchNearbyHospitals(category) {
+        var center = map.getCenter();
+        var lat = center.getLat(); // 위도
+        var lng = center.getLng(); // 경도
+        let endpoint;
+        if (category === "응급실") {
+            endpoint = `/map/nearbyEmergencies?lat=${lat}&lng=${lng}`;
+        } else if (category === "약국") {
+            endpoint = `/map/nearbyPharmacies?lat=${lat}&lng=${lng}`;
+        } else {
+            endpoint = `/map/nearbyHospitals?lat=${lat}&lng=${lng}`;
+        }
+        
+        fetch(endpoint)
+            .then(response => response.json())
+            .then(data => {
+              //  console.log(data); // 데이터 확인용 로그 추가
+                listElement.innerHTML = ""; // 기존 목록 초기화
+                clearMarkers(); // 기존 마커 제거
+
+                
+                // 선택된 카테고리에 따라 데이터 필터링
+                var filteredData = data.filter(place => place.CATEGORY_NAME === category);
+               // console.log(filteredData);
+                
+                filteredData.sort((a, b) => a.distance - b.distance);
+                filteredData.forEach(place => {
+                    var marker = createMarker(place);
+                    var listItem = createListItem(place);
+                    listElement.appendChild(listItem);
+
+                    kakao.maps.event.addListener(marker, 'click', function() {
+                        selectMarker(marker, place);
+                    });
+
+                    markers.push(marker); // 마커 배열에 추가
+                });
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
     }
+
     function fetchSearchResults() {
         let keyword = document.getElementById('searchInput').value.trim();
         if (keyword === "") {

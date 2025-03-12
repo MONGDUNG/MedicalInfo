@@ -17,8 +17,9 @@ public interface PharmacyRepository extends JpaRepository<PharmacyEntity, Long>{
 	                cos(radians(:centerLat)) * cos(radians(CAST(LATITUDE AS DOUBLE))) * 
 	                cos(radians(CAST(LONGITUDE AS DOUBLE)) - radians(:centerLng)) + 
 	                sin(radians(:centerLat)) * sin(radians(CAST(LATITUDE AS DOUBLE)))
-	            )) <= 1000
+	            )) <= :radius
 	            """, nativeQuery = true)
-	    List<PharmacyEntity> findNearbyPharmacies(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng);
+	    List<PharmacyEntity> findNearbyPharmacies(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng,
+	    		@Param("radius") double radius);
 	    
 }

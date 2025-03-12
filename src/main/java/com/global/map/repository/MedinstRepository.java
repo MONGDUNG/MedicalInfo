@@ -20,9 +20,10 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
                 cos(radians(:centerLat)) * cos(radians(CAST(LATITUDE AS DOUBLE))) * 
                 cos(radians(CAST(LONGITUDE AS DOUBLE)) - radians(:centerLng)) + 
                 sin(radians(:centerLat)) * sin(radians(CAST(LATITUDE AS DOUBLE)))
-            )) <= 1000
+            )) <= :radius
             """, nativeQuery = true)
-    List<MedinstEntity> findNearbyHospitals(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng);
+    List<MedinstEntity> findNearbyHospitals(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng,
+    		@Param("radius") double radius);
     
     @Query("SELECT m FROM MedinstEntity m WHERE m.categoryCode = : code") // 특정 종별코드만 조회하는 쿼리임.
     List<MedinstEntity> findByCategoryCode(@Param("code") int code);

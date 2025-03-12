@@ -17,8 +17,9 @@ public interface EmergencyRepository extends JpaRepository<EmergencyEntity, Long
 	                cos(radians(:centerLat)) * cos(radians(CAST(LATITUDE AS DOUBLE))) * 
 	                cos(radians(CAST(LONGITUDE AS DOUBLE)) - radians(:centerLng)) + 
 	                sin(radians(:centerLat)) * sin(radians(CAST(LATITUDE AS DOUBLE)))
-	            )) <= 1000
+	            )) <= :radius
 	            """, nativeQuery = true)
-	    List<EmergencyEntity> findNearbyEmergencys(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng);
+	    List<EmergencyEntity> findNearbyEmergencys(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng,
+	    		@Param("radius") double radius);
 	    
 }

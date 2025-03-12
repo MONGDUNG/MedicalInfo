@@ -25,7 +25,6 @@ public class MapController {
     private final MapService mapService;
 
     @GetMapping("main")
-
     public String mapMain(Model model) throws JsonProcessingException {
 
         return "map/kakaoMapTest";  // Thymeleaf 뷰 반환

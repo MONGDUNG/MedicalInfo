@@ -139,9 +139,9 @@ public class MapService {
 	            break;
 	    }
 	    return code;
-	}                    	
-            	
-    
+	}
+
+	
     // MapService.java
     public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level, String category) {
     	int radius = getRadius(level);

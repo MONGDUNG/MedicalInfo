@@ -43,32 +43,64 @@ public class MapService {
     
     
 
+	public int getRadius(int level) {
+    	int radius = 0;
+    	switch(level) {
+		case 0:
+			radius = 160;
+			break;
+		case 1:
+			radius = 320;
+			break;
+		case 2:
+			radius = 640;
+			break;
+		case 3:
+			radius = 1280;
+			break;
+		case 4:
+			radius = 2560;
+			break;
+		case 5:
+			radius = 5120;
+			break;
+		case 6:
+			radius = 10240;
+			break;
+		default:
+			radius = 20480;
+		}
+		return radius;
+	}
+    
     // MapService.java
-    public List<ItemDTO> getNearbyHospitals(double lat, double lng) {
-        List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(lat, lng);
-        return hospitals.stream()
+    public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level) {
+    	int radius = getRadius(level);
+    	List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(lat, lng, radius);
+    	return hospitals.stream()
                 .map(entity -> itemToDTO(entity))
                 .limit(100000)  // 최대 갯수
                 .toList();
     }
     
     
-    
-   public List<ItemDTO> getNearbyPharmacies(double lat, double lng) {
-      List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(lat, lng);
+    public List<ItemDTO> getNearbyPharmacies(double lat, double lng, int level) {
+    	int radius = getRadius(level);
+    	List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(lat, lng, radius);
 
-      return pharmacies.stream()
-              .map(entity -> itemToDTO(entity))
-              .limit(1000)  // 최대 갯수
-              .toList();
+    	return pharmacies.stream()
+    			.map(entity -> itemToDTO(entity))
+    			.limit(1000)  // 최대 갯수
+    			.toList();
    }
-   public List<ItemDTO> getNearbyEmergencies(double lat, double lng) {
-      List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(lat, lng);
-
-      return emergencies.stream()
-              .map(entity -> itemToDTO(entity))
-              .limit(1000)  // 최대 갯수
-              .toList();
+	public List<ItemDTO> getNearbyEmergencies(double lat, double lng, int level) {
+		int radius = getRadius(level);
+		List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(lat, lng, radius);
+	
+		return emergencies.stream()
+				.map(entity -> itemToDTO(entity))
+				.limit(1000)  // 최대 갯수
+				.toList();
    }
 
     

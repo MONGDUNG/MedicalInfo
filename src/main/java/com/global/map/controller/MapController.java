@@ -45,8 +45,9 @@ public class MapController {
     }
     @GetMapping("nearbyEmergencies")
     @ResponseBody
-	public List<ItemDTO> getNearbyEmergencies(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
-		return mapService.getNearbyEmergencies(lat, lng);
+	public List<ItemDTO> getNearbyEmergencies(@RequestParam("lat") double lat, @RequestParam("lng") double lng, @RequestParam("level") int level) {
+    	
+		return mapService.getNearbyEmergencies(lat, lng, level);
 	}
 
 }

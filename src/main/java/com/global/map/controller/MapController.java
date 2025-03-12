@@ -34,13 +34,13 @@ public class MapController {
 
     @GetMapping("nearbyHospitals")
     @ResponseBody
-    public List<ItemDTO> getNearbyHospitals(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
-        return mapService.getNearbyHospitals(lat, lng);
+    public List<ItemDTO> getNearbyHospitals(@RequestParam("lat") double lat, @RequestParam("lng") double lng, @RequestParam("level") int level, @RequestParam("category") String category) {
+        return mapService.getNearbyHospitals(lat, lng, level, category);
     }
     @GetMapping("nearbyPharmacies")
     @ResponseBody
-    public List<ItemDTO> getNearbyPharmacies(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
-    	return mapService.getNearbyPharmacies(lat, lng);
+    public List<ItemDTO> getNearbyPharmacies(@RequestParam("lat") double lat, @RequestParam("lng") double lng, @RequestParam("level") int level) {
+    	return mapService.getNearbyPharmacies(lat, lng, level);
     	        	
     }
     @GetMapping("nearbyEmergencies")

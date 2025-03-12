@@ -18,6 +18,8 @@ public interface PharmacyRepository extends JpaRepository<PharmacyEntity, Long>{
 	                cos(radians(CAST(LONGITUDE AS DOUBLE)) - radians(:centerLng)) + 
 	                sin(radians(:centerLat)) * sin(radians(CAST(LATITUDE AS DOUBLE)))
 	            )) <= :radius
+	            ORDER BY RAND()
+	 			FETCH FIRST 200 ROWS ONLY
 	            """, nativeQuery = true)
 	    List<PharmacyEntity> findNearbyPharmacies(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng,
 	    		@Param("radius") double radius);

@@ -163,7 +163,7 @@
         } else if (category === "약국") {
             endpoint = `/map/nearbyPharmacies?lat=${lat}&lng=${lng}&level=${level}`;
         } else {
-            endpoint = `/map/nearbyHospitals?lat=${lat}&lng=${lng}&level=${level}`;
+            endpoint = `/map/nearbyHospitals?lat=${lat}&lng=${lng}&level=${level}&category=${category}`;
         }
         
         fetch(endpoint)

@@ -46,53 +46,122 @@ public class MapService {
 	public int getRadius(int level) {
     	int radius = 0;
     	switch(level) {
-		case 0:
-			radius = 160;
-			break;
-		case 1:
-			radius = 320;
-			break;
-		case 2:
-			radius = 640;
-			break;
-		case 3:
-			radius = 1280;
-			break;
-		case 4:
-			radius = 2560;
-			break;
-		case 5:
-			radius = 5120;
-			break;
-		case 6:
-			radius = 10240;
-			break;
-		default:
-			radius = 20480;
+			case 0:
+				radius = 80;
+				break;
+			case 1:
+				radius = 160;
+				break;
+			case 2:
+				radius = 320;
+				break;
+			case 3:
+				radius = 640;
+				break;
+			case 4:
+				radius = 1280;
+				break;
+			case 5:
+				radius = 2560;
+				break;
+			case 6:
+				radius = 5120;
+				break;
+			case 7:
+				radius = 10240;
+				break;
+			case 8:
+				radius = 20480;
+				break;
+			case 9:
+				radius = 40960;
+				break;
+			case 10:
+				radius = 81920;
+				break;
+			default:
+				radius = 300000;
+			
 		}
 		return radius;
 	}
+	
+	public int getCategoryCode(String category) {
+	    int code = 0;
+	    switch(category) {
+	        case "상급종합":
+	            code = 1;
+	            break;
+	        case "종합병원":
+	            code = 11;
+	            break;
+	        case "병원":
+	            code = 21;
+	            break;
+	        case "요양병원":
+	            code = 28;
+	            break;
+	        case "정신병원":
+	            code = 29;
+	            break;
+	        case "의원":
+	            code = 31;
+	            break;
+	        case "치과병원":
+	            code = 41;
+	            break;
+	        case "치과의원":
+	            code = 51;
+	            break;
+	        case "조산원":
+	            code = 61;
+	            break;
+	        case "보건소":
+	            code = 71;
+	            break;
+	        case "보건지소":
+	            code = 72;
+	            break;
+	        case "보건진료소":
+	            code = 73;
+	            break;
+	        case "보건의료원":
+	            code = 75;
+	            break;
+	        case "한방병원":
+	            code = 92;
+	            break;
+	        case "한의원":
+	            code = 93;
+	            break;
+	        default:
+	            code = 0;
+	            break;
+	    }
+	    return code;
+	}                    	
+            	
     
     // MapService.java
-    public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level) {
+    public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level, String category) {
     	int radius = getRadius(level);
-    	List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(lat, lng, radius);
+    	int category_code = getCategoryCode(category);
+    	List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(lat, lng, radius, category_code);
     	return hospitals.stream()
                 .map(entity -> itemToDTO(entity))
                 .limit(100000)  // 최대 갯수
                 .toList();
     }
     
-    
     public List<ItemDTO> getNearbyPharmacies(double lat, double lng, int level) {
     	int radius = getRadius(level);
     	List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(lat, lng, radius);
-
     	return pharmacies.stream()
     			.map(entity -> itemToDTO(entity))
     			.limit(1000)  // 최대 갯수
     			.toList();
    }
+    
 	public List<ItemDTO> getNearbyEmergencies(double lat, double lng, int level) {
 		int radius = getRadius(level);
 		List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(lat, lng, radius);

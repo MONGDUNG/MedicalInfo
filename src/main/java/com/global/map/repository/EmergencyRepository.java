@@ -23,5 +23,7 @@ public interface EmergencyRepository extends JpaRepository<EmergencyEntity, Long
 	            """, nativeQuery = true)
 	    List<EmergencyEntity> findNearbyEmergencys(@Param("centerLat") double centerLat, @Param("centerLng") double centerLng,
 	    		@Param("radius") double radius);
+	 @Query("SELECT e FROM EmergencyEntity e WHERE REPLACE(e.hospitalName, ' ', '') = REPLACE(:hospitalName, ' ', '')")
+	 EmergencyEntity findByHospitalName(@Param("hospitalName") String hospitalName);
 	    
 }

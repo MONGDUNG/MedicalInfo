@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
@@ -17,6 +17,7 @@ public interface MedicalFacilityRepository extends ElasticsearchRepository<Medic
     List<MedicalFacility> findByAddressContaining(String address);
     List<MedicalFacility> findByNameAndLatAndLng(String name, Double lat, Double lng);
     
+
     @Query("{\"bool\": { " +
             "\"must\": [" +
             "  {\"geo_distance\": {\"distance\": \"?2km\", \"location\": {\"lat\": ?0, \"lon\": ?1}}}," +
@@ -28,4 +29,8 @@ public interface MedicalFacilityRepository extends ElasticsearchRepository<Medic
     
 
     
+
+
+    
+
 

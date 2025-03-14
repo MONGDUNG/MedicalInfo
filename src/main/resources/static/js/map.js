@@ -317,4 +317,19 @@
 			        }
 			    });
 			}
+			
+			    document.addEventListener("DOMContentLoaded", function () {
+			        const buttons = document.querySelectorAll("#category-btns button");
+
+			        buttons.forEach(button => {
+			            button.addEventListener("click", function () {
+			                // 모든 버튼에서 선택된 스타일 제거
+			                buttons.forEach(btn => btn.style.backgroundColor = "");
+			                
+			                // 선택한 버튼에 스타일 적용
+			                this.style.backgroundColor = "#ffcc00"; // 노란색 강조
+			            });
+			        });
+			    });
+			
     window.onload = initMap;

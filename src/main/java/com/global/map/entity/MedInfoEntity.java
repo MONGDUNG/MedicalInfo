@@ -22,7 +22,7 @@ public class MedInfoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 자동 증가 ID
 
-    @Column(name = "HOSPITAL_CODE", length = 50, nullable = false)
+    @Column(name = "HOSPITAL_CODE", length = 200, nullable = false)
     private String hospitalCode;
 
     @Column(name = "HOSPITAL_NAME", length = 200, nullable = false)

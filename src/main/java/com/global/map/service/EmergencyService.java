@@ -15,7 +15,6 @@ public class EmergencyService {
     private final EmergencyRepository emergencyRepository;
 
     public Map<String, String> getEmergencyHours(String hospitalName) {
-        System.out.println("🔍 병원명 검색 요청: " + hospitalName);
 
         EmergencyEntity facility = emergencyRepository.findByHospitalName(hospitalName);
 

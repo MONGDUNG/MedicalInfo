@@ -19,11 +19,9 @@ public class EmergencyService {
         EmergencyEntity facility = emergencyRepository.findByHospitalName(hospitalName);
 
         if (facility == null) {
-            System.out.println("❌ DB에 해당 병원 없음: " + hospitalName);
             return new HashMap<>(); // 병원 정보가 없으면 빈 데이터 반환
         }
 
-        System.out.println("✅ 병원 데이터 조회됨: " + facility.getHospitalName());
 
         Map<String, String> hours = new HashMap<>();
         hours.put("mon", facility.getMon() != null ? facility.getMon() : "정보 없음");

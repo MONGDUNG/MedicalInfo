@@ -49,7 +49,8 @@ public class MapController {
     @GetMapping("medicalFacilityByDept")
     @ResponseBody
 	public List<ItemDTO> getMedicalFacilityByDept(@RequestParam("lat") double lat, @RequestParam("lng") double lng, @RequestParam("level") int level,@RequestParam("category") String category, @RequestParam("dept") String dept) {
-		return mapService.getNearbyMedicalFacilitiesByDept(lat, lng, level, category, dept);
+		System.out.println("lat: " + lat + " lng: " + lng + " level: " + level + " category: " + category + " dept: " + dept);
+    	return mapService.getNearbyMedicalFacilitiesByDept(lat, lng, level, category, dept);
 	}
 
 }

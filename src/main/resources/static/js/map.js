@@ -37,6 +37,53 @@
             fetchNearbyHospitals(category);
         });
     });
+	document.querySelectorAll('#hidden-btns button, #category-btns > button[data-category]').forEach(button => {
+	    button.addEventListener('click', function() {
+	        // 모든 버튼에서 active 클래스 제거
+	        document.querySelectorAll('#hidden-btns button, #category-btns > button[data-category]').forEach(btn => {
+	            btn.classList.remove('active');
+	        });
+
+	        // 클릭된 버튼에 active 클래스 추가
+	        this.classList.add('active');
+
+	        var category = this.getAttribute('data-category');
+	        var group = getGroupByCategory(category);
+	        updateDeptList(group);
+	    });
+	});
+
+	function fetchNearbyHospitalsByDept(category, dept) {
+	    var center = map.getCenter();
+	    var lat = center.getLat(); // 위도
+	    var lng = center.getLng(); // 경도
+	    var level = map.getLevel(); // 지도레벨
+	    let endpoint = `/map/medicalFacilityByDept?lat=${lat}&lng=${lng}&level=${level}&category=${category}&dept=${dept}`;
+
+	    fetch(endpoint)
+	        .then(response => response.json())
+	        .then(data => {
+	            console.log(data); // 데이터 확인용 로그 추가
+	            listElement.innerHTML = ""; // 기존 목록 초기화
+	            clearMarkers(); // 기존 마커 제거
+
+	            data.sort((a, b) => a.distance - b.distance);
+	            data.forEach(place => {
+	                var marker = createMarker(place);
+	                var listItem = createListItem(place);
+	                listElement.appendChild(listItem);
+
+	                kakao.maps.event.addListener(marker, 'click', function() {
+	                    selectMarker(marker, place);
+	                });
+
+	                markers.push(marker); // 마커 배열에 추가
+	            });
+	        })
+	        .catch(error => {
+	            console.error('There was a problem with the fetch operation:', error);
+	        });
+	}
 	
     function fetchNearbyHospitals(category) {
         var center = map.getCenter();
@@ -225,4 +272,49 @@
             markers.push(marker); // 마커 배열에 추가
         });
     }
+	const deptList = {
+	            "A": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과"],
+	            "B": ["치과", "구강악안면외과", "치과보철과", "치과교정과", "소아치과", "치주과", "치과보존과", "구강내과", "영상치의학과", "구강병리과", "예방치과", "통합치의학과"],
+	            "C": ["한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
+	            "D": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과", "한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
+	            "E": []
+	        };
+
+	document.querySelectorAll('#hidden-btns button, #category-btns > button[data-category]').forEach(button => {
+		button.addEventListener('click', function() {
+		var category = this.getAttribute('data-category');
+		var group = getGroupByCategory(category);
+		updateDeptList(group);
+		});
+	        });
+
+	        function getGroupByCategory(category) {
+	            if (["상급종합", "종합병원", "병원", "정신병원", "의원"].includes(category)) return "A";
+	            if (["치과병원", "치과의원"].includes(category)) return "B";
+	            if (["한방병원", "한의원"].includes(category)) return "C";
+	            if (["요양병원"].includes(category)) return "D";
+	            return "E";
+	        }
+
+			function updateDeptList(group) {
+			    var deptSelect = document.createElement('select');
+			    deptSelect.id = 'deptSelect';
+			    deptSelect.innerHTML = deptList[group].map(dept => `<option value="${dept}">${dept}</option>`).join('');
+			    document.getElementById('deptList').innerHTML = '';
+			    document.getElementById('deptList').appendChild(deptSelect);
+
+			    // 진료과목 선택 시 이벤트 리스너 추가
+			    deptSelect.addEventListener('change', function() {
+			        var selectedDept = deptSelect.value;
+			        var category = document.querySelector('#category-btns button.active')?.getAttribute('data-category') ||
+			                       document.querySelector('#hidden-btns button.active')?.getAttribute('data-category');
+
+			        console.log("Selected Category:", category); // 로그 추가
+			        console.log("Selected Department:", selectedDept); // 로그 추가
+
+			        if (category && selectedDept) {
+			            fetchNearbyHospitalsByDept(category, selectedDept);
+			        }
+			    });
+			}
     window.onload = initMap;

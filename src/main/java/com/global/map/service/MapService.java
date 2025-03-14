@@ -140,13 +140,14 @@ public class MapService {
 	    }
 	    return code;
 	}
-
+	// 진료과로 가져오기
 	public List<ItemDTO> getNearbyMedicalFacilitiesByDept(double lat, double lng, int level, String category, String deptName) {
-		int radius = getRadius(level);
-		List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitals(lat, lng, radius,
-				category, deptName);
+	    int radius = getRadius(level);
+	    List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitals(lat, lng, radius, category, deptName);
 
-		return medicalFacilities.stream().map(this::itemToDTO).limit(100000).toList();
+	    Collections.shuffle(medicalFacilities); // 리스트를 무작위로 섞음
+
+	    return medicalFacilities.stream().map(this::itemToDTO).limit(200).toList();
 	}
     // MapService.java
     public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level, String category) {

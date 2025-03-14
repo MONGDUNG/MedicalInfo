@@ -152,6 +152,16 @@ public class MapService {
                 .limit(100000)  // 최대 갯수
                 .toList();
     }
+
+    public List<ItemDTO> getNearbyHospitalsByDept(double lat, double lng, int level, String category, String dept) {
+        int radius = getRadius(level);
+        List<MedicalFacility> hospitals = medicalFacilityRepository.findNearByHospitals(lat, lng, radius, category, dept);
+
+        return hospitals.stream()
+                .map(this::itemToDTO)
+                .limit(100000)
+                .toList();
+    }
     
     public List<ItemDTO> getNearbyPharmacies(double lat, double lng, int level) {
     	int radius = getRadius(level);
@@ -230,6 +240,16 @@ public class MapService {
                 .longitude(Double.parseDouble(entity.getLongitude()))
                 .distance(distance)
                 .build();
+    }
+    private ItemDTO itemToDTO(MedicalFacility entity) {
+        return ItemDTO.builder()
+            .name(entity.getName())
+            .address(entity.getAddress())
+            .phone(entity.getPhone())
+            .lat(entity.getLat())
+            .lng(entity.getLng())
+            .categoryName(entity.getCategoryName())
+            .build();
     }
 
    private ItemDTO itemToDTO(ConvenienceStoreEntity entity) {

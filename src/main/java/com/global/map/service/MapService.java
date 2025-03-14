@@ -141,7 +141,13 @@ public class MapService {
 	    return code;
 	}
 
-	
+	public List<ItemDTO> getNearbyMedicalFacilitiesByDept(double lat, double lng, int level, String category, String deptName) {
+		int radius = getRadius(level);
+		List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitals(lat, lng, radius,
+				category, deptName);
+
+		return medicalFacilities.stream().map(this::itemToDTO).limit(100000).toList();
+	}
     // MapService.java
     public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level, String category) {
     	int radius = getRadius(level);

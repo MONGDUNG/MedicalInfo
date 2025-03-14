@@ -20,7 +20,7 @@ public interface MedicalFacilityRepository extends ElasticsearchRepository<Medic
 
     @Query("{\"bool\": { " +
             "\"must\": [" +
-            "  {\"geo_distance\": {\"distance\": \"?2km\", \"location\": {\"lat\": ?0, \"lon\": ?1}}}," +
+            "  {\"geo_distance\": {\"distance\": \"?2\", \"geoLocation\": {\"lat\": ?0, \"lon\": ?1}}}," +
             "  {\"match\": {\"CATEGORY_NAME\": \"?3\"}}" +
             "  #if(?4 != null){ , {\"match\": {\"DEPT_NAME\": \"?4\"}} }" +
             "]}}")

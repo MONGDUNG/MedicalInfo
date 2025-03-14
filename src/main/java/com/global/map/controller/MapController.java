@@ -40,12 +40,16 @@ public class MapController {
     @ResponseBody
     public List<ItemDTO> getNearbyPharmacies(@RequestParam("lat") double lat, @RequestParam("lng") double lng, @RequestParam("level") int level) {
     	return mapService.getNearbyPharmacies(lat, lng, level);
-    	        	
     }
     @GetMapping("nearbyEmergencies")
     @ResponseBody
 	public List<ItemDTO> getNearbyEmergencies(@RequestParam("lat") double lat, @RequestParam("lng") double lng, @RequestParam("level") int level) {
 		return mapService.getNearbyEmergencies(lat, lng, level);
+	}
+    @GetMapping("medicalFacilityByDept")
+    @ResponseBody
+	public List<ItemDTO> getMedicalFacilityByDept(@RequestParam("lat") double lat, @RequestParam("lng") double lng, @RequestParam("level") int level,@RequestParam("category") String category, @RequestParam("dept") String dept) {
+		return mapService.getNearbyMedicalFacilitiesByDept(lat, lng, level, category, dept);
 	}
 
 }

@@ -362,7 +362,8 @@ public class MapService {
       }
    
    public String findHCdByHNmAndAdr(String hospitalName, String address) {
-	   return medinstRepository.findHospitalCodeByHospitalNameAndAddress(hospitalName, address);
+       return medinstRepository.findHCdByHNmAndAdr(hospitalName, address)
+               .orElseThrow(() -> new RuntimeException("Hospital code not found"));
    }
 }
    

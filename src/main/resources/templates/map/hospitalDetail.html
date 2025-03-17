@@ -142,6 +142,7 @@
 
     <script>
     document.addEventListener("DOMContentLoaded", function() {
+
         let hospitalName = document.getElementById("hospitalName").innerText.trim();        
     	let address = document.getElementById("address").innerText.trim();
         console.log("Fetching emergency hours for:", hospitalName, address); // 로그 추가
@@ -161,6 +162,7 @@
             })
             .then(data => {
                 console.log("Parsed JSON Data:", data);
+
                 if (data && Object.keys(data).length > 0) {
                     document.getElementById("mon").innerText = data.mon || "정보 없음";
                     document.getElementById("tues").innerText = data.tues || "정보 없음";
@@ -171,6 +173,7 @@
                     document.getElementById("sun").innerText = data.sun || "정보 없음";
                     document.getElementById("holi").innerText = data.holi || "정보 없음";
                 } else {
+
                     //console.warn("No emergency hours found. Fetching hospital hours...");
                     fetch(`/map/hospital-hours?name=${encodeURIComponent(hospitalName)}&&address=${encodeURIComponent(address)}`)
                         .then(response => {
@@ -186,6 +189,7 @@
                         })
                         .then(data => {
                             console.log("Parsed JSON Data (Hospital):", data);
+
                             document.getElementById("mon").innerText = data.mon || "정보 없음";
                             document.getElementById("tues").innerText = data.tues || "정보 없음";
                             document.getElementById("wednes").innerText = data.wednes || "정보 없음";
@@ -194,10 +198,10 @@
                             document.getElementById("satur").innerText = data.satur || "정보 없음";
                             document.getElementById("sun").innerText = data.sun || "정보 없음";
                         })
-                        .catch(error => console.error("❌ 병원 운영 시간 데이터를 불러오는 데 실패했습니다.", error));
+                        .catch(error => console.error("❌ 병원 운영 시간 API 오류:", error));
                 }
             })
-            .catch(error => console.error("❌ 응급실 운영 시간 데이터를 불러오는 데 실패했습니다.", error));
+            .catch(error => console.error("❌ 응급실 운영 시간 API 오류:", error));
     });
 
     function openKakaoDirections() {

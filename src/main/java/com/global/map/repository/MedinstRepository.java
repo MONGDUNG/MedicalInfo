@@ -1,6 +1,7 @@
 package com.global.map.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,8 +29,8 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
     @Query("SELECT m FROM MedinstEntity m WHERE m.categoryCode = : code") // 특정 종별코드만 조회하는 쿼리임.
     List<MedinstEntity> findByCategoryCode(@Param("code") int code);
     
-    @Query("SELECT m FROM MedinstEntity m WHERE m.hospitalName = :hospitalName AND m.address = :address")
-    String findHospitalCodeByHospitalNameAndAddress(@Param("hospitalName") String hospitalName, @Param("address") String address);
+    @Query("SELECT m.hospitalCode FROM MedinstEntity m WHERE m.hospitalName = :hospitalName AND m.address = :address")
+    Optional<String> findHCdByHNmAndAdr(@Param("hospitalName") String hospitalName, @Param("address") String address);
 
 }
 

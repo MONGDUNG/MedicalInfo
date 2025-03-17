@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.global.map.entity.MedInfoEntity;
 
 public interface MedInfoRepository extends JpaRepository<MedInfoEntity, Long>{
-	Optional<MedInfoEntity> findByHospitalName(String hospitalName);
+	Optional<MedInfoEntity> findByHospitalCode(String hospitalCode);
 
 }

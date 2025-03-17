@@ -16,8 +16,8 @@ public class MedInfoService {
 	
 	private final MedInfoRepository medInfoRepository;
 	
-	public MedInfoDTO getHospitalOperatingHours(String hospitalName) {
-		Optional<MedInfoEntity> entity = medInfoRepository.findByHospitalName(hospitalName);
+	public MedInfoDTO getHospitalOperatingHours(String hospitalCode) {
+		Optional<MedInfoEntity> entity = medInfoRepository.findByHospitalCode(hospitalCode);
 		
 		if(entity.isPresent()) {
 			MedInfoEntity hospital = entity.get();

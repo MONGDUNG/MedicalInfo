@@ -143,9 +143,9 @@
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         let hospitalName = document.getElementById("hospitalName").innerText.trim();        
-
+		let address = document.getElementById("address").innerText.trim();
         // ✅ 응급실 운영 시간 가져오기
-        fetch(`/map/emergency-hours?name=${encodeURIComponent(hospitalName)}`)
+        fetch(`/map/emergency-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
             .then(response => response.json())
             .then(data => {
                 if (data && Object.keys(data).length > 0) {

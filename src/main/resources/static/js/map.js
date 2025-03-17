@@ -213,7 +213,8 @@
         var item = document.createElement('div');
         item.className = 'hospital-item';
         item.innerText = `${place.NAME || "장소"}`;
-
+		item.dataset.address = place.ADDRESS || "주소";
+		
         item.onclick = function() {
         	window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.NAME || "장소")}&address=${encodeURIComponent(place.ADDRESS)}&lat=${place.LAT}&lng=${place.LNG}&phone=${place.PHONE}`;
         };
@@ -237,16 +238,16 @@
         highlightListItem(place);
     }
 
-    function highlightListItem(place) {
-        document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
-        let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
-            item.innerText.includes(place.NAME || "장소")
-        );
-        if (targetItem) {
-            targetItem.classList.add('highlight');
-            targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
+	function highlightListItem(place) {
+	    document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+	    let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
+	        item.innerText.includes(place.NAME || "장소") && item.dataset.address.includes(place.ADDRESS || "주소")
+	    );
+	    if (targetItem) {
+	        targetItem.classList.add('highlight');
+	        targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+	    }
+	}
 
     function openKakaoDirections() {
         window.open("https://map.kakao.com", "_blank");
@@ -286,50 +287,50 @@
 		var group = getGroupByCategory(category);
 		updateDeptList(group);
 		});
-	        });
+	});
 
-	        function getGroupByCategory(category) {
-	            if (["상급종합", "종합병원", "병원", "정신병원", "의원"].includes(category)) return "A";
-	            if (["치과병원", "치과의원"].includes(category)) return "B";
-	            if (["한방병원", "한의원"].includes(category)) return "C";
-	            if (["요양병원"].includes(category)) return "D";
-	            return "E";
-	        }
+	function getGroupByCategory(category) {
+		if (["상급종합", "종합병원", "병원", "정신병원", "의원"].includes(category)) return "A";
+		if (["치과병원", "치과의원"].includes(category)) return "B";
+		if (["한방병원", "한의원"].includes(category)) return "C";
+		if (["요양병원"].includes(category)) return "D";
+		return "E";
+	}
 
-			function updateDeptList(group) {
-			    var deptSelect = document.createElement('select');
-			    deptSelect.id = 'deptSelect';
-			    deptSelect.innerHTML = deptList[group].map(dept => `<option value="${dept}">${dept}</option>`).join('');
-			    document.getElementById('deptList').innerHTML = '';
-			    document.getElementById('deptList').appendChild(deptSelect);
+	function updateDeptList(group) {
+		var deptSelect = document.createElement('select');
+		deptSelect.id = 'deptSelect';
+		deptSelect.innerHTML = deptList[group].map(dept => `<option value="${dept}">${dept}</option>`).join('');
+		document.getElementById('deptList').innerHTML = '';
+		document.getElementById('deptList').appendChild(deptSelect);
 
 			    // 진료과목 선택 시 이벤트 리스너 추가
-			    deptSelect.addEventListener('change', function() {
-			        var selectedDept = deptSelect.value;
-			        var category = document.querySelector('#category-btns button.active')?.getAttribute('data-category') ||
-			                       document.querySelector('#hidden-btns button.active')?.getAttribute('data-category');
+		deptSelect.addEventListener('change', function() {
+			var selectedDept = deptSelect.value;
+			var category = document.querySelector('#category-btns button.active')?.getAttribute('data-category') ||
+							document.querySelector('#hidden-btns button.active')?.getAttribute('data-category');
 
-			        console.log("Selected Category:", category); // 로그 추가
-			        console.log("Selected Department:", selectedDept); // 로그 추가
+			console.log("Selected Category:", category); // 로그 추가
+			console.log("Selected Department:", selectedDept); // 로그 추가
 
-			        if (category && selectedDept) {
-			            fetchNearbyHospitalsByDept(category, selectedDept);
-			        }
-			    });
+			if (category && selectedDept) {
+			fetchNearbyHospitalsByDept(category, selectedDept);
 			}
+		});
+	}
 			
-			    document.addEventListener("DOMContentLoaded", function () {
-			        const buttons = document.querySelectorAll("#category-btns button");
+	document.addEventListener("DOMContentLoaded", function () {
+		const buttons = document.querySelectorAll("#category-btns button");
 
-			        buttons.forEach(button => {
-			            button.addEventListener("click", function () {
+		buttons.forEach(button => {
+			button.addEventListener("click", function () {
 			                // 모든 버튼에서 선택된 스타일 제거
-			                buttons.forEach(btn => btn.style.backgroundColor = "");
+				buttons.forEach(btn => btn.style.backgroundColor = "");
 			                
 			                // 선택한 버튼에 스타일 적용
-			                this.style.backgroundColor = "#ffcc00"; // 노란색 강조
-			            });
-			        });
-			    });
+				this.style.backgroundColor = "#ffcc00"; // 노란색 강조
+			});
+		});
+	});
 			
     window.onload = initMap;

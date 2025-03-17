@@ -360,6 +360,10 @@ public class MapService {
          }
          return categoryName;
       }
+   
+   public String findHCdByHNmAndAdr(String hospitalName, String address) {
+	   return medinstRepository.findHospitalCodeByHospitalNameAndAddress(hospitalName, address);
+   }
 }
    
 

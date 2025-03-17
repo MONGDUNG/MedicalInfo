@@ -142,67 +142,60 @@
 
     <script>
     document.addEventListener("DOMContentLoaded", function() {
-
         let hospitalName = document.getElementById("hospitalName").innerText.trim();        
-    	let address = document.getElementById("address").innerText.trim();
-        console.log("Fetching emergency hours for:", hospitalName, address); // 로그 추가
+        let address = document.getElementById("address").innerText.trim();
+		let category = "[[${category}]]";
+        if (category === "응급실") {
+            fetchEmergencyHours(hospitalName, address);
+        } else {
+            fetchHospitalHours(hospitalName, address);
+        }
+    });
 
-        // ✅ 응급실 운영 시간 가져오기
+    function fetchEmergencyHours(hospitalName, address) {
         fetch(`/map/emergency-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
             .then(response => {
-                //console.log("Emergency API Response:", response); // 응답 로그 추가
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                return response.text(); // JSON 파싱 전에 먼저 원본 응답을 확인
+                return response.text();
             })
             .then(text => {
-                //console.log("Raw Response Text:", text); // 원본 응답을 출력
-                return text ? JSON.parse(text) : {}; // 빈 응답 처리
+                return text ? JSON.parse(text) : {};
             })
             .then(data => {
-                console.log("Parsed JSON Data:", data);
-
-                if (data && Object.keys(data).length > 0) {
-                    document.getElementById("mon").innerText = data.mon || "정보 없음";
-                    document.getElementById("tues").innerText = data.tues || "정보 없음";
-                    document.getElementById("wednes").innerText = data.wednes || "정보 없음";
-                    document.getElementById("thurs").innerText = data.thurs || "정보 없음";
-                    document.getElementById("fri").innerText = data.fri || "정보 없음";
-                    document.getElementById("satur").innerText = data.satur || "정보 없음";
-                    document.getElementById("sun").innerText = data.sun || "정보 없음";
-                    document.getElementById("holi").innerText = data.holi || "정보 없음";
-                } else {
-
-                    //console.warn("No emergency hours found. Fetching hospital hours...");
-                    fetch(`/map/hospital-hours?name=${encodeURIComponent(hospitalName)}&&address=${encodeURIComponent(address)}`)
-                        .then(response => {
-                            //console.log("Hospital API Response:", response);
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            return response.text();
-                        })
-                        .then(text => {
-                            //console.log("Raw Response Text (Hospital):", text);
-                            return text ? JSON.parse(text) : {};
-                        })
-                        .then(data => {
-                            console.log("Parsed JSON Data (Hospital):", data);
-
-                            document.getElementById("mon").innerText = data.mon || "정보 없음";
-                            document.getElementById("tues").innerText = data.tues || "정보 없음";
-                            document.getElementById("wednes").innerText = data.wednes || "정보 없음";
-                            document.getElementById("thurs").innerText = data.thurs || "정보 없음";
-                            document.getElementById("fri").innerText = data.fri || "정보 없음";
-                            document.getElementById("satur").innerText = data.satur || "정보 없음";
-                            document.getElementById("sun").innerText = data.sun || "정보 없음";
-                        })
-                        .catch(error => console.error("❌ 병원 운영 시간 API 오류:", error));
-                }
+                updateHoursTable(data);
             })
             .catch(error => console.error("❌ 응급실 운영 시간 API 오류:", error));
-    });
+    }
+
+    function fetchHospitalHours(hospitalName, address) {
+        fetch(`/map/hospital-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                return text ? JSON.parse(text) : {};
+            })
+            .then(data => {
+                updateHoursTable(data);
+            })
+            .catch(error => console.error("❌ 병원 운영 시간 API 오류:", error));
+    }
+
+    function updateHoursTable(data) {
+        document.getElementById("mon").innerText = data.mon || "정보 없음";
+        document.getElementById("tues").innerText = data.tues || "정보 없음";
+        document.getElementById("wednes").innerText = data.wednes || "정보 없음";
+        document.getElementById("thurs").innerText = data.thurs || "정보 없음";
+        document.getElementById("fri").innerText = data.fri || "정보 없음";
+        document.getElementById("satur").innerText = data.satur || "정보 없음";
+        document.getElementById("sun").innerText = data.sun || "정보 없음";
+        document.getElementById("holi").innerText = data.holi || "정보 없음";
+    }
 
     function openKakaoDirections() {
         var hospitalName = "[[${hospitalName}]]";

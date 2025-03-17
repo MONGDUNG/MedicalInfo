@@ -209,18 +209,6 @@
         return marker;
     }
 
-    function createListItem(place) {
-        var item = document.createElement('div');
-        item.className = 'hospital-item';
-        item.innerText = `${place.NAME || "장소"}`;
-		item.dataset.address = place.ADDRESS || "주소";
-		
-        item.onclick = function() {
-        	window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.NAME || "장소")}&address=${encodeURIComponent(place.ADDRESS)}&lat=${place.LAT}&lng=${place.LNG}&phone=${place.PHONE}`;
-        };
-        return item;
-    }
-
 	function selectMarker(marker, place) {
 	    if (selectedMarker) {
 	        selectedMarker.setImage(new kakao.maps.MarkerImage(
@@ -328,12 +316,13 @@
 	        let name = document.getElementById("modalTitle").innerText;
 	        let address = document.getElementById("modalAddress").innerText;
 	        let phone = document.getElementById("modalPhone").innerText;
-	        
+			let category = document.getElementById("modalCategory").innerText;
+			
 	        // 🔥 여기서 lat, lng 값을 제대로 가져오고 있는지 확인!
 	        let lat = document.getElementById("modalLat")?.innerText || "0.0"; 
 	        let lng = document.getElementById("modalLng")?.innerText || "0.0"; 
 
-	        let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}`;
+	        let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}&category=${encodeURIComponent(category)}`;
 	        console.log("🔗 이동할 URL:", url);
 	        window.location.href = url;
 	    }
@@ -349,6 +338,8 @@
 	        document.getElementById("modalTitle").innerText = place.NAME || "정보 없음";
 	        document.getElementById("modalAddress").innerText = place.ADDRESS || "정보 없음";
 	        document.getElementById("modalPhone").innerText = place.PHONE || "정보 없음";
+			document.getElementById("modalCategory").innerText = place.CATEGORY_NAME || "정보 없음"; // 카테고리 추가
+
 
 	        // 모달 표시 (오른쪽 사이드바에 위치)
 	        let modal = document.getElementById("hospitalModal");
@@ -368,8 +359,9 @@
 	    let name = document.getElementById("modalTitle").innerText;
 	    let address = document.getElementById("modalAddress").innerText;
 	    let phone = document.getElementById("modalPhone").innerText;
+	    let category = document.getElementById("modalCategory").innerText; // 카테고리 추가
 
-		let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${place.LAT}&lng=${place.LNG}`;
+	    let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(category)}`;
 	    window.location.href = url;
 	};
 			

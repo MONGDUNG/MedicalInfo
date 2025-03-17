@@ -32,12 +32,14 @@ public class HospitalController {
 	                                 @RequestParam("lat") String latitude, 
 	                                 @RequestParam("lng") String longitude,
 	                                 @RequestParam("phone") String phoneNumber,
+	                                 @RequestParam("category") String category,
 	                                 Model model) {
 	        model.addAttribute("hospitalName", name);
 	        model.addAttribute("address", address);
 	        model.addAttribute("latitude", latitude);
 	        model.addAttribute("longitude", longitude);
 	        model.addAttribute("phoneNumber", phoneNumber);
+	        model.addAttribute("category", category);
 	        return "map/hospitalDetail";
 	}
 	 // 응급실 운영 시간 조회 API

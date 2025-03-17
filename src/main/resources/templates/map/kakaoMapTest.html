@@ -127,6 +127,44 @@
 		#hidden-btns button:hover {
 		    background-color: #f0f0f0;
 		}
+		
+		.modal {
+            display: none;
+		    position: absolute;
+		    top: 120px;  /* 상단에서 적당한 위치 */
+		    left: 330px; /* 📍 지도 왼쪽 (사이드바 오른쪽) */
+		    width: 300px;
+		    background: white;
+		    padding: 20px;
+		    border-radius: 8px;
+		    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+		    z-index: 1000;
+		}
+        .modal-content {
+            text-align: center;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .close-btn {
+            background: #6c757d;
+       }
+        .close-btn:hover {
+            background: #5a6268;
+       }
 
     </style>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
@@ -175,6 +213,17 @@
             </div>
         </div>
     </div>
+    <div id="hospitalModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle">병원 이름</h2>
+        <p><strong>주소:</strong> <span id="modalAddress"></span></p>
+        <p><strong>전화번호:</strong> <span id="modalPhone"></span></p>
+        <div class="button-group">
+            <button class="btn detail-btn">🔍 상세보기</button>
+            <button class="btn close-btn">🔙 닫기</button>
+        </div>
+    </div>
+</div>
     <script type="text/javascript" src="/js/map.js"></script>
 </body>
 </html>

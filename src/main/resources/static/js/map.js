@@ -221,28 +221,32 @@
         return item;
     }
 
-    function selectMarker(marker, place) {
-        if (selectedMarker) selectedMarker.setImage(new kakao.maps.MarkerImage(
-            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
-            new kakao.maps.Size(33, 36)
-        ));
+	function selectMarker(marker, place) {
+	    if (selectedMarker) {
+	        selectedMarker.setImage(new kakao.maps.MarkerImage(
+	            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+	            new kakao.maps.Size(33, 36)
+	        ));
+	    }
 
-        marker.setImage(new kakao.maps.MarkerImage(
-            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-            new kakao.maps.Size(33, 36)
-        ));
+	    marker.setImage(new kakao.maps.MarkerImage(
+	        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+	        new kakao.maps.Size(33, 36)
+	    ));
 
-        selectedMarker = marker;
-        map.setCenter(marker.getPosition());
+	    selectedMarker = marker;
+	    map.setCenter(marker.getPosition());
 
-        highlightListItem(place);
-    }
+	    highlightListItem(place);
+	}
 
 	function highlightListItem(place) {
 	    document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+
 	    let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
-	        item.innerText.includes(place.NAME || "장소") && item.dataset.address.includes(place.ADDRESS || "주소")
+	        item.innerText.includes(place.NAME || "장소")
 	    );
+
 	    if (targetItem) {
 	        targetItem.classList.add('highlight');
 	        targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -319,18 +323,54 @@
 		});
 	}
 			
-	document.addEventListener("DOMContentLoaded", function () {
-		const buttons = document.querySelectorAll("#category-btns button");
+	document.addEventListener("click", function(event) {
+	    if (event.target.classList.contains("detail-btn")) {
+	        let name = document.getElementById("modalTitle").innerText;
+	        let address = document.getElementById("modalAddress").innerText;
+	        let phone = document.getElementById("modalPhone").innerText;
+	        
+	        // 🔥 여기서 lat, lng 값을 제대로 가져오고 있는지 확인!
+	        let lat = document.getElementById("modalLat")?.innerText || "0.0"; 
+	        let lng = document.getElementById("modalLng")?.innerText || "0.0"; 
 
-		buttons.forEach(button => {
-			button.addEventListener("click", function () {
-			                // 모든 버튼에서 선택된 스타일 제거
-				buttons.forEach(btn => btn.style.backgroundColor = "");
-			                
-			                // 선택한 버튼에 스타일 적용
-				this.style.backgroundColor = "#ffcc00"; // 노란색 강조
-			});
-		});
+	        let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}`;
+	        console.log("🔗 이동할 URL:", url);
+	        window.location.href = url;
+	    }
 	});
+	
+	function createListItem(place) {
+	    var item = document.createElement('div');
+	    item.className = 'hospital-item';
+	    item.innerText = `${place.NAME || "장소"}`;
+
+	    // 🏥 병원 클릭 시 모달 열기
+	    item.onclick = function() {
+	        document.getElementById("modalTitle").innerText = place.NAME || "정보 없음";
+	        document.getElementById("modalAddress").innerText = place.ADDRESS || "정보 없음";
+	        document.getElementById("modalPhone").innerText = place.PHONE || "정보 없음";
+
+	        // 모달 표시 (오른쪽 사이드바에 위치)
+	        let modal = document.getElementById("hospitalModal");
+	        modal.style.display = "block";
+	    };
+
+	    return item;
+	}
+
+	// ❌ 뒤로가기 버튼 (모달 닫기)
+	document.querySelector(".close-btn").onclick = function() {
+	    document.getElementById("hospitalModal").style.display = "none";
+	};
+
+	// ✅ 상세보기 버튼 (병원 상세 페이지 이동)
+	document.querySelector(".detail-btn").onclick = function() {
+	    let name = document.getElementById("modalTitle").innerText;
+	    let address = document.getElementById("modalAddress").innerText;
+	    let phone = document.getElementById("modalPhone").innerText;
+
+		let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${place.LAT}&lng=${place.LNG}`;
+	    window.location.href = url;
+	};
 			
     window.onload = initMap;

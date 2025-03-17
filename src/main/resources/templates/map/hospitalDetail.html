@@ -142,12 +142,20 @@
 
     <script>
     document.addEventListener("DOMContentLoaded", function() {
-        let hospitalName = document.getElementById("hospitalName").innerText.trim();        
-		let address = document.getElementById("address").innerText.trim();
-        // ✅ 응급실 운영 시간 가져오기
+        let hospitalName = document.getElementById("hospitalName").innerText.trim();
+        let address = document.getElementById("address")?.innerText?.trim() || "";
+
+        console.log("📌 병원 이름:", hospitalName);
+        console.log("📌 병원 주소:", address);
+
         fetch(`/map/emergency-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
-            .then(response => response.json())
+            .then(response => {
+                console.log("🔍 응급실 운영 시간 응답 상태:", response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log("✅ 응급실 운영 시간 데이터:", data);
+
                 if (data && Object.keys(data).length > 0) {
                     document.getElementById("mon").innerText = data.mon || "정보 없음";
                     document.getElementById("tues").innerText = data.tues || "정보 없음";
@@ -158,10 +166,11 @@
                     document.getElementById("sun").innerText = data.sun || "정보 없음";
                     document.getElementById("holi").innerText = data.holi || "정보 없음";
                 } else {
-                    // ✅ 응급실 운영 시간이 없으면 병원 운영 시간 가져오기
+                    console.log("⚠️ 응급실 운영 시간 없음, 일반 운영 시간 조회 시작...");
                     fetch(`/map/hospital-hours?name=${encodeURIComponent(hospitalName)}`)
                         .then(response => response.json())
                         .then(data => {
+                            console.log("✅ 병원 운영 시간 데이터:", data);
                             document.getElementById("mon").innerText = data.mon || "정보 없음";
                             document.getElementById("tues").innerText = data.tues || "정보 없음";
                             document.getElementById("wednes").innerText = data.wednes || "정보 없음";
@@ -170,10 +179,10 @@
                             document.getElementById("satur").innerText = data.satur || "정보 없음";
                             document.getElementById("sun").innerText = data.sun || "정보 없음";
                         })
-                        .catch(error => console.error("❌ 병원 운영 시간 데이터를 불러오는 데 실패했습니다.", error));
+                        .catch(error => console.error("❌ 병원 운영 시간 API 오류:", error));
                 }
             })
-            .catch(error => console.error("❌ 응급실 운영 시간 데이터를 불러오는 데 실패했습니다.", error));
+            .catch(error => console.error("❌ 응급실 운영 시간 API 오류:", error));
     });
 
     function openKakaoDirections() {

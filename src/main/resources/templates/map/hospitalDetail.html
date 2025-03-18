@@ -140,72 +140,77 @@
         </div>
     </div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        let hospitalName = document.getElementById("hospitalName").innerText.trim();        
-        let address = document.getElementById("address").innerText.trim();
-		let category = "[[${category}]]";
-        if (category === "응급실") {
-            fetchEmergencyHours(hospitalName, address);
-        } else {
-            fetchHospitalHours(hospitalName, address);
-        }
-    });
-
-    function fetchEmergencyHours(hospitalName, address) {
-        fetch(`/map/emergency-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                return text ? JSON.parse(text) : {};
-            })
-            .then(data => {
-                updateHoursTable(data);
-            })
-            .catch(error => console.error("❌ 응급실 운영 시간 API 오류:", error));
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let hospitalName = document.getElementById("hospitalName").innerText.trim();        
+    let address = document.getElementById("address").innerText.trim();
+    let category = "[[${category}]]";
+    
+    if (category === "응급실") {
+        fetchEmergencyHours(hospitalName, address);
+    } else if (category === "병원") {
+        fetchHospitalHours(hospitalName, address);
+    } else {
+        document.querySelector(".highlight").style.display = "none";
+        document.querySelector(".time-table").style.display = "none";
     }
+});
 
-    function fetchHospitalHours(hospitalName, address) {
-        fetch(`/map/hospital-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                return text ? JSON.parse(text) : {};
-            })
-            .then(data => {
-                updateHoursTable(data);
-            })
-            .catch(error => console.error("❌ 병원 운영 시간 API 오류:", error));
-    }
+function fetchEmergencyHours(hospitalName, address) {
+    fetch(`/map/emergency-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(text => {
+            return text ? JSON.parse(text) : {};
+        })
+        .then(data => {
+            updateHoursTable(data);
+        })
+        .catch(error => console.error("❌ 응급실 운영 시간 API 오류:", error));
+}
 
-    function updateHoursTable(data) {
-        document.getElementById("mon").innerText = data.mon || "정보 없음";
-        document.getElementById("tues").innerText = data.tues || "정보 없음";
-        document.getElementById("wednes").innerText = data.wednes || "정보 없음";
-        document.getElementById("thurs").innerText = data.thurs || "정보 없음";
-        document.getElementById("fri").innerText = data.fri || "정보 없음";
-        document.getElementById("satur").innerText = data.satur || "정보 없음";
-        document.getElementById("sun").innerText = data.sun || "정보 없음";
-        document.getElementById("holi").innerText = data.holi || "정보 없음";
-    }
+function fetchHospitalHours(hospitalName, address) {
+    fetch(`/map/hospital-hours?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(text => {
+            return text ? JSON.parse(text) : {};
+        })
+        .then(data => {
+            updateHoursTable(data);
+        })
+        .catch(error => console.error("❌ 병원 운영 시간 API 오류:", error));
+}
 
-    function openKakaoDirections() {
-        var hospitalName = "[[${hospitalName}]]";
-        var latitude = "[[${latitude}]]";
-        var longitude = "[[${longitude}]]";
+function updateHoursTable(data) {
+    document.getElementById("mon").innerText = data.mon || "정보 없음";
+    document.getElementById("tues").innerText = data.tues || "정보 없음";
+    document.getElementById("wednes").innerText = data.wednes || "정보 없음";
+    document.getElementById("thurs").innerText = data.thurs || "정보 없음";
+    document.getElementById("fri").innerText = data.fri || "정보 없음";
+    document.getElementById("satur").innerText = data.satur || "정보 없음";
+    document.getElementById("sun").innerText = data.sun || "정보 없음";
+    document.getElementById("holi").innerText = data.holi || "정보 없음";
+}
 
-        var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
-        window.open(url, "_blank");
-    }
+function openKakaoDirections() {
+    var hospitalName = "[[${hospitalName}]]";
+    var latitude = "[[${latitude}]]";
+    var longitude = "[[${longitude}]]";
+
+    var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
+    window.open(url, "_blank");
+}
 </script>
+
 
 </body>
 </html>

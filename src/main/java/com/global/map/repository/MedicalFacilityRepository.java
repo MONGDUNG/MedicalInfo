@@ -26,7 +26,14 @@ public interface MedicalFacilityRepository extends ElasticsearchRepository<Medic
             "\"filter\": [" +
             "  {\"match\": {\"DEPT_NAME\": \"?4\"}}" +
             "]}}")
-    List<MedicalFacility> findNearByHospitals(double lat, double lng, double radius, String categoryName, String deptName);
+    List<MedicalFacility> findNearByHospitalsByDept(double lat, double lng, double radius, String categoryName, String deptName);
+    
+    @Query("{\"bool\": { " +
+			"\"must\": [" +
+			"  {\"geo_distance\": {\"distance\": \"?2\", \"geoLocation\": {\"lat\": ?0, \"lon\": ?1}}}," +
+			"  {\"match\": {\"CATEGORY_NAME\": \"?3\"}}" +
+			"]}}")
+    List<MedicalFacility> findNearByHospitals(double lat, double lng, double radius, String categoryName);
  }
     
 

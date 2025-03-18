@@ -143,7 +143,7 @@ public class MapService {
 	// 진료과로 가져오기
 	public List<ItemDTO> getNearbyMedicalFacilitiesByDept(double lat, double lng, int level, String category, String deptName) {
 	    int radius = getRadius(level);
-	    List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitals(lat, lng, radius, category, deptName);
+	    List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitalsByDept(lat, lng, radius, category, deptName);
 
 	    Collections.shuffle(medicalFacilities); // 리스트를 무작위로 섞음
 
@@ -151,45 +151,12 @@ public class MapService {
 	}
     // MapService.java
     public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level, String category) {
-    	int radius = getRadius(level);
-    	int category_code = getCategoryCode(category);
-    	List<MedinstEntity> hospitals = medinstRepository.findNearbyHospitals(lat, lng, radius, category_code);
-    	return hospitals.stream()
-                .map(entity -> itemToDTO(entity))
-                .limit(100000)  // 최대 갯수
-                .toList();
+    	double radius = getRadius(level);
+    	List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitals(lat, lng, radius, category);
+    	  Collections.shuffle(medicalFacilities); // 리스트를 무작위로 섞음
+    	  return medicalFacilities.stream().map(this::itemToDTO).limit(200).toList();
     }
-
-    public List<ItemDTO> getNearbyHospitalsByDept(double lat, double lng, int level, String category, String dept) {
-        int radius = getRadius(level);
-        List<MedicalFacility> hospitals = medicalFacilityRepository.findNearByHospitals(lat, lng, radius, category, dept);
-
-        return hospitals.stream()
-                .map(this::itemToDTO)
-                .limit(100000)
-                .toList();
-    }
-    
-    public List<ItemDTO> getNearbyPharmacies(double lat, double lng, int level) {
-    	int radius = getRadius(level);
-    	List<PharmacyEntity> pharmacies = pharmacyRepository.findNearbyPharmacies(lat, lng, radius);
-    	return pharmacies.stream()
-    			.map(entity -> itemToDTO(entity))
-    			.limit(1000)  // 최대 갯수
-    			.toList();
-   }
-    
-	public List<ItemDTO> getNearbyEmergencies(double lat, double lng, int level) {
-		int radius = getRadius(level);
-		List<EmergencyEntity> emergencies = emergencyRepository.findNearbyEmergencys(lat, lng, radius);
-	
-		return emergencies.stream()
-				.map(entity -> itemToDTO(entity))
-				.limit(1000)  // 최대 갯수
-				.toList();
-   }
-
-    
+ 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double R = 6371 * 1000; // 지구 반지름 (m)
         double dLat = Math.toRadians(lat2 - lat1);
@@ -238,16 +205,7 @@ public class MapService {
                 .build();
     }
 
-    private ConvenienceStoreDTO storeToDTO(ConvenienceStoreEntity entity, double distance) {
-        return ConvenienceStoreDTO.builder()
-                .id(entity.getId())
-                .storeName(entity.getStoreName())
-                .address(entity.getAddress())
-                .latitude(Double.parseDouble(entity.getLatitude()))
-                .longitude(Double.parseDouble(entity.getLongitude()))
-                .distance(distance)
-                .build();
-    }
+
     private ItemDTO itemToDTO(MedicalFacility entity) {
         return ItemDTO.builder()
             .name(entity.getName())

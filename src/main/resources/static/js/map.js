@@ -91,13 +91,9 @@
         var lng = center.getLng(); // 경도
         var level = map.getLevel(); // 지도레벨
         let endpoint;
-        if (category === "응급실") {
-            endpoint = `/map/nearbyEmergencies?lat=${lat}&lng=${lng}&level=${level}`;
-        } else if (category === "약국") {
-            endpoint = `/map/nearbyPharmacies?lat=${lat}&lng=${lng}&level=${level}`;
-        } else {
-            endpoint = `/map/nearbyHospitals?lat=${lat}&lng=${lng}&level=${level}&category=${category}`;
-        }
+
+        endpoint = `/map/nearbyHospitals?lat=${lat}&lng=${lng}&level=${level}&category=${category}`;
+
         
         fetch(endpoint)
             .then(response => response.json())

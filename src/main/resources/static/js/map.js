@@ -211,12 +211,15 @@
 	            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
 	            new kakao.maps.Size(33, 36)
 	        ));
+	        selectedMarker.setZIndex(1); // 이전 선택된 마커를 원래 위치로 보냄
 	    }
 
 	    marker.setImage(new kakao.maps.MarkerImage(
 	        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
 	        new kakao.maps.Size(33, 36)
 	    ));
+
+	    marker.setZIndex(999); // 선택된 마커를 최상위로 올림
 
 	    selectedMarker = marker;
 	    map.setCenter(marker.getPosition());
@@ -329,15 +332,33 @@
 	    item.className = 'hospital-item';
 	    item.innerText = `${place.NAME || "장소"}`;
 
-	    // 🏥 병원 클릭 시 모달 열기
 	    item.onclick = function() {
+	        // 기존 하이라이트 제거
+	        document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+
+	        // 클릭된 리스트 항목에 하이라이트 적용
+	        item.classList.add('highlight');
+
+	        // 마커 찾기
+	        var selectedMarker = markers.find(marker => {
+	            return parseFloat(marker.getPosition().getLat().toFixed(6)) === parseFloat(place.LAT.toFixed(6)) &&
+	                   parseFloat(marker.getPosition().getLng().toFixed(6)) === parseFloat(place.LNG.toFixed(6));
+	        });
+
+	        console.log("🔍 찾은 마커:", selectedMarker);
+
+	        if (selectedMarker) {
+	            selectMarker(selectedMarker, place);
+	        } else {
+	            console.warn("❌ 해당 병원의 마커를 찾을 수 없음:", place.NAME);
+	        }
+
+	        // 모달 표시
 	        document.getElementById("modalTitle").innerText = place.NAME || "정보 없음";
 	        document.getElementById("modalAddress").innerText = place.ADDRESS || "정보 없음";
 	        document.getElementById("modalPhone").innerText = place.PHONE || "정보 없음";
-			document.getElementById("modalCategory").innerText = place.CATEGORY_NAME || "정보 없음"; // 카테고리 추가
+	        document.getElementById("modalCategory").innerText = place.CATEGORY_NAME || "정보 없음";
 
-
-	        // 모달 표시 (오른쪽 사이드바에 위치)
 	        let modal = document.getElementById("hospitalModal");
 	        modal.style.display = "block";
 	    };

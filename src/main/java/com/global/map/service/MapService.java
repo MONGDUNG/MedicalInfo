@@ -1,10 +1,14 @@
 package com.global.map.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -34,8 +38,6 @@ import lombok.RequiredArgsConstructor;
 public class MapService {
    
     private final MedinstRepository medinstRepository;
-    private final PharmacyRepository pharmacyRepository;
-    private final EmergencyRepository emergencyRepository;
     private final MedicalFacilityRepository medicalFacilityRepository;
     
     private final double centerLat = 37.5665;  // 서울시청 (회원 주소로 변경 가능)
@@ -143,18 +145,53 @@ public class MapService {
 	// 진료과로 가져오기
 	public List<ItemDTO> getNearbyMedicalFacilitiesByDept(double lat, double lng, int level, String category, String deptName) {
 	    int radius = getRadius(level);
+	    
+	    // 전체 데이터 가져오기
 	    List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitalsByDept(lat, lng, radius, category, deptName);
+	    
+	    int size = medicalFacilities.size(); // 리스트 크기 확인
+	    if (size <= 200) {
+	        return medicalFacilities.stream().map(this::itemToDTO).toList(); // 200개 이하라면 그대로 반환
+	    }
 
-	    Collections.shuffle(medicalFacilities); // 리스트를 무작위로 섞음
+	    // 랜덤한 200개의 인덱스를 선택
+	    Random random = new Random();
+	    Set<Integer> randomIndexes = new HashSet<>();
+	    while (randomIndexes.size() < 200) {
+	        randomIndexes.add(random.nextInt(size));
+	    }
 
-	    return medicalFacilities.stream().map(this::itemToDTO).limit(200).toList();
+	    // 선택된 인덱스의 데이터만 새로운 리스트에 저장
+	    List<ItemDTO> result = new ArrayList<>();
+	    for (int index : randomIndexes) {
+	        result.add(itemToDTO(medicalFacilities.get(index)));
+	    }
+
+	    return result;
 	}
     // MapService.java
     public List<ItemDTO> getNearbyHospitals(double lat, double lng, int level, String category) {
     	double radius = getRadius(level);
     	List<MedicalFacility> medicalFacilities = medicalFacilityRepository.findNearByHospitals(lat, lng, radius, category);
-    	  Collections.shuffle(medicalFacilities); // 리스트를 무작위로 섞음
-    	  return medicalFacilities.stream().map(this::itemToDTO).limit(200).toList();
+    	 int size = medicalFacilities.size(); // 리스트 크기 확인
+ 	    if (size <= 200) {
+ 	        return medicalFacilities.stream().map(this::itemToDTO).toList(); // 200개 이하라면 그대로 반환
+ 	    }
+
+ 	    // 랜덤한 200개의 인덱스를 선택
+ 	    Random random = new Random();
+ 	    Set<Integer> randomIndexes = new HashSet<>();
+ 	    while (randomIndexes.size() < 200) {
+ 	        randomIndexes.add(random.nextInt(size));
+ 	    }
+
+ 	    // 선택된 인덱스의 데이터만 새로운 리스트에 저장
+ 	    List<ItemDTO> result = new ArrayList<>();
+ 	    for (int index : randomIndexes) {
+ 	        result.add(itemToDTO(medicalFacilities.get(index)));
+ 	    }
+
+ 	    return result;
     }
  
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {

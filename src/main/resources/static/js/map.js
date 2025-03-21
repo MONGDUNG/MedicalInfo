@@ -366,5 +366,94 @@
 		let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}&category=${encodeURIComponent(category)}`;
 	    window.location.href = url;
 	};
+	function fetchReviews(hospitalCode) {
+	    fetch(`/api/review/${hospitalCode}`)
+	        .then(response => response.json())
+	        .then(data => {
+	            let reviewList = document.getElementById("reviewList");
+	            reviewList.innerHTML = ""; // 기존 리뷰 초기화
+
+	            if (data.length === 0) {
+	                reviewList.innerHTML = "<p>리뷰가 없습니다.</p>";
+	                return;
+	            }
+
+	            data.forEach(review => {
+	                let reviewItem = document.createElement("div");
+	                reviewItem.className = "review-item";
+	                reviewItem.innerHTML = `<strong>⭐ ${review.rating}점</strong> - ${review.reviewText}`;
+	                reviewList.appendChild(reviewItem);
+	            });
+	        })
+	        .catch(error => console.error("리뷰 가져오기 오류:", error));
+	}
+
+	function checkLoginStatus() {
+	    fetch('/api/user/session')
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data.isLoggedIn) {
+	                document.getElementById("reviewForm").style.display = "block";
+	                document.getElementById("loginMessage").style.display = "none";
+	            } else {
+	                document.getElementById("reviewForm").style.display = "none";
+	                document.getElementById("loginMessage").style.display = "block";
+	            }
+	        })
+	        .catch(error => console.error("로그인 상태 확인 오류:", error));
+	}
+
+	// 로그인 버튼 클릭 시 이동
+	function redirectToLogin() {
+	    window.location.href = "/login";
+	}
+
+	// 리뷰 목록 불러오기
+	function fetchReviews(hospitalCode) {
+	    fetch(`/api/review/${hospitalCode}`)
+	        .then(response => response.json())
+	        .then(data => {
+	            let reviewList = document.getElementById("reviewList");
+	            reviewList.innerHTML = ""; // 기존 리뷰 초기화
+
+	            if (data.length === 0) {
+	                reviewList.innerHTML = "<p>작성된 리뷰가 없습니다.</p>";
+	                return;
+	            }
+
+	            data.forEach(review => {
+	                let reviewItem = document.createElement("div");
+	                reviewItem.className = "review-item";
+	                reviewItem.innerHTML = `<strong>⭐ ${review.rating}점</strong> - ${review.reviewText}`;
+	                reviewList.appendChild(reviewItem);
+	            });
+	        })
+	        .catch(error => console.error("리뷰 가져오기 오류:", error));
+	}
+
+	// 병원 선택 시 리뷰 가져오기 & 로그인 상태 확인
+	function selectMarker(marker, place) {
+	    if (selectedMarker) {
+	        selectedMarker.setImage(new kakao.maps.MarkerImage(
+	            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+	            new kakao.maps.Size(33, 36)
+	        ));
+	    }
+
+	    marker.setImage(new kakao.maps.MarkerImage(
+	        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+	        new kakao.maps.Size(33, 36)
+	    ));
+
+	    selectedMarker = marker;
+	    map.setCenter(marker.getPosition());
+
+	    highlightListItem(place);
+	    fetchReviews(place.HOSPITAL_CODE);
+	    document.getElementById("reviewHospitalCode").value = place.HOSPITAL_CODE;
+
+	    // 로그인 상태 확인
+	    checkLoginStatus();
+	}
 			
     window.onload = initMap;

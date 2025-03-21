@@ -4,16 +4,20 @@
 <head>
     <title>주변 병원 찾기</title>
     <style>
-        #map { width: 75%; height: 800px; float: right; }
-        #sidebar {
-            width: 25%;
-            height: 750px;
-            float: left;
-            background: #f8f9fa;
-            padding: 10px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
+      #map {
+        width: 75%;
+        height: 800px;
+        float: left;
+        }
+    #sidebar {
+        width: 25%;
+        height: 750px;
+        float: left;
+        background: #f8f9fa;
+        padding: 10px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
         }
         #searchContainer {
             display: flex;
@@ -165,7 +169,24 @@
         .close-btn:hover {
             background: #5a6268;
        }
-
+       
+        #reviewSection {
+        width: 20%; /* 기존 25%에서 20%로 줄임 */
+        padding: 20px;
+        background: #f8f9fa;
+        border-top: 2px solid #ccc;
+        margin-top: 20px;
+        float: left;
+       }
+        #reviewList {
+        width: 75%;
+        padding: 20px;
+        background: #f8f9fa;
+        border-top: 2px solid #ccc;
+        margin-top: 0; /* margin-top 값을 0으로 설정 */
+        float: right;
+      }
+      
     </style>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
     
@@ -225,6 +246,20 @@
             <button class="btn close-btn">🔙 닫기</button>
         </div>
     </div>
+</div>
+    <div id="reviewSection">
+    <h3>리뷰 작성</h3>
+    <form id="reviewForm">
+        <input type="hidden" id="reviewHospitalCode">
+        <label>회원 ID: <input type="text" id="reviewMemberId" required></label><br>
+        <label>별점: <input type="number" id="reviewRating" min="1" max="5" required></label><br>
+        <label>리뷰 내용: <textarea id="reviewText" required></textarea></label><br>
+        <button type="submit">리뷰 작성</button>
+    </form>
+</div>
+<div id="reviewList">
+    <h2>Review</h2>
+    <div>등록된 리뷰가 없습니다.</div>
 </div>
     <script type="text/javascript" src="/js/map.js"></script>
 </body>

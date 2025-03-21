@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.global.map.dto.MedInfoDTO;
+import com.global.map.dto.MedinstDTO;
 import com.global.map.service.EmergencyService;
 import com.global.map.service.MapService;
 import com.global.map.service.MedInfoService;
@@ -25,22 +26,29 @@ public class HospitalController {
 	private final EmergencyService emergencyService;
 	private final MedInfoService medInfoService;
 	private final MapService mapService;
-	
 	@GetMapping("hospitaldetail")
-	    public String hospitalDetail(@RequestParam("name") String name, 
-	                                 @RequestParam("address") String address, 
-	                                 @RequestParam("lat") String latitude, 
-	                                 @RequestParam("lng") String longitude,
-	                                 @RequestParam("phone") String phoneNumber,
-	                                 @RequestParam("category") String category,
-	                                 Model model) {
-	        model.addAttribute("hospitalName", name);
-	        model.addAttribute("address", address);
-	        model.addAttribute("latitude", latitude);
-	        model.addAttribute("longitude", longitude);
-	        model.addAttribute("phoneNumber", phoneNumber);
-	        model.addAttribute("category", category);
-	        return "map/hospitalDetail";
+	public String hospitalDetail(@RequestParam("name") String name, 
+	                             @RequestParam("address") String address,
+	                             @RequestParam("phone") String phone,
+	                             @RequestParam("lat") String latitude, 
+                                 @RequestParam("lng") String longitude,
+	                             @RequestParam("category") String category,
+	                             Model model) {
+	    model.addAttribute("name", name);
+	    model.addAttribute("address", address);
+	    model.addAttribute("phone", phone);
+	    model.addAttribute("category", category);
+	    model.addAttribute("latitude", latitude);
+        model.addAttribute("longitude", longitude);
+
+	    if (!category.equals("응급실") && !category.equals("약국")) {
+	    	System.out.println("category : " + category);
+	        String hospitalCode = mapService.findHCdByHNmAndAdr(name, address);
+	        MedinstDTO hospitalInfo = mapService.getHospitalInfo(hospitalCode);
+	        model.addAttribute("hospitalInfo", hospitalInfo);
+	    }
+
+	    return "map/hospitalDetail";
 	}
 	 // 응급실 운영 시간 조회 API
     @GetMapping("emergency-hours")

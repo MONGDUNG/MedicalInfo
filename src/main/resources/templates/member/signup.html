@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 가입</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <style>
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .form-control, .btn, input[type="reset"] {
+            margin-top: 10px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        #emailCheckMessage, #usernameCheckMessage {
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+    </style>
+    <script>
+        let isEmailValid = false; // 이메일 중복 확인 상태
+        let isUsernameValid = false; // 아이디 중복 확인 상태
+
+        // 이메일 중복 체크
+        function checkEmail() {
+            const email = document.getElementById("email").value.trim();
+            const messageElement = document.getElementById("emailCheckMessage");
+
+            if (!email) {
+                messageElement.style.color = "red";
+                messageElement.textContent = "이메일을 입력해주세요.";
+                isEmailValid = false; // 이메일 유효 상태를 초기화
+                toggleSubmitButton();
+                return;
+            }
+
+            fetch(`/member/check-email?email=${encodeURIComponent(email)}`)
+                .then(response => response.json())
+                .then(isDuplicate => {
+                    if (isDuplicate) {
+                        messageElement.style.color = "red";
+                        messageElement.textContent = "이미 사용 중인 이메일입니다.";
+                        isEmailValid = false; // 중복이면 유효 상태를 false로 설정
+                    } else {
+                        messageElement.style.color = "green";
+                        messageElement.textContent = "사용 가능한 이메일입니다.";
+                        isEmailValid = true; // 사용 가능하면 true로 설정
+                    }
+                    toggleSubmitButton(); // 버튼 상태 업데이트
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        // 사용자 이름 중복 체크
+        function checkUsername() {
+            const username = document.getElementById("username").value.trim();
+            const messageElement = document.getElementById("usernameCheckMessage");
+
+            if (!username) {
+                messageElement.style.color = "red";
+                messageElement.textContent = "ID를 입력해주세요.";
+                isUsernameValid = false; // 아이디 유효 상태를 초기화
+                toggleSubmitButton();
+                return;
+            }
+
+            fetch(`/member/check-username?username=${encodeURIComponent(username)}`)
+                .then(response => response.json())
+                .then(isDuplicate => {
+                    if (isDuplicate) {
+                        messageElement.style.color = "red";
+                        messageElement.textContent = "이미 사용 중인 사용자 ID입니다.";
+                        isUsernameValid = false; // 중복이면 유효 상태를 false로 설정
+                    } else {
+                        messageElement.style.color = "green";
+                        messageElement.textContent = "사용 가능한 사용자 ID입니다.";
+                        isUsernameValid = true; // 사용 가능하면 true로 설정
+                    }
+                    toggleSubmitButton(); // 버튼 상태 업데이트
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        // 회원 가입 버튼 활성화/비활성화
+        function toggleSubmitButton() {
+            const submitButton = document.getElementById("submitButton");
+            if (isEmailValid && isUsernameValid) {
+                submitButton.disabled = false; // 모두 유효하면 활성화
+            } else {
+                submitButton.disabled = true; // 하나라도 유효하지 않으면 비활성화
+            }
+        }
+
+        // 주소 검색
+        function daumPost() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var addr;
+                    if (data.userSelectedType === 'R') { 
+                        addr = data.roadAddress;
+                    } else { 
+                        addr = data.jibunAddress;
+                    }
+                    document.getElementById('postcode').value = data.zonecode;
+                    document.getElementById('address').value = addr;
+                    document.getElementById('detailaddress').focus();
+                }
+            }).open();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h4 class="text-center">회원 가입</h4>
+        <form method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            
+            <div class="form-group">
+                <label for="username">사용자 ID</label>
+                <input class="form-control" id="username" name="username" type="text" placeholder="id를 입력하세요" required>
+                <button type="button" class="btn btn-secondary mt-2" onclick="checkUsername()">ID 중복 확인</button>
+                <p id="usernameCheckMessage" class="mt-2"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input class="form-control" id="password" name="password" type="password" placeholder="비밀번호를 입력하세요" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="birth">생년월일</label>
+                <input class="form-control" id="birth" name="birth" type="date" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input class="form-control" id="name" name="name" type="text" placeholder="이름을 입력하세요" required>
+            </div>
+            
+            <div class="form-group">
+                <input type="text" id="postcode" name="postcode" placeholder="우편번호" readonly required>
+                <button type="button" class="btn btn-secondary" onclick="daumPost()">우편번호 찾기</button><br>
+                <input class="form-control" type="text" name="address" id="address" placeholder="주소" required>
+                <input class="form-control" type="text" name="detailaddress" id="detailaddress" placeholder="상세주소" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input class="form-control" id="email" name="email" type="email" placeholder="메일주소를 입력하세요" required>
+                <button type="button" class="btn btn-secondary mt-2" onclick="checkEmail()">이메일 중복 확인</button>
+                <p id="emailCheckMessage" class="mt-2"></p>
+            </div>            
+            <div class="form-group">
+                <label for="sex">성별</label><br>
+                <input type="radio" id="sex" name="sex" value="남자" checked> 남자
+                <input type="radio" id="sex" name="sex" value="여자"> 여자
+            </div>
+            
+            <div class="form-group">
+                <label for="underlyingcondition">기저질환</label>
+                <input class="form-control" id="underlyingcondition" name="underlyingcondition" type="text" value="없음">
+            </div>
+            	<!-- 회원 등급 -->
+            <div class="form-group">
+                <label for="memberstatus">구분</label>
+                <select class="form-control" id="memberstatus" name="memberstatus" required>
+                    <option value="general" selected>일반</option>
+                    <option value="doctor">의사</option>
+                    <option value="pharmacist">약사</option>
+                    <option value="admin">관리자</option>
+                </select>
+            </div>
+            	<!-- 가입방식 -->
+            <div class="form-group">
+        		<input class="form-control" id="signuppath" name="signuppath" th:value="*{signuppath}" type="hidden">
+    		</div>
+            
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary" id="submitButton" disabled>회원 가입</button>
+                <input type="reset" class="btn btn-secondary" value="다시 입력">
+            </div>
+        </form>
+    </div>
+</body>
+</html>

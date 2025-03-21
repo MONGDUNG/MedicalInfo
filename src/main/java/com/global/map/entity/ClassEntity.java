@@ -1,6 +1,5 @@
 package com.global.map.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -16,13 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class ClassificationEntity {
-	
+public class ClassEntity {
 	@Id
 	@Column(name = "CATEGORY_CODE", length = 50, nullable = false)
     private Integer CategoryCode;
 	
 	@Column(name = "CATEGORY_NAME", length = 50, nullable = false)
     private String CategoryName;
-
 }

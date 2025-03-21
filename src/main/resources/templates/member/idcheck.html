@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member ID Check</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .centered {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background-color: #007bff;
+            color: white;
+            border: 2px solid #0056b3;
+        }
+        .btn-bordered {
+            border: 2px solid #0056b3;
+        }
+        .card-body .btn, .form-container .btn {
+            margin-top: 10px;
+        }
+        .form-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container centered">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">사용자의 아이디는</h5>
+                <p class="card-text" id="username" th:text="${username}"> </p>입니다.               
+            </div>
+        </div><br>
+        <a href="/member/login" class="btn btn-light btn-bordered"><i class="fas fa-sign-in-alt"></i> 로그인</a>
+        <div class="form-container">
+            <form action="/member/newpassword" method="post">
+                <input type="hidden" name="username" th:value="${username}">
+                <button type="submit" class="btn btn-light btn-bordered"><i class="fas fa-key"></i> 비밀번호 변경</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

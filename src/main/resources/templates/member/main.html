@@ -1,0 +1,27 @@
+<!-- 좌측 고정 네비게이션 바 -->
+<div class="sidebar">
+    <div class="container">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/member/login}">로그인</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/logout}">로그아웃</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/modify}">정보수정</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/delete}">계정 삭제</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/member/signup}">회원가입</a>
+            </li> 
+            <div> 
+            <li class="nav-item" th:if="${dto != null && dto.memberstatus == 'admin' }">
+              <a class="nav-link"  th:href="@{/member/admin}">관리자페이지</a>
+            </li>
+            </div>                       
+        </ul>
+    </div>
+</div>

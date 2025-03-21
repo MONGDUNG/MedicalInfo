@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>회원 목록</title>
+    <!-- 부트스트랩 추가 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .table th {
+            background-color: #6c757d;
+            color: white;
+            text-align: center;
+        }
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .btn-update {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-update:hover {
+            background-color: #0056b3;
+        }
+        .btn-main {
+            margin-top: 20px;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center text-primary">회원 목록</h2>
+
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>아이디</th>
+                    <th>이름</th>
+                    <th>주소</th>
+                    <th>이메일</th> 
+                    <th>회원 상태</th>                
+                    <th>제재 시작일</th>
+                    <th>제재 종료일</th>                          
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="member : ${list}">
+                    <td th:text="${member.id}"></td>
+                    <td th:text="${member.username}"></td>
+                    <td th:text="${member.name}"></td>
+                    <td th:text="${member.address}"></td>
+                    <td th:text="${member.email}"></td> 
+                    <td>
+                        <form th:action="@{/member/updatememberstatus}" method="post" class="d-flex align-items-center">
+                            <input type="hidden" name="memberId" th:value="${member.id}" />
+                            <select name="newMemberStatus" class="form-select me-2">
+                                <option th:value="general" th:selected="${member.memberstatus} == 'general'">일반</option>
+                                <option th:value="doctor" th:selected="${member.memberstatus} == 'doctor'">의사</option>
+                                <option th:value="pharmacist" th:selected="${member.memberstatus} == 'pharmacist'">약사</option>
+                                <option th:value="admin" th:selected="${member.memberstatus} == 'admin'">관리자</option>
+                                <option th:value="dormant" th:selected="${member.memberstatus} == 'dormant'">휴면</option>
+                                <option th:value="withdrawn" th:selected="${member.memberstatus} == 'withdrawn'">탈퇴</option>
+                                <option th:value="sanctioned" th:selected="${member.memberstatus} == 'sanctioned'">밴</option>
+                            </select>                                               
+                            <button type="submit" class="btn btn-primary btn-sm">변경</button>
+                        </form>                
+                    </td>
+                    <td th:if="${member.memberstatus == 'sanctioned'}" th:text="${member.classiId.bandate}"></td>
+                    <td th:if="${member.memberstatus == 'sanctioned'}" th:text="${member.classiId.unbandate}"></td>
+                    <td th:if="${member.memberstatus != 'sanctioned'}" colspan="2">제재 상태가 아닙니다.</td>                                                                                                                      
+                </tr>
+            </tbody>
+        </table>
+
+        <p class="text-center">전체 회원 수: <span th:text="${count}" class="fw-bold text-primary">0</span></p>
+
+        <a th:href="@{/member/time}" class="btn btn-secondary btn-main">메인으로 이동</a>
+    </div>
+</body>
+</html>

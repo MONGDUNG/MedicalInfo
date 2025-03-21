@@ -204,7 +204,7 @@ public class MapService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
-    private MedinstDTO medinstToDTO(MedinstEntity entity, double distance) {
+    private MedinstDTO medinstToDTO(MedinstEntity entity) {
         return MedinstDTO.builder()
                 .id(entity.getId())
                 .hospitalCode(entity.getHospitalCode())
@@ -218,27 +218,24 @@ public class MapService {
                 .totalDoc(entity.getTotalDoc())
                 .latitude(Double.parseDouble(entity.getLatitude()))
                 .longitude(Double.parseDouble(entity.getLongitude()))
-                .distance(distance)
                 .build();
     }
-    private PharmacyDTO pharmacyToDTO(PharmacyEntity entity, double distance) {
+    private PharmacyDTO pharmacyToDTO(PharmacyEntity entity) {
         return PharmacyDTO.builder()
                 .id(entity.getId())
                 .pharmacyName(entity.getPharmacyName())
                 .address(entity.getAddress())
                 .latitude(Double.parseDouble(entity.getLatitude()))
                 .longitude(Double.parseDouble(entity.getLongitude()))
-                .distance(distance)
                 .build();
     }
-    private EmergencyDTO emergencyToDTO(EmergencyEntity entity, double distance) {
+    private EmergencyDTO emergencyToDTO(EmergencyEntity entity) {
         return EmergencyDTO.builder()
                 .erId(entity.getErId())
                 .hospitalName(entity.getHospitalName())
                 .address(entity.getAddress())
                 .latitude(Double.parseDouble(entity.getLatitude()))
                 .longitude(Double.parseDouble(entity.getLongitude()))
-                .distance(distance)
                 .build();
     }
 
@@ -359,6 +356,10 @@ public class MapService {
    public String findHCdByHNmAndAdr(String hospitalName, String address) {
        return medinstRepository.findHCdByHNmAndAdr(hospitalName, address)
                .orElseThrow(() -> new RuntimeException("Hospital code not found"));
+   }
+   public MedinstDTO getHospitalInfo(String hospitalCode) {
+	   MedinstEntity entity = medinstRepository.findByHospitalCode(hospitalCode);
+	   return medinstToDTO(entity);
    }
 }
    

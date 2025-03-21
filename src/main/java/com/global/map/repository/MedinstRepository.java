@@ -31,6 +31,8 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
     
     @Query("SELECT m.hospitalCode FROM MedinstEntity m WHERE m.hospitalName = :hospitalName AND m.address = :address")
     Optional<String> findHCdByHNmAndAdr(@Param("hospitalName") String hospitalName, @Param("address") String address);
+    
+    MedinstEntity findByHospitalCode(String hospitalCode);
 
 }
 

@@ -4,8 +4,6 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.global.map.entity.ClassificationEntity;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +28,7 @@ import lombok.NoArgsConstructor;
 @Table(name="member")
 public class MemberEntity {
 
+	
 		
 		@Id
 		@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,5 +52,13 @@ public class MemberEntity {
 		
 		@OneToOne(cascade= CascadeType.REMOVE)
 		private ClassificationEntity classiId; 
-			
+		
+		@OneToOne 
+		private MemberTierEntity tierId;
+		
+		
+		
+
 }
+
+

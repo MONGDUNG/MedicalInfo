@@ -27,12 +27,14 @@ public class ReviewController {
 
 	// ✅ 리뷰 저장 처리 (병원 코드도 함께 받아서 설정하도록 변경!)
 	@PostMapping("/save")
+
 	public String saveReview(
 			@RequestParam Long memberId,
 			@RequestParam String hospitalCode, // ✅ 병원 코드 입력 받음
 			@ModelAttribute ReviewEntity review,
 			Model model) {
 		
+
 		MemberEntity member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다. ID: " + memberId));
 

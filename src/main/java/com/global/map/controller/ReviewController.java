@@ -26,7 +26,7 @@ public class ReviewController {
 
 	
 	@PostMapping("/save")
-	public String saveReview(@RequestParam Long memberId, @ModelAttribute ReviewEntity review, Model model) { // ✅ 리뷰 저장 처리 (폼 데이터 받기)
+	public String saveReview(@RequestParam Integer memberId, @ModelAttribute ReviewEntity review, Model model) { // ✅ 리뷰 저장 처리 (폼 데이터 받기)
 		MemberEntity member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다. ID: " + memberId));
 

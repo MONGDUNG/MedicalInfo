@@ -309,23 +309,6 @@
 			}
 		});
 	}
-			
-	document.addEventListener("click", function(event) {
-	    if (event.target.classList.contains("detail-btn")) {
-	        let name = document.getElementById("modalTitle").innerText;
-	        let address = document.getElementById("modalAddress").innerText;
-	        let phone = document.getElementById("modalPhone").innerText;
-			let category = document.getElementById("modalCategory").innerText;
-			
-	        // 🔥 여기서 lat, lng 값을 제대로 가져오고 있는지 확인!
-	        let lat = document.getElementById("modalLat")?.innerText || "0.0"; 
-	        let lng = document.getElementById("modalLng")?.innerText || "0.0"; 
-
-	        let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}&category=${encodeURIComponent(category)}`;
-	        console.log("🔗 이동할 URL:", url);
-	        window.location.href = url;
-	    }
-	});
 	
 	function createListItem(place) {
 	    var item = document.createElement('div');
@@ -377,8 +360,10 @@
 	    let address = document.getElementById("modalAddress").innerText;
 	    let phone = document.getElementById("modalPhone").innerText;
 	    let category = document.getElementById("modalCategory").innerText; // 카테고리 추가
-
-	    let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(category)}`;
+		// 🔥 여기서 lat, lng 값을 제대로 가져오고 있는지 확인!
+		let lat = document.getElementById("modalLat")?.innerText || "0.0"; 
+		let lng = document.getElementById("modalLng")?.innerText || "0.0"; 
+		let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}&category=${encodeURIComponent(category)}`;
 	    window.location.href = url;
 	};
 			

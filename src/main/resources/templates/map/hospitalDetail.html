@@ -112,9 +112,12 @@
 
     <div class="container">
         <h1>🏥 병원 상세 정보</h1>
-        <p class="info"><strong>병원명:</strong> <span id="hospitalName" th:text="${hospitalName}"></span></p>
+        <p class="info"><strong>병원명:</strong> <span id="hospitalName" th:text="${name}"></span></p>
         <p class="info"><strong>주소:</strong> <span id="address" th:text="${address}"></span></p>
-        <p class="info"><strong>전화번호:</strong> <span th:text="${phoneNumber}"></span></p>
+        <p class="info"><strong>전화번호:</strong> <span th:text="${phone}"></span></p>
+        <p class="info" th:if="${hospitalInfo != null and hospitalInfo.website != null and hospitalInfo.website != ''}">
+		    <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
+		</p>
 
         <h2 class="highlight">🏥 운영 시간</h2>
         <table class="time-table">
@@ -202,7 +205,7 @@ function updateHoursTable(data) {
 }
 
 function openKakaoDirections() {
-    var hospitalName = "[[${hospitalName}]]";
+    var hospitalName = "[[${name}]]";
     var latitude = "[[${latitude}]]";
     var longitude = "[[${longitude}]]";
 

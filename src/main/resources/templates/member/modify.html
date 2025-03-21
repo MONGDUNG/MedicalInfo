@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보 수정</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <style>
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .form-control, .btn, input[type="reset"] {
+            margin-top: 10px;
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h4 class="text-center">정보수정</h4>
+        <form method="post" th:object="${memberDTO}">
+    <!-- CSRF 토큰 추가 -->
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+    <div class="form-group">
+        <label for="username">사용자 ID</label>
+        <span th:text="${memberDTO.username}" id="username" name="username"></span>
+    </div>
+    <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input class="form-control" id="password" name="password" type="password" placeholder="비밀번호를 입력하세요." required >
+    </div>
+    <div class="form-group">
+        <label for="birth">생년월일</label>
+        <input class="form-control" id="birth" name="birth" type="date" th:value="*{birth}">
+    </div>
+    <div class="form-group">
+        <label for="name">이름</label>
+        <input class="form-control" id="name" name="name" th:value="*{name}">
+    </div>
+    <div class="form-group">
+        <input type="text" id="postcode" name="postcode" th:value="*{postcode}" placeholder="우편번호" readonly="readonly">
+        <button type="button" class="btn btn-secondary" onclick="daumPost()">우편번호 찾기</button><br>
+        <input class="form-control" type="text" th:value="*{address}" name="address" id="address" placeholder="주소">
+        <input class="form-control" type="text" th:value="*{detailaddress}" name="detailaddress" id="detailaddress" placeholder="상세주소">
+    </div>
+    <div class="form-group">
+        <label for="email">이메일</label>
+        <input class="form-control" id="email" name="email" th:value="*{email}" type="email">
+    </div>
+    <div class="form-group">
+        <label for="sex">성별</label><br>
+        <input type="radio" id="sex_male" name="sex" value="남자" th:checked="*{sex} == '남자'"> 남자
+        <input type="radio" id="sex_female" name="sex" value="여자" th:checked="*{sex} == '여자'"> 여자
+    </div>
+    <div class="form-group">
+        <label for="underlyingcondition">기저질환</label>
+        <input class="form-control" id="underlyingcondition" name="underlyingcondition" th:value="*{underlyingcondition}" type="text">
+    </div>
+    <div class="form-group">
+        <label for="memberstatus">구분</label>
+        <select class="form-control" id="memberstatus" name="memberstatus">
+            <option value="general" th:selected="*{memberstatus} == 'general'">일반</option>
+            <option value="doctor" th:selected="*{memberstatus} == 'doctor'">의사</option>
+            <option value="pharmacist" th:selected="*{memberstatus} == 'pharmacist'">약사</option>
+            <option value="admin" th:selected="*{memberstatus} == 'admin'">관리자</option>
+        </select> 
+        															
+             
+    </div>
+    <div class="form-group">
+        <input class="form-control" id="signuppath" name="signuppath" th:value="*{signuppath}" type="hidden">
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">정보 수정</button>
+        <input type="reset" class="btn btn-secondary" value="다시 입력">
+    </div>
+</form>
+        
+    </div>
+    <script>
+    //주소 api 부분
+        function daumPost() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var addr;
+                    if (data.userSelectedType === 'R') { 
+                        addr = data.roadAddress;
+                    } else { 
+                        addr = data.jibunAddress;
+                    }
+                    document.getElementById('postcode').value = data.zonecode;
+                    document.getElementById('address').value = addr;
+                    document.getElementById('detailaddress').focus();
+                }
+            }).open();
+        }
+    </script>
+</body>
+</html>

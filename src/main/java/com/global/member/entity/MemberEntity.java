@@ -40,6 +40,11 @@ public class MemberEntity {
 		private String name; //이름
 		private String address; //주소
 		private String detailaddress; //상세주소
+		
+		//문동규추가
+		private Double latitude; // 위도
+	    private Double longitude; // 경도
+		
 		private String postcode; //우편번호
 		private Date birth; //생일
 		@Column(unique = true) 
@@ -49,6 +54,8 @@ public class MemberEntity {
 		private LocalDateTime lastlogindate; //마지막 로그인		
 		private Integer signuppath; //가입경로
 		private String memberstatus;   // 10 일반, 20,21 의사,약사 40 관리자
+		
+		
 		
 		@OneToOne(cascade= CascadeType.REMOVE)
 		private ClassificationEntity classiId; 

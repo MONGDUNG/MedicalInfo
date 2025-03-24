@@ -116,8 +116,8 @@
         <p class="info"><strong>주소:</strong> <span id="address" th:text="${address}"></span></p>
         <p class="info"><strong>전화번호:</strong> <span th:text="${phone}"></span></p>
         <p class="info" th:if="${hospitalInfo != null and hospitalInfo.website != null and hospitalInfo.website != ''}">
-		    <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
-		</p>
+          <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
+      </p>
 
         <h2 class="highlight">🏥 운영 시간</h2>
         <table class="time-table">
@@ -138,9 +138,10 @@
 
         <!-- ✅ 버튼을 flex로 정렬 -->
         <div class="button-group">
-            <button class="btn" onclick="window.location.href='/map/main'">🔙 뒤로 가기</button>
-            <button class="btn kakao-btn" onclick="openKakaoDirections()">🗺️ 카카오맵 길찾기</button>
-        </div>
+        <button class="btn" onclick="window.location.href='/map/main'">🔙 뒤로 가기</button>
+        <button class="btn kakao-btn" onclick="openKakaoDirections()">🗺️ 카카오맵 길찾기</button>
+        <button class="btn" onclick="goToReview()">📝 리뷰 보기</button> <!-- ✅ 리뷰 보기 버튼 추가 -->
+       </div>
     </div>
 
 <script>
@@ -149,13 +150,17 @@ document.addEventListener("DOMContentLoaded", function() {
     let address = document.getElementById("address").innerText.trim();
     let category = "[[${category}]]";
     
+   
+
     if (category === "응급실") {
         fetchEmergencyHours(hospitalName, address);
-    } else if (category === "병원") {
-        fetchHospitalHours(hospitalName, address);
-    } else {
-        document.querySelector(".highlight").style.display = "none";
+    } else if(category === "약국"){
+    	// 약국은 운영시간 표시X  
+    	document.querySelector(".highlight").style.display = "none";
         document.querySelector(".time-table").style.display = "none";
+    }
+    else{
+        fetchHospitalHours(hospitalName, address);
     }
 });
 
@@ -211,7 +216,28 @@ function openKakaoDirections() {
 
     var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
     window.open(url, "_blank");
+    
 }
+function goToReview() {
+    const hospitalName = document.getElementById("hospitalName").innerText.trim();
+    const address = document.getElementById("address").innerText.trim();
+
+    fetch(`/review/code?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("병원 코드 조회 실패");
+            }
+            return response.text();
+        })
+        .then(hospitalCode => {
+            window.location.href = `/review/list/${hospitalCode}`;
+        })
+        .catch(error => {
+            console.error("❌ 병원 코드 fetch 에러:", error);
+            alert("리뷰 페이지로 이동할 수 없습니다. 병원 정보 확인 필요");
+        });
+}
+
 </script>
 
 

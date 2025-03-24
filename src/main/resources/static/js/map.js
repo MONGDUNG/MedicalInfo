@@ -52,8 +52,15 @@
 	        updateDeptList(group);
 	    });
 	});
-	document.getElementById('nearbyCheckbox').addEventListener('change', function() {
-	    if (this.checked && window.isLoggedIn) {
+	document.getElementById('nearbyCheckbox').addEventListener('change', function(event) {
+	    if (!window.isLoggedIn) {
+	        alert('로그인이 필요합니다.');
+	        event.preventDefault();  // 체크박스 상태 변경 방지
+	        this.checked = false;    // 체크박스 상태를 강제로 해제
+	        return;
+	    }
+	    
+	    if (this.checked) {
 	        moveMapToUserLocation();
 	    }
 	});

@@ -85,63 +85,63 @@
             background: #bfbfbf;
         }
         #category-btns {
-		    position: absolute;
-		    top: 17px;
-		    left: 10px;
-		    z-index: 10;
-		    display: flex;
-		    flex-wrap: wrap;
-		    align-items: center;
-		}
-		
-		#category-btns button {
-		    padding: 8px;
-		    margin: 2px;
-		    cursor: pointer;
-		}
-		
-		#more-btn {
-		    position: relative; /* 상대 위치 기준점으로 설정 */
-		    font-weight: bold;
-		}
-		
-		#hidden-btns {
-		    position: absolute;
-		    top: 100%; /* 더보기 버튼의 바로 아래쪽으로 위치 설정 */
-		    right: 0; /* 더보기 버튼의 오른쪽 끝에 맞춤 */
-		    background: #fff;
-		    border: 1px solid #ccc;
-		    padding: 10px;
-		    border-radius: 5px;
-		    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-		    white-space: nowrap; /* 버튼이 한 줄로 표시되도록 유지 */
-		}
-		
-		#hidden-btns button {
-		    display: block;
-		    width: 100%;
-		    text-align: left;
-		    border: none;
-		    background: none;
-		    margin: 3px 0;
-		}
-		
-		#hidden-btns button:hover {
-		    background-color: #f0f0f0;
-		}
-		
-		.modal {
+          position: absolute;
+          top: 17px;
+          left: 10px;
+          z-index: 10;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+      }
+      
+      #category-btns button {
+          padding: 8px;
+          margin: 2px;
+          cursor: pointer;
+      }
+      
+      #more-btn {
+          position: relative; /* 상대 위치 기준점으로 설정 */
+          font-weight: bold;
+      }
+      
+      #hidden-btns {
+          position: absolute;
+          top: 100%; /* 더보기 버튼의 바로 아래쪽으로 위치 설정 */
+          right: 0; /* 더보기 버튼의 오른쪽 끝에 맞춤 */
+          background: #fff;
+          border: 1px solid #ccc;
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+          white-space: nowrap; /* 버튼이 한 줄로 표시되도록 유지 */
+      }
+      
+      #hidden-btns button {
+          display: block;
+          width: 100%;
+          text-align: left;
+          border: none;
+          background: none;
+          margin: 3px 0;
+      }
+      
+      #hidden-btns button:hover {
+          background-color: #f0f0f0;
+      }
+      
+      .modal {
             display: none;
-		    position: absolute;
-		    top: 120px;  /* 상단에서 적당한 위치 */
-		    left: 330px; /* 📍 지도 왼쪽 (사이드바 오른쪽) */
-		    width: 300px;
-		    background: white;
-		    padding: 20px;
-		    border-radius: 8px;
-		    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-		    z-index: 1000;
-		}
+          position: absolute;
+          top: 120px;  /* 상단에서 적당한 위치 */
+          left: 330px; /* 📍 지도 왼쪽 (사이드바 오른쪽) */
+          width: 300px;
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+      }
         .modal-content {
             text-align: center;
         }
@@ -247,9 +247,9 @@
 </div>
 
 <script th:inline="javascript">
-	window.isLoggedIn = /*[[${isLoggedIn}]]*/ false;
-	window.userLatitude = /*[[${dto?.latitude}]]*/ null;
-	window.userLongitude = /*[[${dto?.longitude}]]*/ null;
+   window.isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+   window.userLatitude = /*[[${dto?.latitude}]]*/ null;
+   window.userLongitude = /*[[${dto?.longitude}]]*/ null;
 </script>
 
     <script type="text/javascript" src="/js/map.js"></script>

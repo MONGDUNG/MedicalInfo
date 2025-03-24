@@ -216,8 +216,7 @@ function openKakaoDirections() {
 
     var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
     window.open(url, "_blank");
-    
-}
+
 function goToReview() {
     const hospitalName = document.getElementById("hospitalName").innerText.trim();
     const address = document.getElementById("address").innerText.trim();
@@ -236,7 +235,7 @@ function goToReview() {
             console.error("❌ 병원 코드 fetch 에러:", error);
             alert("리뷰 페이지로 이동할 수 없습니다. 병원 정보 확인 필요");
         });
-}
+
 
 </script>
 

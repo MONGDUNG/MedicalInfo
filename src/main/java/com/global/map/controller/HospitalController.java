@@ -46,8 +46,8 @@ public class HospitalController {
 	        String hospitalCode = mapService.findHCdByHNmAndAdr(name, address);
 	        MedinstDTO hospitalInfo = mapService.getHospitalInfo(hospitalCode);
 	        model.addAttribute("hospitalInfo", hospitalInfo);
+	        
 	    }
-
 	    return "map/hospitalDetail";
 	}
 	 // 응급실 운영 시간 조회 API

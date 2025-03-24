@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.global.map.dto.ReviewDTO;
 import com.global.map.entity.ReviewEntity;
 import com.global.map.repository.ReviewRepository;
 import com.global.map.service.MapService;
@@ -71,13 +72,17 @@ public class ReviewController {
         return "reviewList";
     }
 
-    // ✅ 병원명+주소로 직접 리뷰 리스트 JSON으로 가져오기 (API용)
     @GetMapping("/list")
-    public List<ReviewEntity> getReviews(
-            @RequestParam String hospitalName,
-            @RequestParam String address) {
+    @ResponseBody
+    public List<ReviewDTO> getReviews(
+        @RequestParam("hospitalName") String hospitalName,
+        @RequestParam("address") String address) {
 
         String hospitalCode = mapService.findHCdByHNmAndAdr(hospitalName, address);
-        return reviewRepository.findByHospitalCode(hospitalCode);
+        System.out.println("✅ 조회된 hospitalCode: " + hospitalCode);
+
+        return reviewRepository.findByHospitalCode(hospitalCode).stream()
+                .map(ReviewDTO::new)
+                .toList();
     }
 }

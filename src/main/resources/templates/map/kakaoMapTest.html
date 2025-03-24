@@ -245,6 +245,14 @@
         </div>
     </div>
 </div>
+
+
+<script th:inline="javascript">
+	window.isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+	window.userLatitude = /*[[${dto?.latitude}]]*/ null;
+	window.userLongitude = /*[[${dto?.longitude}]]*/ null;
+</script>
+
     <script type="text/javascript" src="/js/map.js"></script>
 </body>
 </html>

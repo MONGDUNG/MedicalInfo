@@ -3,29 +3,44 @@ package com.global.map.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.global.map.dto.ItemDTO;
 import com.global.map.service.MapService;
+import com.global.member.dto.MemberDTO;
+import com.global.member.service.MemberService;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/map")
 @RequiredArgsConstructor
 public class MapController {
-
+	@Autowired
+	private MemberService ms;
     private final MapService mapService;
 
     @GetMapping("main")
-    public String mapMain(Model model) throws JsonProcessingException {
-
+    public String mapMain(Model model, Principal principal) throws JsonProcessingException {
+        if (principal != null) {
+            model.addAttribute("dto", ms.readUser(principal.getName()));
+            model.addAttribute("isLoggedIn", true);
+        } else {
+            model.addAttribute("isLoggedIn", false);
+        }
         return "map/kakaoMapTest";  // Thymeleaf 뷰 반환
-    }     
-    
+    }    
 
     @GetMapping("nearbyHospitals")
     @ResponseBody

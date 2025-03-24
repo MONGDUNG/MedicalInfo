@@ -29,7 +29,7 @@ public class ReviewController {
 	@PostMapping("/save")
 
 	public String saveReview(
-			@RequestParam Long memberId,
+			@RequestParam Integer memberId,
 			@RequestParam String hospitalCode, // ✅ 병원 코드 입력 받음
 			@ModelAttribute ReviewEntity review,
 			Model model) {

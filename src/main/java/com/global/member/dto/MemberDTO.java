@@ -22,6 +22,11 @@ public class MemberDTO {
 		private String name; //이름
 		private String address; //주소
 		private String detailaddress; //상세주소
+		
+		//문동규추가
+		private Double latitude; // 위도
+	    private Double longitude; // 경도
+		
 		private String postcode; //우편번호
 		private Date birth; //생일
 		private String sex; //성별

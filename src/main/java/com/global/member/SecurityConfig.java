@@ -36,7 +36,8 @@ public class SecurityConfig {
 	            .permitAll() // 모든 권한 허용.
 	    )
 	    .csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2/**"), 
-	    		new AntPathRequestMatcher("/member/**"))) 
+	    		new AntPathRequestMatcher("/member/**"),
+	    	    new AntPathRequestMatcher("/review/**"))) // 이거 연결되고 지워야됨!
 	        // 해당 경로(h2) 제외 설정. ( ?/ 파라미터 관련 보안 설정)
 	    .headers((header) -> header.addHeaderWriter(new XFrameOptionsHeaderWriter(
 	        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))) // H2 콘솔 페이지 출력 셋팅

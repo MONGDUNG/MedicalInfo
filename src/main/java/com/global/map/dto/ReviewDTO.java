@@ -23,6 +23,6 @@ public class ReviewDTO {
         this.reviewDate = entity.getReviewDate();
         this.rating = entity.getRating();
         this.reviewText = entity.getReviewText();
-        this.reviewerName = entity.getMember().getName(); // MemberEntity에 name 필드 있어야 함
+        this.reviewerName = entity.getReviewerName(); // 멤버 넣으면 삭제
     }
 }

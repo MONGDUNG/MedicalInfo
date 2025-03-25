@@ -114,7 +114,7 @@
         <h1>🏥 병원 상세 정보</h1>
         <p class="info"><strong>병원명:</strong> <span id="hospitalName" th:text="${name}"></span></p>
         <p class="info"><strong>주소:</strong> <span id="address" th:text="${address}"></span></p>
-        <p class="info"><strong>전화번호:</strong> <span th:text="${phone}"></span></p>
+        <p class="info"><strong>전화번호:</strong> <span id="phone" th:text="${phone}"></span></p>
         <p class="info" th:if="${hospitalInfo != null and hospitalInfo.website != null and hospitalInfo.website != ''}">
 		    <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
 		</p>
@@ -240,23 +240,34 @@ function openKakaoDirections() {
     var longitude = "[[${longitude}]]";
 
     var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
-    window.open(url, "_blank");
-    
+    window.open(url, "_blank"); 
 }
+
 function goToReviewWrite() {
     const hospitalName = document.getElementById("hospitalName").innerText.trim();
     const address = document.getElementById("address").innerText.trim();
+    const phone = document.getElementById("phone").innerText.trim();
+    const category = "[[${category}]]";
+    const lat = "[[${latitude}]]";
+    const lng = "[[${longitude}]]";
 
     fetch(`/review/code?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
         .then(response => response.text())
         .then(hospitalCode => {
-            window.location.href = `/review/write/${hospitalCode}`;
+            const url = `/review/write/${hospitalCode}?` +
+                        `name=${encodeURIComponent(hospitalName)}` +
+                        `&address=${encodeURIComponent(address)}` +
+                        `&phone=${encodeURIComponent(phone)}` +
+                        `&lat=${lat}` +
+                        `&lng=${lng}` +
+                        `&category=${encodeURIComponent(category)}`;
+
+            window.location.href = url;
         })
         .catch(error => {
             console.error("❌ 병원 코드 조회 실패:", error);
             alert("리뷰 작성 페이지로 이동할 수 없습니다.");
         });
-
 }
 
 

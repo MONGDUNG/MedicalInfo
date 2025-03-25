@@ -26,6 +26,8 @@ public class ReviewEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
+	
 	private Long id;
 	
 	@Column(nullable = false)
@@ -40,8 +42,14 @@ public class ReviewEntity {
 	@Column(columnDefinition = "TEXT")
 	private String reviewText;
 	
+	@Column(nullable = false)
+	private String reviewerName;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private MemberEntity member;
-
+	
+	@Column(nullable = false)
+	private String reviewName;
+	
 }

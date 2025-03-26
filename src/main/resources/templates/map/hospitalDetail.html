@@ -114,10 +114,10 @@
         <h1>🏥 병원 상세 정보</h1>
         <p class="info"><strong>병원명:</strong> <span id="hospitalName" th:text="${name}"></span></p>
         <p class="info"><strong>주소:</strong> <span id="address" th:text="${address}"></span></p>
-        <p class="info"><strong>전화번호:</strong> <span th:text="${phone}"></span></p>
+        <p class="info"><strong>전화번호:</strong> <span id="phone" th:text="${phone}"></span></p>
         <p class="info" th:if="${hospitalInfo != null and hospitalInfo.website != null and hospitalInfo.website != ''}">
-          <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
-      </p>
+		    <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
+		</p>
 
         <h2 class="highlight">🏥 운영 시간</h2>
         <table class="time-table">
@@ -140,8 +140,12 @@
         <div class="button-group">
         <button class="btn" onclick="window.location.href='/map/main'">🔙 뒤로 가기</button>
         <button class="btn kakao-btn" onclick="openKakaoDirections()">🗺️ 카카오맵 길찾기</button>
-        <button class="btn" onclick="goToReview()">📝 리뷰 보기</button> <!-- ✅ 리뷰 보기 버튼 추가 -->
+        <button class="btn" onclick="goToReviewWrite()">📝 리뷰 작성하기</button> <!-- ✅ 리뷰 보기 버튼 추가 -->
        </div>
+       <div id="reviewSection" style="margin-top: 30px;">
+         <h3>🗣️ 사용자 리뷰</h3>
+       <div id="reviewList">로딩 중...</div>
+     </div>
     </div>
 
 <script>
@@ -149,19 +153,44 @@ document.addEventListener("DOMContentLoaded", function() {
     let hospitalName = document.getElementById("hospitalName").innerText.trim();        
     let address = document.getElementById("address").innerText.trim();
     let category = "[[${category}]]";
-    
-   
 
     if (category === "응급실") {
         fetchEmergencyHours(hospitalName, address);
+
+        // 👉 응급실은 리뷰 fetch 생략 + "리뷰 없음" 고정 출력
+        const container = document.getElementById("reviewList");
+        container.innerHTML = "<p>응급실은 리뷰를 제공하지 않습니다.</p>";
+        return; // 아래 리뷰 fetch 실행 안 됨
     } else if(category === "약국"){
-    	// 약국은 운영시간 표시X  
-    	document.querySelector(".highlight").style.display = "none";
+		// 약국은 운영시간 표시 x
+		document.querySelector(".highlight").style.display = "none";
         document.querySelector(".time-table").style.display = "none";
-    }
-    else{
-        fetchHospitalHours(hospitalName, address);
-    }
+	} else{
+		// 일반 병원 리뷰 로직
+		fetchHospitalHours(hospitalName, address);
+
+		fetch(`/review/list?hospitalName=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
+			.then(res => res.json())
+			.then(data => {
+				const container = document.getElementById("reviewList");
+				if (data.length === 0) {
+					container.innerHTML = "<p>아직 작성된 리뷰가 없습니다.</p>";
+					return;
+				}
+
+				container.innerHTML = data.map(r => `
+					<div style="border:1px solid #ddd; padding:10px; margin:10px 0;">
+						<strong>⭐ ${r.rating}점</strong> <br>
+						<p>${r.reviewText}</p>
+						<small>🕒 ${r.reviewDate.replace('T', ' ').slice(0, 16)} | ✍️ ${r.reviewerName}</small>
+					</div>
+				`).join('');
+			})
+			.catch(err => {
+				console.error("❌ 리뷰 리스트 불러오기 실패:", err);
+				document.getElementById("reviewList").innerHTML = "<p>리뷰를 불러올 수 없습니다.</p>";
+			});
+		}
 });
 
 function fetchEmergencyHours(hospitalName, address) {
@@ -215,30 +244,40 @@ function openKakaoDirections() {
     var longitude = "[[${longitude}]]";
 
     var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
-    window.open(url, "_blank");
 
-function goToReview() {
+    window.open(url, "_blank"); 
+}
+
+function goToReviewWrite() {
+
     const hospitalName = document.getElementById("hospitalName").innerText.trim();
     const address = document.getElementById("address").innerText.trim();
+    const phone = document.getElementById("phone").innerText.trim();
+    const category = "[[${category}]]";
+    const lat = "[[${latitude}]]";
+    const lng = "[[${longitude}]]";
 
     fetch(`/review/code?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("병원 코드 조회 실패");
-            }
-            return response.text();
-        })
+        .then(response => response.text())
         .then(hospitalCode => {
-            window.location.href = `/review/list/${hospitalCode}`;
+            const url = `/review/write/${hospitalCode}?` +
+                        `name=${encodeURIComponent(hospitalName)}` +
+                        `&address=${encodeURIComponent(address)}` +
+                        `&phone=${encodeURIComponent(phone)}` +
+                        `&lat=${lat}` +
+                        `&lng=${lng}` +
+                        `&category=${encodeURIComponent(category)}`;
+
+            window.location.href = url;
         })
         .catch(error => {
-            console.error("❌ 병원 코드 fetch 에러:", error);
-            alert("리뷰 페이지로 이동할 수 없습니다. 병원 정보 확인 필요");
+            console.error("❌ 병원 코드 조회 실패:", error);
+            alert("리뷰 작성 페이지로 이동할 수 없습니다.");
         });
 
 
-</script>
 
+</script>
 
 </body>
 </html>

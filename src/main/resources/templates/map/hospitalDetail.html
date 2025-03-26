@@ -244,10 +244,12 @@ function openKakaoDirections() {
     var longitude = "[[${longitude}]]";
 
     var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
+
     window.open(url, "_blank"); 
 }
 
 function goToReviewWrite() {
+
     const hospitalName = document.getElementById("hospitalName").innerText.trim();
     const address = document.getElementById("address").innerText.trim();
     const phone = document.getElementById("phone").innerText.trim();
@@ -272,7 +274,7 @@ function goToReviewWrite() {
             console.error("❌ 병원 코드 조회 실패:", error);
             alert("리뷰 작성 페이지로 이동할 수 없습니다.");
         });
-}
+
 
 
 </script>

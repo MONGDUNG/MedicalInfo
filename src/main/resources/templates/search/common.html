@@ -1,0 +1,33 @@
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+	    document.querySelectorAll(".btn").forEach(button => {
+	        button.addEventListener("click", function(event) {
+	            event.preventDefault(); // a태그 기본 링크 이동 방지
+	            
+	            let selectedText = this.innerText; // A태그의 텍스트 가져오기 ex)얼굴
+	            let statck =  button.getAttribute("data-name"); 
+	            console.log("선택한 답변: ", statck); // 콘솔에 출력 브라우저에서 확인하는 용도 안해도됨
+
+	            // 페이지 이동
+	            window.location.href = this.href+"?txt="+statck; 
+	        });
+	    });
+	});
+</script>
+
+
+<!-- DTO자체만 출력할 경우 스택오버플로우 에러 현상 뜨니 주의 -->
+
+<!-- 질문 -->
+<h1 th:text="${question.questionText}"></h1>
+
+<!-- 답변 -->
+<div th:each="answer : ${question.answers}" class="container text-center mt-5">
+	<a class="btn btn-primary" th:data-name="${answer.stackNum}"  th:href="@{/disease/self_diagnosis/{num}(num=${orderNum + 1})}" th:text="${answer.answerText}"></a>
+</div>
+
+
+<!-- 선택 결과 -->
+<div>
+	
+</div>

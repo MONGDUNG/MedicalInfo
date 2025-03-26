@@ -24,4 +24,4 @@ public class ConvenienceStoreController {
         // 편의점 데이터 콘솔 출력
         stores.forEach(System.out::println);
     }
-}
+} // ㄴsex

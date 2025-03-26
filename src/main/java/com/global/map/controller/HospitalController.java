@@ -42,12 +42,11 @@ public class HospitalController {
         model.addAttribute("longitude", longitude);
 
 	    if (!category.equals("응급실") && !category.equals("약국")) {
-	    	System.out.println("category : " + category);
 	        String hospitalCode = mapService.findHCdByHNmAndAdr(name, address);
 	        MedinstDTO hospitalInfo = mapService.getHospitalInfo(hospitalCode);
 	        model.addAttribute("hospitalInfo", hospitalInfo);
+	        
 	    }
-
 	    return "map/hospitalDetail";
 	}
 	 // 응급실 운영 시간 조회 API
@@ -60,6 +59,7 @@ public class HospitalController {
     @ResponseBody
     public MedInfoDTO getHospitalHours(@RequestParam("name") String hospitalName, @RequestParam("address") String address) {
     	String hospitalCode = mapService.findHCdByHNmAndAdr(hospitalName, address);
+  
         return medInfoService.getHospitalOperatingHours(hospitalCode);
     }
 }

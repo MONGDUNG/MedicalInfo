@@ -29,12 +29,6 @@ import com.global.member.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
 
-
-
-
-
-
-
 @RequestMapping("/member/")
 @Controller
 public class MemberController {

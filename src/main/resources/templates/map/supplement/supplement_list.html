@@ -1,0 +1,67 @@
+<div layout:fragment="content" class="container my-3">
+
+    <!-- 메인페이지로 -->
+    <div class="mb-3">
+        <a href="/" class="btn btn-secondary"></a>
+    </div>
+
+    <!-- 검색 폼 -->
+    <form th:action="@{|/supplement/all?page=1${searchTerm != null ? '&name=' + searchTerm : ''}${primaryFnclty != null && primaryFnclty != '' ? '&primaryFnclty=' + primaryFnclty : ''}|}" method="get" class="mb-4">
+        <div class="form-group">
+            <label for="kw">검색어</label>
+            <input type="text" id="kw" name="name" class="form-control" placeholder="제품명으로 검색" th:value="${searchTerm}">
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="primaryFnclty">효과 검색</label>
+            <input type="text" id="primaryFnclty" name="primaryFnclty" class="form-control" placeholder="효과로 검색" th:value="${primaryFnclty}">
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">검색</button>
+    </form>
+
+    <!-- 제품 목록 테이블 -->
+    <table class="table">
+        <thead class="table-dark">
+            <tr class="text-center">
+                <th>번 호</th>
+                <th>제품명</th>
+                <th>업체명</th>
+                <th>좋아요 수</th> <!-- 좋아요 수 추가 -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="supplementDTO : ${list}" class="text-center">
+                <td th:text="${supplementDTO.id}"></td>
+                <td>
+                    <a th:href="@{|/supplement/detail/${supplementDTO.id}|}" th:text="${supplementDTO.prdlstNm}"></a>
+                </td>
+                <td th:text="${supplementDTO.bsshNm}"></td>
+                <td th:text="${supplementDTO.voter}">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <!-- 이전 버튼 -->
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{|/supplement/all?page=${currentPage - 1}${searchTerm != null ? '&name=' + searchTerm : ''}${primaryFnclty != null ? '&primaryFnclty=' + primaryFnclty : ''}|}">«</a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li th:each="pageNum : ${#numbers.sequence(startPage, endPage)}" class="page-item"
+                th:classappend="${pageNum == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{|/supplement/all?page=${pageNum}${searchTerm != null ? '&name=' + searchTerm : ''}${primaryFnclty != null ? '&primaryFnclty=' + primaryFnclty : ''}|}" th:text="${pageNum}"></a>
+            </li>
+
+            <!-- 다음 버튼 -->
+            <li class="page-item" th:classappend="${endPage == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{|/supplement/all?page=${currentPage + 1}${searchTerm != null ? '&name=' + searchTerm : ''}${primaryFnclty != null ? '&primaryFnclty=' + primaryFnclty : ''}|}">»</a>
+            </li>
+        </ul>
+    </div>
+
+</div>

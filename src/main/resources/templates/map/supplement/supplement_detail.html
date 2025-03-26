@@ -1,0 +1,33 @@
+<div layout:fragment="content" class="container my-3">
+    <h2 class="border-bottom py-2" th:text="${supplementDTO.prdlstNm}"></h2>
+    <div class="card-body">
+        <div th:text="${supplementDTO.primaryFnclty}" class="card-text"></div>
+    </div>
+    
+    <div class="my-3" sec:authorize="isAuthenticated()">
+        <a class="btn btn-success" th:href="@{|/supplement/vote/${supplementDTO.id}|}" th:text="좋아요"></a>
+        <span class="badge rounded-pill bg-success" th:text="${supplementDTO.voter}"></span> <!-- 추천수 (좋아요) -->
+    </div>
+    
+    <!-- 답변 개수 -->
+    <h5 class="border-bottom my-3 py-2" th:text="${#lists.size(supplementDTO.answerList)} + ' 개의 답변이 있습니다.'"></h5>
+
+    <!-- 답변(answer) 반복 -->
+    <div th:each="answerDTO : ${supplementDTO.answerList}">
+        <div class="card-body">
+            <div class="card-text" th:text="${answerDTO.content}"></div>
+        </div>
+    </div>    
+
+    <!-- 답변 등록 폼 -->
+    <form method="post" th:action="@{|/answer/create/supplement/${supplementDTO.id}|}">
+        <textarea class="form-control" rows="5" cols="20" name="content"></textarea>
+        <button type="submit" class="btn btn-primary my-2">답변등록</button>
+    </form>
+
+    <!-- 메인 페이지 이동 -->
+    <a href="/member/main" class="btn btn-secondary mb-3">메인 페이지로 이동</a>
+    
+    <!-- 의약품 페이지 이동 -->
+    <a href="/supplement/all" class="btn btn-secondary mb-3">의약품 페이지로 이동</a>
+</div>

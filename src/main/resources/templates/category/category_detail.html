@@ -1,0 +1,28 @@
+<div layout:fragment="content" class="container my-3">
+    <h2 class="border-bottom py-2" th:text="${categoryDTO.productName}"></h2>
+    <div class="card-body">
+        <div th:text="${categoryDTO.indications}" class="card-text"></div>
+    </div>
+    
+    <!-- 답변 개수 -->
+    <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(categoryDTO.answerList)} 개의 답변이 있습니다.|"></h5>
+
+    <!-- 답변(answer) 반복 -->
+    <div th:each="answerDTO : ${categoryDTO.answerList}">
+        <div class="card-body">
+            <div class="card-text" th:text="${answerDTO.content}"></div>
+    	</div>
+    </div>    
+
+    <!-- 답변 등록 폼 -->
+    <form method="post" th:action="@{|/answer/create/category/${categoryDTO.id}|}">
+        <textarea class="form-control" rows="5" cols="20" name="content"></textarea>
+        <button type="submit" class="btn btn-primary my-2">답변등록</button>
+    </form>
+
+    <!-- 메인 페이지 이동 -->
+    <a href="/member/main" class="btn btn-secondary mb-3">메인 페이지로 이동</a>
+    
+    <!-- 의약품 페이지 이동 -->
+    <a href="/category/all" class="btn btn-secondary mb-3">의약품 페이지로 이동</a>
+</div>

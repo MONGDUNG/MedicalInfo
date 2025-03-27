@@ -11,7 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
 import com.global.map.dto.ReviewDTO;
+
 import com.global.map.entity.ReviewEntity;
 import com.global.map.repository.ReviewRepository;
 import com.global.map.service.MapService;
@@ -31,26 +33,31 @@ public class ReviewController {
     private final MapService mapService;
     private final ReviewService reviewService;
 
-    
+
     // ✅ 리뷰 작성 페이지
     @GetMapping("/write/{hospitalCode}")
+
     public String reviewWritePage(@PathVariable("hospitalCode") String hospitalCode, Model model) {
         model.addAttribute("hospitalCode", hospitalCode);
 
         return "map/reviewWrite";
+
     }
 
     // ✅ 리뷰 저장 처리
     @PostMapping("/save")
     public String saveReview(
+
     		Principal principal,
             ReviewDTO reviewDTO,
+
             @RequestParam("name") String name,
             @RequestParam("address") String address,
             @RequestParam("phone") String phone,
             @RequestParam("lat") String lat,
             @RequestParam("lng") String lng,
             @RequestParam("category") String category,
+
             Model model) {
     	
     	reviewDTO.setReviewDate(LocalDateTime.now());
@@ -59,6 +66,7 @@ public class ReviewController {
         reviewService.saveReview(reviewDTO, loginMember); 
 
         model.addAttribute("message", "리뷰가 성공적으로 저장되었습니다.");
+
         
         return "redirect:/map/hospitaldetail?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8)
         + "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8)
@@ -66,6 +74,7 @@ public class ReviewController {
         + "&lat=" + URLEncoder.encode(lat, StandardCharsets.UTF_8)
         + "&lng=" + URLEncoder.encode(lng, StandardCharsets.UTF_8)
         + "&category=" + URLEncoder.encode(category, StandardCharsets.UTF_8);
+
     }
 
     // ✅ 특정 병원의 리뷰 목록 페이지
@@ -79,6 +88,7 @@ public class ReviewController {
 
         model.addAttribute("reviews", reviews);
         model.addAttribute("hospitalCode", hospitalCode);
+
         return "map/reviewWrite";
     }
 
@@ -101,5 +111,6 @@ public class ReviewController {
         model.addAttribute("reviews", reviews);
         model.addAttribute("hospitalCode", hospitalCode);
         return "map/hospitalDetail";
+
     }
 }

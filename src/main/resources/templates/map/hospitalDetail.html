@@ -244,17 +244,21 @@ function openKakaoDirections() {
     var longitude = "[[${longitude}]]";
 
     var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
+
     window.open(url, "_blank"); 
 }
 
 function goToReviewWrite() {
+
     const hospitalCode = "[[${hospitalCode}]]"; // Thymeleaf에서 그대로 꺼냄
+
     const hospitalName = document.getElementById("hospitalName").innerText.trim();
     const address = document.getElementById("address").innerText.trim();
     const phone = document.getElementById("phone").innerText.trim();
     const category = "[[${category}]]";
     const lat = "[[${latitude}]]";
     const lng = "[[${longitude}]]";
+
 
     const url = `/review/write/${hospitalCode}?` +
                 `name=${encodeURIComponent(hospitalName)}` +
@@ -266,6 +270,7 @@ function goToReviewWrite() {
 
     window.location.href = url;
 }
+
 
 
 </script>

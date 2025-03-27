@@ -2,7 +2,9 @@ package com.global.map.controller;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import java.security.Principal;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,17 +49,14 @@ public class ReviewController {
     // ✅ 리뷰 저장 처리
     @PostMapping("/save")
     public String saveReview(
-
     		Principal principal,
             ReviewDTO reviewDTO,
-
             @RequestParam("name") String name,
             @RequestParam("address") String address,
             @RequestParam("phone") String phone,
             @RequestParam("lat") String lat,
             @RequestParam("lng") String lng,
             @RequestParam("category") String category,
-
             Model model) {
     	
     	reviewDTO.setReviewDate(LocalDateTime.now());
@@ -111,6 +110,5 @@ public class ReviewController {
         model.addAttribute("reviews", reviews);
         model.addAttribute("hospitalCode", hospitalCode);
         return "map/hospitalDetail";
-
     }
 }

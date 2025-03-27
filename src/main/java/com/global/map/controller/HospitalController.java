@@ -3,6 +3,7 @@ package com.global.map.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import com.global.map.dto.MedinstDTO;
 import com.global.map.service.EmergencyService;
 import com.global.map.service.MapService;
 import com.global.map.service.MedInfoService;
+import com.global.member.entity.MemberEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,19 +35,20 @@ public class HospitalController {
 	                             @RequestParam("lat") String latitude, 
                                  @RequestParam("lng") String longitude,
 	                             @RequestParam("category") String category,
-	                             Model model) {
+	                             Model model,
+	                             @AuthenticationPrincipal MemberEntity loginMember) {
 	    model.addAttribute("name", name);
 	    model.addAttribute("address", address);
 	    model.addAttribute("phone", phone);
 	    model.addAttribute("category", category);
 	    model.addAttribute("latitude", latitude);
         model.addAttribute("longitude", longitude);
-
+        model.addAttribute("loginMember", loginMember);
 	    if (!category.equals("응급실") && !category.equals("약국")) {
 	        String hospitalCode = mapService.findHCdByHNmAndAdr(name, address);
 	        MedinstDTO hospitalInfo = mapService.getHospitalInfo(hospitalCode);
 	        model.addAttribute("hospitalInfo", hospitalInfo);
-	        
+	        model.addAttribute("hospitalCode", hospitalCode);
 	    }
 	    return "map/hospitalDetail";
 	}

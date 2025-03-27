@@ -83,6 +83,8 @@ public class MemberService {
 				.address(dto.getAddress())
 				.detailaddress(dto.getDetailaddress())
 				.postcode(dto.getPostcode())
+				.latitude(dto.getLatitude())
+				.longitude(dto.getLongitude())
 				.email(dto.getEmail())
 				.sex(dto.getSex())
 				.underlyingcondition(dto.getUnderlyingcondition())
@@ -120,6 +122,8 @@ public class MemberService {
 				.name(entity.getName())
 				.address(entity.getAddress())
 				.detailaddress(entity.getDetailaddress())
+				.latitude(entity.getLatitude())
+				.longitude(entity.getLongitude())
 				.sex(entity.getSex())
 				.postcode(entity.getPostcode())
 				.email(entity.getEmail())				
@@ -142,6 +146,8 @@ public class MemberService {
 			me.setAddress(dto.getAddress());
 			me.setDetailaddress(dto.getDetailaddress());
 			me.setEmail(dto.getEmail());
+			me.setLatitude(dto.getLatitude());
+			me.setLongitude(dto.getLongitude());
 			me.setLastlogindate(LocalDateTime.now());			
 			me.setName(dto.getName());
 			me.setPassword(passwordEncoder.encode(dto.getPassword()));

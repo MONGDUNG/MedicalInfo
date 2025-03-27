@@ -52,11 +52,39 @@
 	        updateDeptList(group);
 	    });
 	});
+	document.getElementById('nearbyCheckbox').addEventListener('change', function(event) {
+	    if (!window.isLoggedIn) {
+	        alert('로그인이 필요합니다.');
+	        event.preventDefault();  // 체크박스 상태 변경 방지
+	        this.checked = false;    // 체크박스 상태를 강제로 해제
+	        return;
+	    }
+	    
+	    if (this.checked) {
+	        moveMapToUserLocation();
+	    }
+	});
+	function moveMapToUserLocation() {
+	    if (window.isLoggedIn && window.userLatitude !== 'null' && window.userLongitude !== 'null') {
+	        var userPosition = new kakao.maps.LatLng(window.userLatitude, window.userLongitude);
+	        map.setCenter(userPosition);
+	    }
+	}
 
 	function fetchNearbyHospitalsByDept(category, dept) {
 	    var center = map.getCenter();
-	    var lat = center.getLat(); // 위도
-	    var lng = center.getLng(); // 경도
+		var checkbox = document.getElementById('nearbyCheckbox');
+		    
+		    // 로그인 상태이고 체크박스가 체크되어 있으면 회원 좌표 사용
+		    if (window.isLoggedIn && checkbox.checked && window.userLatitude !== 'null' && window.userLongitude !== 'null') {
+		        lat = window.userLatitude;
+		        lng = window.userLongitude;
+		    } else {
+		        // 아니면 지도 중심 좌표 사용
+		        var center = map.getCenter();
+		        lat = center.getLat();
+		        lng = center.getLng();
+		    }
 	    var level = map.getLevel(); // 지도레벨
 	    let endpoint = `/map/medicalFacilityByDept?lat=${lat}&lng=${lng}&level=${level}&category=${category}&dept=${dept}`;
 
@@ -87,8 +115,18 @@
 	
     function fetchNearbyHospitals(category) {
         var center = map.getCenter();
-        var lat = center.getLat(); // 위도
-        var lng = center.getLng(); // 경도
+		var checkbox = document.getElementById('nearbyCheckbox');
+		   
+		   // 로그인 상태이고 체크박스가 체크되어 있으면 회원 좌표 사용
+		   if (window.isLoggedIn && checkbox.checked && window.userLatitude !== 'null' && window.userLongitude !== 'null') {
+		       lat = window.userLatitude;
+		       lng = window.userLongitude;
+		   } else {
+		       // 아니면 지도 중심 좌표 사용
+		       var center = map.getCenter();
+		       lat = center.getLat();
+		       lng = center.getLng();
+		   }
         var level = map.getLevel(); // 지도레벨
         let endpoint;
 
@@ -147,16 +185,6 @@
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
-    }
-
-    function toggleNearbyHospitals() {
-        var checkbox = document.getElementById('nearbyCheckbox');
-        if (checkbox.checked) {
-            fetchNearbyHospitals();
-        } else {
-            listElement.innerHTML = ""; // 목록 초기화
-            clearMarkers(); // 기존 마커 제거
-        }
     }
 
     function clearMarkers() {
@@ -382,5 +410,4 @@
 	    window.location.href = url;
 	};
 
-			
     window.onload = initMap;

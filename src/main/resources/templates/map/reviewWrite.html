@@ -65,7 +65,8 @@
       <!-- 병원 코드: URL에서 전달된 값 -->
       <input type="hidden" name="hospitalCode" th:value="${hospitalCode}" />
       <label for="reviewerName">작성자 이름</label>
-      <input type="text" id="reviewerName" name="reviewerName" placeholder="이름을 입력해주세요" required />
+      <input type="text" id="reviewerName" name="reviewerName" th:value="${#authentication.name}" readonly />
+
       <label for="reviewName">리뷰 제목</label>
       <input type="text" id="reviewName" name="reviewName" placeholder="예: 친절한 응대 감사합니다" required />
       <!-- 로그인 연동 전이므로 임시 ID 사용 -->

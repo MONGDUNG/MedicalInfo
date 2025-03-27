@@ -1,15 +1,12 @@
 package com.global.member.entity;
 
-import java.util.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -32,7 +29,7 @@ public class ClassificationEntity {
 	@OneToOne
 	private MemberEntity memberId; // 상태
 
-	@OneToOne
+	@ManyToOne
 	private MemberTierEntity tierId;
 	
 	private LocalDateTime bandate;

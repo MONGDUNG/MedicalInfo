@@ -248,6 +248,7 @@ function openKakaoDirections() {
 }
 
 function goToReviewWrite() {
+    const hospitalCode = "[[${hospitalCode}]]"; // Thymeleaf에서 그대로 꺼냄
     const hospitalName = document.getElementById("hospitalName").innerText.trim();
     const address = document.getElementById("address").innerText.trim();
     const phone = document.getElementById("phone").innerText.trim();
@@ -255,23 +256,15 @@ function goToReviewWrite() {
     const lat = "[[${latitude}]]";
     const lng = "[[${longitude}]]";
 
-    fetch(`/review/code?name=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
-        .then(response => response.text())
-        .then(hospitalCode => {
-            const url = `/review/write/${hospitalCode}?` +
-                        `name=${encodeURIComponent(hospitalName)}` +
-                        `&address=${encodeURIComponent(address)}` +
-                        `&phone=${encodeURIComponent(phone)}` +
-                        `&lat=${lat}` +
-                        `&lng=${lng}` +
-                        `&category=${encodeURIComponent(category)}`;
+    const url = `/review/write/${hospitalCode}?` +
+                `name=${encodeURIComponent(hospitalName)}` +
+                `&address=${encodeURIComponent(address)}` +
+                `&phone=${encodeURIComponent(phone)}` +
+                `&lat=${encodeURIComponent(lat)}` +
+                `&lng=${encodeURIComponent(lng)}` +
+                `&category=${encodeURIComponent(category)}`;
 
-            window.location.href = url;
-        })
-        .catch(error => {
-            console.error("❌ 병원 코드 조회 실패:", error);
-            alert("리뷰 작성 페이지로 이동할 수 없습니다.");
-        });
+    window.location.href = url;
 }
 
 

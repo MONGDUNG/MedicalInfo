@@ -60,7 +60,7 @@ public class MemberEntity {
 		@OneToOne(cascade= CascadeType.REMOVE)
 		private ClassificationEntity classiId; 
 		
-		@OneToOne 
+		@ManyToOne 
 		private MemberTierEntity tierId;
 		
 		

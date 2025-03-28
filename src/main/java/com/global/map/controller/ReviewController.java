@@ -90,6 +90,9 @@ public class ReviewController {
         model.addAttribute("reviews", reviews);
         model.addAttribute("hospitalCode", hospitalCode);
         return "map/reviewWrite";
+        
+        
+        
     }
 
     @GetMapping("/list")

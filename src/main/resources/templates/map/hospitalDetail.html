@@ -161,6 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const container = document.getElementById("reviewList");
         container.innerHTML = "<p>응급실은 리뷰를 제공하지 않습니다.</p>";
         return; // 아래 리뷰 fetch 실행 안 됨
+
     } else if(category === "약국"){
 		// 약국은 운영시간 표시 x
 		document.querySelector(".highlight").style.display = "none";
@@ -247,10 +248,12 @@ function openKakaoDirections() {
     var longitude = "[[${longitude}]]";
 
     var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
+
     window.open(url, "_blank"); 
 }
 
 function goToReviewWrite() {
+
     const hospitalCode = "[[${hospitalCode}]]"; // Thymeleaf에서 그대로 꺼냄
     const hospitalName = document.getElementById("hospitalName").innerText.trim();
     const address = document.getElementById("address").innerText.trim();
@@ -266,6 +269,17 @@ function goToReviewWrite() {
     	return;
     }
 
+            window.location.href = url;
+        })
+        .catch(error => {
+            console.error("❌ 병원 코드 조회 실패:", error);
+            alert("리뷰 작성 페이지로 이동할 수 없습니다.");
+        });
+}
+
+
+</script>
+
     const url = `/review/write/${hospitalCode}?` +
                 `name=${encodeURIComponent(hospitalName)}` +
                 `&address=${encodeURIComponent(address)}` +
@@ -276,6 +290,7 @@ function goToReviewWrite() {
 
     window.location.href = url;
 }
+
 
 
 </script>

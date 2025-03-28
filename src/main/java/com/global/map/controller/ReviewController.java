@@ -2,7 +2,9 @@ package com.global.map.controller;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import java.security.Principal;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
 import com.global.map.dto.ReviewDTO;
+
 import com.global.map.service.MapService;
 import com.global.map.service.ReviewService;
 import com.global.member.entity.MemberEntity;
@@ -27,10 +31,12 @@ public class ReviewController {
     private final MapService mapService;
     private final ReviewService reviewService;
 
-    
+
     // ✅ 리뷰 작성 페이지
     @GetMapping("/write/{hospitalCode}")
+
     public String reviewWritePage(@PathVariable("hospitalCode") String hospitalCode, Model model, Principal principal) {
+
         model.addAttribute("hospitalCode", hospitalCode);
         
         if (principal == null) {
@@ -38,6 +44,7 @@ public class ReviewController {
         	
 		}
         return "map/reviewWrite";
+
     }
 
     // ✅ 리뷰 저장 처리
@@ -59,6 +66,7 @@ public class ReviewController {
         reviewService.saveReview(reviewDTO, loginMember); 
 
         model.addAttribute("message", "리뷰가 성공적으로 저장되었습니다.");
+
         
         return "redirect:/map/hospitaldetail?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8)
         + "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8)
@@ -66,6 +74,7 @@ public class ReviewController {
         + "&lat=" + URLEncoder.encode(lat, StandardCharsets.UTF_8)
         + "&lng=" + URLEncoder.encode(lng, StandardCharsets.UTF_8)
         + "&category=" + URLEncoder.encode(category, StandardCharsets.UTF_8);
+
     }
 
     // ✅ 특정 병원의 리뷰 목록 페이지
@@ -79,6 +88,7 @@ public class ReviewController {
 
         model.addAttribute("reviews", reviews);
         model.addAttribute("hospitalCode", hospitalCode);
+
         return "map/reviewWrite";
     }
 

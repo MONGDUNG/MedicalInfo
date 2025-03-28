@@ -33,7 +33,6 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
     Optional<String> findHCdByHNmAndAdr(@Param("hospitalName") String hospitalName, @Param("address") String address);
     
     MedinstEntity findByHospitalCode(String hospitalCode);
-
 }
 
 

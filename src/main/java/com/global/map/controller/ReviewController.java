@@ -6,14 +6,11 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.global.map.dto.ReviewDTO;
-import com.global.map.entity.ReviewEntity;
-import com.global.map.repository.ReviewRepository;
 import com.global.map.service.MapService;
 import com.global.map.service.ReviewService;
 import com.global.member.entity.MemberEntity;
@@ -26,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReviewController {
 
-    private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final MapService mapService;
     private final ReviewService reviewService;
@@ -34,9 +30,13 @@ public class ReviewController {
     
     // ✅ 리뷰 작성 페이지
     @GetMapping("/write/{hospitalCode}")
-    public String reviewWritePage(@PathVariable("hospitalCode") String hospitalCode, Model model) {
+    public String reviewWritePage(@PathVariable("hospitalCode") String hospitalCode, Model model, Principal principal) {
         model.addAttribute("hospitalCode", hospitalCode);
-
+        
+        if (principal == null) {
+        	return "member/login";
+        	
+		}
         return "map/reviewWrite";
     }
 
@@ -87,19 +87,10 @@ public class ReviewController {
     public List<ReviewDTO> getReviews(
         @RequestParam("hospitalName") String hospitalName,
         @RequestParam("address") String address) {
-
-        String hospitalCode = mapService.findHCdByHNmAndAdr(hospitalName, address);
         
-        return reviewRepository.findByHospitalCode(hospitalCode).stream()
-                .map(ReviewDTO::new)
-                .toList();
+        List<ReviewDTO> reviews = reviewService.getReviewList(hospitalName, address);
+        
+        return reviews;
     }
     
-    @GetMapping("/hospital/detail/{hospitalCode}")
-    public String showHospitalDetail(@PathVariable("hospitalCode") String hospitalCode, Model model) {
-        List<ReviewEntity> reviews = reviewRepository.findByHospitalCode(hospitalCode);
-        model.addAttribute("reviews", reviews);
-        model.addAttribute("hospitalCode", hospitalCode);
-        return "map/hospitalDetail";
-    }
 }

@@ -165,6 +165,9 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 약국은 운영시간 표시 x
 		document.querySelector(".highlight").style.display = "none";
         document.querySelector(".time-table").style.display = "none";
+        const container = document.getElementById("reviewList");
+        container.innerHTML = "<p>약국은 리뷰를 제공하지 않습니다.</p>";
+        return; // 아래 리뷰 fetch 실행 안 됨
 	} else{
 		// 일반 병원 리뷰 로직
 		fetchHospitalHours(hospitalName, address);
@@ -255,6 +258,13 @@ function goToReviewWrite() {
     const category = "[[${category}]]";
     const lat = "[[${latitude}]]";
     const lng = "[[${longitude}]]";
+    if(category === "약국"){
+    	alert("약국은 리뷰를 작성할 수 없습니다.");
+    	return;
+    } else if(category === "응급실"){
+    	alert("응급실은 리뷰를 작성할 수 없습니다.");
+    	return;
+    }
 
     const url = `/review/write/${hospitalCode}?` +
                 `name=${encodeURIComponent(hospitalName)}` +

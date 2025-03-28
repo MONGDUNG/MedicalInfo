@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.global.map.entity.MedinstEntity;
 
@@ -33,6 +35,28 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
     Optional<String> findHCdByHNmAndAdr(@Param("hospitalName") String hospitalName, @Param("address") String address);
     
     MedinstEntity findByHospitalCode(String hospitalCode);
+    
+    //hospitalCode로 병원을 찾아 리뷰수를 1 증가시키는 쿼리
+    @Transactional
+    @Modifying
+    @Query("UPDATE MedinstEntity m SET m.reviewCount = m.reviewCount + 1 WHERE m.hospitalCode = :hospitalCode")
+    void updateReviewCount(@Param("hospitalCode") String hospitalCode);
+    //hospitalCode로 병원을 찾아 리뷰수를 1 감소시키는 쿼리
+    @Transactional
+    @Modifying
+    @Query("UPDATE MedinstEntity m SET m.reviewCount = m.reviewCount - 1 WHERE m.hospitalCode = :hospitalCode")
+    void decreaseReviewCount(@Param("hospitalCode") String hospitalCode);
+    
+    //hospitalCode로 병원을 찾아 평균 별점을 업데이트하는 쿼리
+    @Transactional
+    @Modifying
+    @Query("UPDATE MedinstEntity m SET m.ratingAvg = :avgRating WHERE m.hospitalCode = :hospitalCode")
+    void updateRating(@Param("hospitalCode") String hospitalCode,@Param("avgRating") double avgRating);
+    
+    @Query("SELECT m.reviewCount FROM MedinstEntity m WHERE m.hospitalCode = :hospitalCode")
+    public int findReviewCountByHospitalCode(@Param("hospitalCode") String hospitalCode);
+    @Query("SELECT m.ratingAvg FROM MedinstEntity m WHERE m.hospitalCode = :hospitalCode")
+    public Double findAvgRatingByHospitalCode(@Param("hospitalCode") String hospitalCode);
 }
 
 

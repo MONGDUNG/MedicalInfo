@@ -24,7 +24,6 @@ public class ReviewService {
 	private final MapService mapService;
 
 	public void saveReview(ReviewDTO reviewDTO, MemberEntity member) {
-
 		ReviewEntity reviewEntity = ReviewEntity.builder()
 				.hospitalCode(reviewDTO.getHospitalCode())
 				.reviewDate(reviewDTO.getReviewDate())
@@ -35,9 +34,12 @@ public class ReviewService {
 				.member(member)
 				.build();
 		reviewRepository.save(reviewEntity);
+		updateReviewCount(reviewDTO.getHospitalCode());
+		updateAvgRating(reviewDTO.getHospitalCode());
 	}
 	public void deleteReview(Long id) {
 		reviewRepository.deleteById(id);
+		decreaseReviewCount(reviewRepository.findById(id).get().getHospitalCode());
 	}
 	@Transactional
 	public void updateReview(ReviewDTO reviewDTO) {
@@ -55,6 +57,7 @@ public class ReviewService {
 	    );
 
 	    // 3. save 호출 생략 가능 (JPA가 dirty checking으로 자동 반영)
+	    updateAvgRating(reviewDTO.getHospitalCode());
 	}
 	public List<ReviewDTO> getReviewList(String hospitalName, String address) {
 		String hospitalCode = mapService.findHCdByHNmAndAdr(hospitalName, address);
@@ -65,7 +68,27 @@ public class ReviewService {
 		return dtoList;
 	}
 	
-	//리뷰 작성시 medinst의 리뷰수 증가
-	
+	//리뷰수 증가 메소드
+	public void updateReviewCount(String hospitalCode) {
+		mapService.updateReviewCount(hospitalCode);
+	}
+	//리뷰수 감소 메소드
+	public void decreaseReviewCount(String hospitalCode) {
+		mapService.decreaseReviewCount(hospitalCode);
+	}
+	//특정 병원의 평균 별점을 계산하는 메소드
+	public double getAvgRating(String hospitalCode) {
+		List<ReviewEntity> reviewEntityList = reviewRepository.findByHospitalCode(hospitalCode);
+		double sum = 0;
+		for (ReviewEntity reviewEntity : reviewEntityList) {
+			sum += reviewEntity.getRating();
+		}
+		return sum / reviewEntityList.size();
+	}
+	//병원의 평균 별점을 업데이트하는 메소드
+	public void updateAvgRating(String hospitalCode) {
+		double avgRating = getAvgRating(hospitalCode);
+		mapService.updateAvgRating(hospitalCode, avgRating);
+	}
 	
 }

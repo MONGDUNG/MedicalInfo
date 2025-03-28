@@ -54,5 +54,16 @@ public class MapController {
 		System.out.println("lat: " + lat + " lng: " + lng + " level: " + level + " category: " + category + " dept: " + dept);
     	return mapService.getNearbyMedicalFacilitiesByDept(lat, lng, level, category, dept);
 	}
+    
+    //모달 상세보기에서 별점, 리뷰수 가져오는 메소드
+    @GetMapping("getReviewInfo")
+    @ResponseBody
+    public Map<String, Object> getReviewInfo(@RequestParam("hospitalName") String hospitalName, @RequestParam("address") String address) {
+		String hospitalCode = mapService.findHCdByHNmAndAdr(hospitalName, address);
+		Map<String, Object> map = new HashMap<>();
+		map.put("avgRating", mapService.getAvgRating(hospitalCode));
+		map.put("reviewCount", mapService.getReviewCount(hospitalCode));
+		return map;                                                                                                                                                                                            
+	}
 
 }

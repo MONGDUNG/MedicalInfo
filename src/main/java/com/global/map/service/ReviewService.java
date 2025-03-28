@@ -38,9 +38,15 @@ public class ReviewService {
 		updateAvgRating(reviewDTO.getHospitalCode());
 	}
 	public void deleteReview(Long id) {
-		reviewRepository.deleteById(id);
-		decreaseReviewCount(reviewRepository.findById(id).get().getHospitalCode());
-	}
+	       ReviewEntity review = reviewRepository.findById(id)
+	           .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. ID: " + id));
+
+	       String hospitalCode = review.getHospitalCode(); 
+	       reviewRepository.deleteById(id);               
+	       decreaseReviewCount(hospitalCode);             
+	       updateAvgRating(hospitalCode);
+	   }
+
 	@Transactional
 	public void updateReview(ReviewDTO reviewDTO) {
 	    // 1. 기존 리뷰 찾기 (예외 처리 포함)

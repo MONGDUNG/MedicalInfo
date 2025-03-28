@@ -287,18 +287,6 @@ function goToReviewWrite() {
     	alert("응급실은 리뷰를 작성할 수 없습니다.");
     	return;
     }
-
-            window.location.href = url;
-        })
-        .catch(error => {
-            console.error("❌ 병원 코드 조회 실패:", error);
-            alert("리뷰 작성 페이지로 이동할 수 없습니다.");
-        });
-}
-
-
-</script>
-
     const url = `/review/write/${hospitalCode}?` +
                 `name=${encodeURIComponent(hospitalName)}` +
                 `&address=${encodeURIComponent(address)}` +
@@ -306,7 +294,6 @@ function goToReviewWrite() {
                 `&lat=${encodeURIComponent(lat)}` +
                 `&lng=${encodeURIComponent(lng)}` +
                 `&category=${encodeURIComponent(category)}`;
-
     window.location.href = url;
 }
 

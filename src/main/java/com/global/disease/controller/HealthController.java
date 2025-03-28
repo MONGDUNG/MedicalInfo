@@ -36,7 +36,7 @@ public class HealthController {
     @GetMapping("body-parts")
     public String showBodyParts(Model model) {
         model.addAttribute("bodyParts", bodyPartRepo.findAll());
-        return "health/select-body-part";
+        return "disease/health/select-body-part";
     }
 
     // 2단계: 증상 선택
@@ -44,10 +44,13 @@ public class HealthController {
     public String showSymptoms(@RequestParam("bodyPartId") Long bodyPartId, Model model) {
         List<BodyPartSymptom> relations = bodyPartSymptomRepo.findByBodyPart_Id(bodyPartId);
         List<Symptom> symptoms = relations.stream().map(BodyPartSymptom::getSymptom).toList();
+        // relations: 연결된 테이블에서 정보 추출
+        // relations.stream().map(BodyPartSymptom::getSymptom)   =    relations.stream().map(relation -> relation.getSymptom())
+        // BodyPartSymptom 객체에 대해 getSymptom() 메서드를 호출하여 그 결과를 스트림 요소로 변환하는 역할(map은 각 두 객체를 매치시킴)
 
         model.addAttribute("symptoms", symptoms);
         model.addAttribute("bodyPartId", bodyPartId);
-        return "health/select-symptoms";
+        return "disease/health/select-symptoms";
     }
 
     // 3단계: 질병 추천 결과
@@ -57,7 +60,8 @@ public class HealthController {
                                 Model model) {
         List<Disease> diseases = diseaseService.recommendDiseases(bodyPartId, symptomIds);
         model.addAttribute("diseases", diseases);
-        return "health/disease-results";
+                
+        return "disease/health/disease-results";
     }
 }
 

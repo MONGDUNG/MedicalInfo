@@ -32,7 +32,7 @@
 					<!-- 카드 -->
 					<div th:each="diseaseEntity : ${list}" class="col-md-4 mb-3">
 						<div class="card-body">
-							<h5 th:text="'병명: ' + ${diseaseEntity.diseaseName}" class="card-title"></h5>
+							<h5 th:text="${diseaseEntity.diseaseName}" class="card-title"></h5>
 							<p th:text="'증상: ' + ${diseaseEntity.symptom}" class="card-text"></p>
 							<p class="card-text mb-1"><small th:text="'동의어: ' + ${diseaseEntity.synonyms}"  class="text-muted"></small></p>
 							<p class="card-text m-0"><small th:text="'진료과: ' + ${diseaseEntity.mediDepart}"  class="text-muted"></small></p>

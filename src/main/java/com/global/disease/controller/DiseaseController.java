@@ -24,20 +24,17 @@ public class DiseaseController {
 			model.addAttribute("list", diseaseService.diseasePage(page, keyword));
 			model.addAttribute("count", diseaseService.totalCount(keyword));
 			model.addAttribute("keyword", keyword);
-		return "search/disease_list";
+		return "disease/search/disease_list";
 	}
 	
 	@GetMapping("self_diagnosis")
 	public String diagnosis() {
-		return "search/self_diagnosis";
+		return "disease/search/self_diagnosis";
 	}
 	
-	@GetMapping("self_diagnosis/{orderNum}")
-	public String common(@PathVariable("orderNum") int orderNum, Model model , @RequestParam(value="txt",defaultValue="" ,required = false) String txt) {
-		//@RequestParam(required=false) 뜻: 이것의 기본값은 null 로 정한다는 뜻이다.
-		//현재 질문 가져오기
-		model.addAttribute("orderNum", orderNum);
-		
-		return "search/common";
+	@GetMapping("result/{disease}")
+	public String result(@PathVariable("disease") String name, Model model) {
+		model.addAttribute("pick", diseaseService.picked(name));
+		return "disease/search/result";
 	}
 }

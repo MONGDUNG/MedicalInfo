@@ -118,7 +118,8 @@
         <p class="info" th:if="${hospitalInfo != null and hospitalInfo.website != null and hospitalInfo.website != ''}">
 		    <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
 		</p>
-
+        
+        <div id="hoursTableWrapper">
         <h2 class="highlight">🏥 운영 시간</h2>
         <table class="time-table">
             <tr>
@@ -135,7 +136,8 @@
                 <td id="holi">-</td>
             </tr>
         </table>
-
+        </div>
+        
         <!-- ✅ 버튼을 flex로 정렬 -->
         <div class="button-group">
         <button class="btn" onclick="window.location.href='/map/main'">🔙 뒤로 가기</button>
@@ -232,11 +234,28 @@ function fetchHospitalHours(hospitalName, address) {
 }
 
 function updateHoursTable(data) {
-    document.getElementById("mon").innerText = data.mon || "정보 없음";
-    document.getElementById("tues").innerText = data.tues || "정보 없음";
-    document.getElementById("wednes").innerText = data.wednes || "정보 없음";
-    document.getElementById("thurs").innerText = data.thurs || "정보 없음";
-    document.getElementById("fri").innerText = data.fri || "정보 없음";
+	const mon = data.mon || "";
+    const tues = data.tues || "";
+    const wednes = data.wednes || "";
+    const thurs = data.thurs || "";
+    const fri = data.fri || "";
+
+    const isAllWeekdaysEmpty = !mon && !tues && !wednes && !thurs && !fri;
+
+    const wrapper = document.getElementById("hoursTableWrapper");
+
+    if (isAllWeekdaysEmpty) {
+        wrapper.style.display = "none";
+        return;
+    } else {
+        wrapper.style.display = "block";
+    }
+
+    document.getElementById("mon").innerText = mon || "정보 없음";
+    document.getElementById("tues").innerText = tues || "정보 없음";
+    document.getElementById("wednes").innerText = wednes || "정보 없음";
+    document.getElementById("thurs").innerText = thurs || "정보 없음";
+    document.getElementById("fri").innerText = fri || "정보 없음";
     document.getElementById("satur").innerText = data.satur || "정보 없음";
     document.getElementById("sun").innerText = data.sun || "정보 없음";
     document.getElementById("holi").innerText = data.holi || "정보 없음";

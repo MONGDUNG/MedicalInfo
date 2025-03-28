@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{/layout}">
+	
 <head>
     <meta charset="UTF-8">
     <title>의료정보 플랫폼</title>
@@ -8,13 +10,7 @@
 </head>
 <body>
 
-<!-- 오른쪽 상단 로그인 / 회원가입 -->
-<div class="d-flex justify-content-end align-items-center pe-4 pt-2" style="background-color: white;">
-    <div sec:authorize="isAnonymous()">
-        <a th:href="@{/member/login}" class="btn btn-sm btn-outline-primary me-2">로그인</a>
-        <a th:href="@{/member/signup}" class="btn btn-sm btn-outline-success">회원가입</a>
-    </div>
-</div>
+<div layout:fragment="content">
 
 <!-- 로고 (왼쪽 정렬, nav 위에 위치) -->
 <div class="py-4" style="padding-left: 120px; background-color: white; border-bottom: 1px solid #ddd;">
@@ -210,6 +206,6 @@
     }
   });
 </script>
-
+</div>
 </body>
 </html>

@@ -106,4 +106,17 @@ public class ReviewController {
         return reviews;
     }
     
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public void deleteReview(@PathVariable("id") Long id) {
+      reviewService.deleteReview(id);
+   }
+    
+    @PutMapping("/update")
+    @ResponseBody
+    public void updateReview(@RequestBody ReviewDTO reviewDTO) {
+       reviewService.updateReview(reviewDTO);
+    }
+
+    
 }

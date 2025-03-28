@@ -61,10 +61,12 @@ public class MedinstEntity {
     @Column(name = "LONGITUDE", length = 20, nullable = false)
     private String longitude;
 	
-    @Column(name = "REVIEW_COUNT")
+    //default 0 으로 설정
+    
+    @Column(name = "REVIEW_COUNT", columnDefinition = "INT default 0")
     private Integer reviewCount;
     
-    @Column(name = "RATING_AVG")
+    @Column(name = "RATING_AVG", columnDefinition = "DOUBLE default 0.0")
     private Double ratingAvg;
 
 }

@@ -1,6 +1,5 @@
 package com.global.map.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +22,7 @@ public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 	private final MapService mapService;
-	private final MemberRepository memberRepository;
-	
+
 	public void saveReview(ReviewDTO reviewDTO, MemberEntity member) {
 
 		ReviewEntity reviewEntity = ReviewEntity.builder()
@@ -66,4 +64,8 @@ public class ReviewService {
 			    .collect(Collectors.toList());
 		return dtoList;
 	}
+	
+	//리뷰 작성시 medinst의 리뷰수 증가
+	
+	
 }

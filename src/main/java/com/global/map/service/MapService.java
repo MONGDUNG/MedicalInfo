@@ -361,6 +361,22 @@ public class MapService {
 	   MedinstEntity entity = medinstRepository.findByHospitalCode(hospitalCode);
 	   return medinstToDTO(entity);
    }
+   public void updateReviewCount(String hospitalCode) {
+	   medinstRepository.updateReviewCount(hospitalCode);
+   }
+   public void decreaseReviewCount(String hospitalCode) {
+	   medinstRepository.decreaseReviewCount(hospitalCode);
+   }
+   public void updateAvgRating(String hospitalCode, double avgRating) {
+	   medinstRepository.updateRating(hospitalCode, avgRating);
+   }
+   //리뷰수 가져오는 메서드
+   public int getReviewCount(String hospitalCode) {
+	   return medinstRepository.findReviewCountByHospitalCode(hospitalCode);
+   }
+   public double getAvgRating(String hospitalCode) {
+	   return medinstRepository.findAvgRatingByHospitalCode(hospitalCode);
+   }
 }
    
 

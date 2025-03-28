@@ -386,7 +386,17 @@
 	        document.getElementById("modalAddress").innerText = place.ADDRESS || "정보 없음";
 	        document.getElementById("modalPhone").innerText = place.PHONE || "정보 없음";
 	        document.getElementById("modalCategory").innerText = place.CATEGORY_NAME || "정보 없음";
-
+			// 리뷰 데이터 표시
+			        fetch(`/map/getReviewInfo?hospitalName=${place.NAME}&address=${place.ADDRESS}`)
+			            .then(response => response.json())
+			            .then(data => {
+			                document.getElementById("reviewCount").innerText = `리뷰수: ${data.reviewCount}`;
+			                document.getElementById("averageScore").innerText = `평점: ${data.avgRating.toFixed(1)}점`;
+			            })
+			            .catch(error => {
+			                console.error('리뷰 데이터를 가져오는 중 오류 발생:', error);
+			            });
+	        
 	        let modal = document.getElementById("hospitalModal");
 	        modal.style.display = "block";
 	    };

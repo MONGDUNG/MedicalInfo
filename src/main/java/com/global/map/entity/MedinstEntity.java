@@ -61,5 +61,10 @@ public class MedinstEntity {
     @Column(name = "LONGITUDE", length = 20, nullable = false)
     private String longitude;
 	
+    @Column(name = "REVIEW_COUNT")
+    private Integer reviewCount;
+    
+    @Column(name = "RATING_AVG")
+    private Double ratingAvg;
 
 }

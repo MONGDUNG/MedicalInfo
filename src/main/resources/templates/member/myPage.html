@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 정보 보기</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .form-control, .btn, input[type="reset"] {
+            margin-top: 10px;
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h4 class="text-center">내 정보 보기</h4>
+        <div class="form-group">
+            <label>사용자 ID</label>
+            <div th:text="${memberDTO.username}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>생년월일</label>
+            <div th:text="${memberDTO.birth}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>이름</label>
+            <div th:text="${memberDTO.name}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>우편번호</label>
+            <div th:text="${memberDTO.postcode}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>주소</label>
+            <div th:text="${memberDTO.address}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>상세주소</label>
+            <div th:text="${memberDTO.detailaddress}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>이메일</label>
+            <div th:text="${memberDTO.email}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>성별</label>
+            <div th:text="${memberDTO.sex}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>기저질환</label>
+            <div th:text="${memberDTO.underlyingcondition}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>구분</label>
+            <div th:text="${memberDTO.memberstatus}" class="form-control-plaintext"></div>
+        </div>
+        
+        <div class="text-center">
+            <a th:href="@{/modify}" class="btn btn-primary">정보 수정하기</a>
+        </div>
+    </div>
+</body>
+</html>

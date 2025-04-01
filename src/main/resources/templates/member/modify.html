@@ -19,7 +19,15 @@
         .text-center {
             text-align: center;
         }
+        
+        
+        input[disabled] {  
+    		background-color: #f5f5f5;  /* 비활성화 배경 색상 */
+    		cursor: not-allowed; 	/* 비활성화 시 마우스 커서 */
+		}
+        
     </style>
+    
 </head>
 <body>
     <div class="container">
@@ -32,30 +40,31 @@
         <span th:text="${memberDTO.username}" id="username" name="username"></span>
     </div>
     <div class="form-group">
-        <label for="password">비밀번호</label>
-        <input class="form-control" id="password" name="password" type="password" placeholder="비밀번호를 입력하세요." required >
-    </div>
-    <div class="form-group">
         <label for="birth">생년월일</label>
-        <input class="form-control" id="birth" name="birth" type="date" th:value="*{birth}">
+        <input class="form-control" id="birth" name="birth" type="date" th:value="*{birth}" required>
     </div>
     <div class="form-group">
         <label for="name">이름</label>
         <input class="form-control" id="name" name="name" th:value="*{name}">
     </div>
     <div class="form-group">
-        <input type="text" id="postcode" name="postcode" th:value="*{postcode}" placeholder="우편번호" readonly="readonly">
+        <input type="text" id="postcode" name="postcode" th:value="*{postcode}" placeholder="우편번호" readonly="readonly" required>
         <button type="button" class="btn btn-secondary" onclick="daumPost()">우편번호 찾기</button><br>
-        <input class="form-control" type="text" th:value="*{address}" name="address" id="address" placeholder="주소">
+        <input class="form-control" type="text" th:value="*{address}" name="address" id="address" placeholder="주소" required>
         <input class="form-control" type="text" th:value="*{detailaddress}" name="detailaddress" id="detailaddress" placeholder="상세주소">
     </div>
+    
+    	<!--  가입경로가 회원가입이 아닐시 변경 불가 (카카오 등)  -->
     <div class="form-group">
-        <label for="email">이메일</label>
-        <input class="form-control" id="email" name="email" th:value="*{email}" type="email">
-    </div>
+    	<label for="email">이메일</label>
+    	<input class="form-control"  id="email" name="email"  th:value="*{email}" type="email"  th:disabled="*{signuppath != 1}">
+	</div>
+	<div>
+		<input type=hidden class="form-control"  id="email" name="email" th:value="*{email}" th:disabled="*{signuppath == 1}">
+	</div>
     <div class="form-group">
         <label for="sex">성별</label><br>
-        <input type="radio" id="sex_male" name="sex" value="남자" th:checked="*{sex} == '남자'"> 남자
+        <input type="radio" id="sex_male" name="sex" value="남자" th:checked="*{sex} == '남자'" required> 남자
         <input type="radio" id="sex_female" name="sex" value="여자" th:checked="*{sex} == '여자'"> 여자
     </div>
     <div class="form-group">
@@ -64,7 +73,7 @@
     </div>
     <div class="form-group">
         <label for="memberstatus">구분</label>
-        <select class="form-control" id="memberstatus" name="memberstatus">
+        <select class="form-control" id="memberstatus" name="memberstatus" required>
             <option value="general" th:selected="*{memberstatus} == 'general'">일반</option>
             <option value="doctor" th:selected="*{memberstatus} == 'doctor'">의사</option>
             <option value="pharmacist" th:selected="*{memberstatus} == 'pharmacist'">약사</option>
@@ -73,17 +82,33 @@
         															
              
     </div>
+    		<!--  가입경로  -->
     <div class="form-group">
         <input class="form-control" id="signuppath" name="signuppath" th:value="*{signuppath}" type="hidden">
+        <input type="hidden" id="latitude" name="latitude" th:value="*{latitude}">
+        <input type="hidden" id="longitude" name="longitude" th:value="*{longitude}">
     </div>
     <div class="text-center">
-        <button type="submit" class="btn btn-primary">정보 수정</button>
+        <button type="submit" class="btn btn-primary"  onclick="showAlert(event)">정보 수정</button>
         <input type="reset" class="btn btn-secondary" value="다시 입력">
     </div>
 </form>
         
     </div>
-    <script>
+    
+     <script>
+    
+    // 정보 수정 버튼 클릭 시 alert 표시
+      function showAlert(event) {
+   		event.preventDefault(); // 폼 제출 방지
+    	console.log("Alert function triggered"); // 디버깅 메시지 추가
+    	alert("수정되었습니다."); // 알림 창 표시
+    	event.target.closest("form").submit(); // 폼 실제 제출
+	}
+
+
+
+    
     // 주소 API 부분
     function daumPost() {
         new daum.Postcode({
@@ -111,11 +136,15 @@
                 var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                 console.log('위도: ' + coords.getLat() + ', 경도: ' + coords.getLng());
                 // 여기서 좌표를 사용하여 필요한 작업을 수행할 수 있습니다.
+                document.getElementById('latitude').value = coords.getLat();
+                document.getElementById('longitude').value = coords.getLng();
             } else {
                 console.error('주소 변환 실패: ' + status);
             }
         });
     }
+ 
     </script>
+    
 </body>
 </html>

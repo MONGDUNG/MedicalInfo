@@ -3,7 +3,6 @@ package com.global.disease.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -24,17 +23,11 @@ public class DiseaseController {
 			model.addAttribute("list", diseaseService.diseasePage(page, keyword));
 			model.addAttribute("count", diseaseService.totalCount(keyword));
 			model.addAttribute("keyword", keyword);
-		return "disease/search/disease_list";
+		return "search/disease_list";
 	}
 	
 	@GetMapping("self_diagnosis")
 	public String diagnosis() {
-		return "disease/search/self_diagnosis";
-	}
-	
-	@GetMapping("result/{disease}")
-	public String result(@PathVariable("disease") String name, Model model) {
-		model.addAttribute("pick", diseaseService.picked(name));
-		return "disease/search/result";
+		return "search/self_diagnosis";
 	}
 }

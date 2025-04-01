@@ -6,10 +6,10 @@
 <body>
     <h2>어디가 불편하신가요?</h2>
     <form th:action="@{/diagnosis/symptoms}" method="get">
-        <select name="bodyPartId" required>
+        <select name="bodyPart" required>
             <option value="">부위를 선택하세요</option>
             <option th:each="part : ${bodyParts}"
-                    th:value="${part.id}"
+                    th:value="${part.name}"
                     th:text="${part.name}"></option>
         </select>
         <button type="submit">다음</button>

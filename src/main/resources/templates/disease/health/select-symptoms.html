@@ -4,13 +4,33 @@
     <title>증상 선택</title>
 </head>
 <body>
+	<script>
+		document.addEventListener('DOMContentLoaded', function(){   //체크박스 5개 제한
+			const checkboxs = document.querySelectorAll('input[name="symptom"]');
+			const maxSelection = 5;
+			
+			checkboxs.forEach(function (checkbox){
+				checkbox.addEventListener('change', function(){
+					const selectedCount = document.querySelectorAll("input[name='symptom']:checked").length;
+					if(selectedCount > maxSelection){
+						alert("최대 5개까지 증상을 선택할 수 있습니다.");
+						checkbox.checked = false; //마지막 체크를 취소
+					}
+				});
+			});
+		});
+	</script>
+	
+	
+	
+	
     <h2>해당 부위의 증상을 선택하세요</h2>
     <form th:action="@{/diagnosis/diseases}" method="get">
-        <input type="hidden" name="bodyPartId" th:value="${bodyPartId}" />
-        <div th:each="symptom : ${symptoms}">
+        <input type="hidden" name="bodyPart" th:value="${bodyPart}" />
+        <div th:each="symp : ${symptoms}">
             <label>
-                <input type="checkbox" name="symptomIds" th:value="${symptom.id}" />
-                <span th:text="${symptom.name}"></span>
+                <input type="checkbox" name="symptom" th:value="${symp.symptom}" />
+                <span th:text="${symp.symptom}"></span>
             </label><br>
         </div>
         <button type="submit">의심 질병 확인</button>

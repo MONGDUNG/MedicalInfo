@@ -12,13 +12,11 @@
 
     <ul th:unless="${#lists.isEmpty(diseases)}">
         <li th:each="disease : ${diseases}">
-            <strong th:text="${disease.name}"></strong> <br>
-            <span th:text="${disease.description}"></span><br>
-            <em>진료과: <span th:text="${disease.medicalDepartment}"></span></em><br>
-            <p th:text="'추천: ' + ${disease.recommendation}"></p>
-            <form th:action="@{|/disease/result/${disease.name}|}" method="get">
-				<button type="submit">자세히 보기</button>
-			</form>
+            <strong th:text="${disease.diseaseName}"></strong> <br>
+            <span th:text="${disease.symptom}"></span><br>
+            <em>진료과: <span th:text="${disease.mediDepart}"></span></em>
+			<p th:text="'동의어: ' + ${disease.synonyms}"></p>
+            <p th:text="'관련질환: ' + ${disease.related}"></p>
 			<hr>
         </li>
     

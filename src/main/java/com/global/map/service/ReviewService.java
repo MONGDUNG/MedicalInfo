@@ -24,6 +24,12 @@ public class ReviewService {
 	private final MapService mapService;
 
 	public void saveReview(ReviewDTO reviewDTO, MemberEntity member) {
+		boolean exists = reviewRepository.existsByHospitalCodeAndMember(reviewDTO.getHospitalCode(), member);
+		
+		if(exists) {
+			throw new IllegalArgumentException("이미 리뷰를 작성하셨습니다.");
+		}
+		
 		ReviewEntity reviewEntity = ReviewEntity.builder()
 				.hospitalCode(reviewDTO.getHospitalCode())
 				.reviewDate(reviewDTO.getReviewDate())
@@ -38,8 +44,13 @@ public class ReviewService {
 		updateAvgRating(reviewDTO.getHospitalCode());
 	}
 	public void deleteReview(Long id) {
-		reviewRepository.deleteById(id);
-		decreaseReviewCount(reviewRepository.findById(id).get().getHospitalCode());
+	    ReviewEntity review = reviewRepository.findById(id)
+	        .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. ID: " + id));
+
+	    String hospitalCode = review.getHospitalCode(); 
+	    reviewRepository.deleteById(id);               
+	    decreaseReviewCount(hospitalCode);             
+	    updateAvgRating(hospitalCode);
 	}
 	@Transactional
 	public void updateReview(ReviewDTO reviewDTO) {
@@ -91,4 +102,7 @@ public class ReviewService {
 		mapService.updateAvgRating(hospitalCode, avgRating);
 	}
 	
+	public boolean hasReviewed(String hospitalCode, MemberEntity member) {
+	    return reviewRepository.existsByHospitalCodeAndMember(hospitalCode, member);
+	}
 }

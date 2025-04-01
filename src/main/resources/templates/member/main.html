@@ -173,7 +173,12 @@
             <a th:href="@{/hospital/list?category=치과}" class="btn btn-outline-primary">치과</a>
         </div>
     </section>
-
+    
+    <section class="mb-5">
+  <h3 class="mb-3">📊 인기 병원 순위</h3>
+  <ul id="popularList" class="list-group"></ul>
+</section>
+    
     <!-- 최신 리뷰 섹션 -->
     <section>
         <h3 class="mb-3">📝 최신 리뷰</h3>
@@ -210,6 +215,26 @@
     }
   });
 </script>
+   <script>
+    fetch("/map/popular")
+      .then(res => res.json())
+      .then(data => {
+                     const list = document.getElementById("popularList");
+                     list.innerHTML = "";
 
+      if (data.length === 0) {
+                     const li = document.createElement("li");
+                     li.className = "list-group-item";
+                     li.innerText = "📭 인기 병원이 아직 없습니다.";
+                     list.appendChild(li);
+      }
+      data.forEach((h, i) => {
+                     const li = document.createElement("li");
+                     li.className = "list-group-item";
+                     li.innerText = `${i + 1}위 🏥 ${h.hospitalName} (${h.address})`;
+                     list.appendChild(li);
+                         });
+      });
+   </script>
 </body>
 </html>

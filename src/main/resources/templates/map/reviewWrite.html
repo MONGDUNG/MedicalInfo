@@ -55,6 +55,9 @@
 
   <div class="form-container">
     <h2>📝 병원 리뷰 작성</h2>
+    <div th:if="${message}" style="color: red; margin-bottom: 15px; font-weight: bold;">
+    <p th:text="${message}"></p>
+    </div>
     <form action="/review/save" method="post">
     <input type="hidden" name="name" th:value="${param.name}" />
     <input type="hidden" name="address" th:value="${param.address}" />
@@ -85,6 +88,7 @@
       <textarea id="reviewText" name="reviewText" rows="6" placeholder="내용을 입력해주세요" required></textarea>
 
       <button type="submit">리뷰 등록</button>
+      <button type="button" onclick="history.back()" style="margin-top: 8px;">뒤로가기</button>
     </form>
   </div>
 

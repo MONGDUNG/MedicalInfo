@@ -1,6 +1,5 @@
 package com.global.member.dto;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;

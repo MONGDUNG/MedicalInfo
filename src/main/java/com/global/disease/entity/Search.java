@@ -24,10 +24,8 @@ public class Search {
 		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		private long id;  //칼럼 추가
 		
-		private String category; //대분류
-		
 		@Column(nullable = false)
-		private String subCategory;  //소분류
+		private String bodyPart;  //신체부위
 		
 		@Column(nullable = false)
 		private String gender; //성별

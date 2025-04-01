@@ -2,9 +2,6 @@ package com.global.member.dto;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.List;
-
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

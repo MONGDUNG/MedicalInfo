@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.global.map.dto.ConvenienceStoreDTO;
 import com.global.map.dto.EmergencyDTO;
 import com.global.map.dto.ItemDTO;
 import com.global.map.dto.MedinstDTO;
@@ -23,10 +22,8 @@ import com.global.map.entity.EmergencyEntity;
 import com.global.map.entity.MedinstEntity;
 import com.global.map.entity.PharmacyEntity;
 import com.global.map.etc.MedicalFacility;
-import com.global.map.repository.EmergencyRepository;
 import com.global.map.repository.MedicalFacilityRepository;
 import com.global.map.repository.MedinstRepository;
-import com.global.map.repository.PharmacyRepository;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;

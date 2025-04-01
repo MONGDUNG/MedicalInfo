@@ -10,7 +10,6 @@ import com.global.map.dto.ReviewDTO;
 import com.global.map.entity.ReviewEntity;
 import com.global.map.repository.ReviewRepository;
 import com.global.member.entity.MemberEntity;
-import com.global.member.repository.MemberRepository;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;

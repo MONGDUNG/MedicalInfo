@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko"
+layout:decorate="~{/layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,8 @@
             font-family: 'Arial', sans-serif;
             text-align: center;
             background-color: #f7f7f7;
-            padding: 20px;
+            padding: 0px;
+            
         }
 
         /* ✅ 컨테이너 크기 조정 */
@@ -22,6 +24,7 @@
             width: 90%; /* ✅ 화면 크기에 맞게 조정 */
             max-width: 600px; /* 너무 넓어지지 않도록 제한 */
             box-sizing: border-box;
+            margin: 70px;
         }
 
         h1 {
@@ -108,8 +111,7 @@
         }
     </style>
 </head>
-<body>
-
+<div layout:fragment="content">
     <div class="container">
         <h1>🏥 병원 상세 정보</h1>
         <p class="info"><strong>병원명:</strong> <span id="hospitalName" th:text="${name}"></span></p>
@@ -356,5 +358,5 @@ function editReview(id) {
 
 </script>
 
-</body>
+</div>
 </html>

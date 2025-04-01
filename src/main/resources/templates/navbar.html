@@ -13,6 +13,9 @@
                     <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/member/login}"> 로그인</a>
                 </li>
                 <li class="nav-item me-3">
+                    <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/mypage}"> 내 정보</a>
+                </li>
+                <li class="nav-item me-3">
                     <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/logout}"> 로그아웃</a>
                 </li>
                 <li class="nav-item">

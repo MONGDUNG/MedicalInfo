@@ -113,6 +113,14 @@ public class MemberController {
 		return "redirect:/member/logout";
 	}
 	
+	@GetMapping("/mypage") // 마이페이지
+	public String mypage(Principal principal, Model model) {
+	    String username = principal.getName(); // 로그인한 사용자의 이름을 얻어옴
+	    MemberDTO memberDTO = ms.readUser(username); 
+	    model.addAttribute("memberDTO", memberDTO);
+	    return "/member/myPage"; // Thymeleaf 템플릿 경로 (resources/templates/member/myPage.html)
+	}
+
 	
 	@Autowired
 	private MailService mailService;

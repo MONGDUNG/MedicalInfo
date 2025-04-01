@@ -259,7 +259,8 @@
 	    document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
 
 	    let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
-	        item.innerText.includes(place.NAME || "장소")
+	        parseFloat(item.getAttribute('data-lat')) === parseFloat(place.LAT) &&
+	        parseFloat(item.getAttribute('data-lng')) === parseFloat(place.LNG)
 	    );
 
 	    if (targetItem) {
@@ -359,19 +360,21 @@
 	    var item = document.createElement('div');
 	    item.className = 'hospital-item';
 	    item.innerText = `${place.NAME || "장소"}`;
+		item.setAttribute('data-lat', place.LAT);
+		item.setAttribute('data-lng', place.LNG);
 
-	    item.onclick = function() {
-	        // 기존 하이라이트 제거
-	        document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+		item.onclick = function () {
+		       document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+		       item.classList.add('highlight');
 
-	        // 클릭된 리스트 항목에 하이라이트 적용
-	        item.classList.add('highlight');
+		       let selectedMarker = markers.find(marker => {
+		           return parseFloat(marker.getPosition().getLat().toFixed(6)) === parseFloat(place.LAT.toFixed(6)) &&
+		               parseFloat(marker.getPosition().getLng().toFixed(6)) === parseFloat(place.LNG.toFixed(6));
+		       });
 
-	        // 마커 찾기
-	        var selectedMarker = markers.find(marker => {
-	            return parseFloat(marker.getPosition().getLat().toFixed(6)) === parseFloat(place.LAT.toFixed(6)) &&
-	                   parseFloat(marker.getPosition().getLng().toFixed(6)) === parseFloat(place.LNG.toFixed(6));
-	        });
+		       if (selectedMarker) {
+		           selectMarker(selectedMarker, place);
+		       }
 
 	        console.log("🔍 찾은 마커:", selectedMarker);
 

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-layout:decorate="~{/layout}">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,7 +134,7 @@ layout:decorate="~{/layout}">
 
     </script>
 </head>
-<div layout:fragment="content">
+<body>
     <div class="container">
         <h4 class="text-center">회원 가입</h4>
         <form method="post">
@@ -167,7 +166,7 @@ layout:decorate="~{/layout}">
                 <input type="text" id="postcode" name="postcode" placeholder="우편번호" readonly required>
                 <button type="button" class="btn btn-secondary" onclick="daumPost()">우편번호 찾기</button><br>
                 <input class="form-control" type="text" name="address" id="address" placeholder="주소" required>
-                <input class="form-control" type="text" name="detailaddress" id="detailaddress" placeholder="상세주소" required>
+                <input class="form-control" type="text" name="detailaddress" id="detailaddress" placeholder="상세주소" required >
             </div>
             
             <div class="form-group">
@@ -198,7 +197,7 @@ layout:decorate="~{/layout}">
             </div>
             	<!-- 가입방식 -->
             <div class="form-group">
-        		<input class="form-control" id="signuppath" name="signuppath" th:value="*{signuppath}" type="hidden">
+        		<input class="form-control" id="signuppath" name="signuppath" th:value="1" type="hidden">
     		</div>
             <input type="hidden" id="latitude" name="latitude" th:value="*{latitude}">
             <input type="hidden" id="longitude" name="longitude" th:value="*{longitude}">
@@ -208,5 +207,5 @@ layout:decorate="~{/layout}">
             </div>
         </form>
     </div>
-</div>
+</body>
 </html>

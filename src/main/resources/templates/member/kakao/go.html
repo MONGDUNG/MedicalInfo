@@ -1,0 +1,20 @@
+<body>
+</body>
+<form action="/member/login" method="post">
+	<input type="hidden" name="username" th:value="${username}" />
+	<input type="hidden" name="password" th:value="${password}" />	
+</form>
+
+<script>
+window.onload = function() { // 히든값 전달용
+    // 폼 선택
+    const form = document.querySelector('form[action="/member/login"]');
+    
+    if (form) {
+        // 폼 자동 제출
+        form.submit();
+    } else {
+        console.error("Form not found!");
+    }
+};
+</script>

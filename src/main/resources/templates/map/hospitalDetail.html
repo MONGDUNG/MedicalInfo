@@ -118,8 +118,8 @@ layout:decorate="~{/layout}">
         <p class="info"><strong>주소:</strong> <span id="address" th:text="${address}"></span></p>
         <p class="info"><strong>전화번호:</strong> <span id="phone" th:text="${phone}"></span></p>
         <p class="info" th:if="${hospitalInfo != null and hospitalInfo.website != null and hospitalInfo.website != ''}">
-		    <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
-		</p>
+          <strong>웹사이트:</strong> <a th:href="${hospitalInfo.website}" th:text="${hospitalInfo.website}" target="_blank"></a>
+      </p>
         
         <div id="hoursTableWrapper">
         <h2 class="highlight">🏥 운영 시간</h2>
@@ -167,38 +167,42 @@ document.addEventListener("DOMContentLoaded", function() {
         return; // 아래 리뷰 fetch 실행 안 됨
 
     } else if(category === "약국"){
-		// 약국은 운영시간 표시 x
-		document.querySelector(".highlight").style.display = "none";
+      // 약국은 운영시간 표시 x
+      document.querySelector(".highlight").style.display = "none";
         document.querySelector(".time-table").style.display = "none";
         const container = document.getElementById("reviewList");
         container.innerHTML = "<p>약국은 리뷰를 제공하지 않습니다.</p>";
         return; // 아래 리뷰 fetch 실행 안 됨
-	} else{
-		// 일반 병원 리뷰 로직
-		fetchHospitalHours(hospitalName, address);
+   } else{
+      // 일반 병원 리뷰 로직
+      fetchHospitalHours(hospitalName, address);
 
-		fetch(`/review/list?hospitalName=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
-			.then(res => res.json())
-			.then(data => {
-				const container = document.getElementById("reviewList");
-				if (data.length === 0) {
-					container.innerHTML = "<p>아직 작성된 리뷰가 없습니다.</p>";
-					return;
-				}
+      fetch(`/review/list?hospitalName=${encodeURIComponent(hospitalName)}&address=${encodeURIComponent(address)}`)
+         .then(res => res.json())
+         .then(data => {
+            const container = document.getElementById("reviewList");
+            if (data.length === 0) {
+               container.innerHTML = "<p>아직 작성된 리뷰가 없습니다.</p>";
+               return;
+            }
 
-				container.innerHTML = data.map(r => `
-					<div style="border:1px solid #ddd; padding:10px; margin:10px 0;">
-						<strong>⭐ ${r.rating}점</strong> <br>
-						<p>${r.reviewText}</p>
-						<small>🕒 ${r.reviewDate.replace('T', ' ').slice(0, 16)} | ✍️ ${r.reviewerName}</small>
-					</div>
-				`).join('');
-			})
-			.catch(err => {
-				console.error("❌ 리뷰 리스트 불러오기 실패:", err);
-				document.getElementById("reviewList").innerHTML = "<p>리뷰를 불러올 수 없습니다.</p>";
-			});
-		}
+            container.innerHTML = data.map(r => `
+             <div data-id="${r.id}" style="border:1px solid #ddd; padding:10px; margin:10px 0;">
+                 <strong>⭐ ${r.rating}점</strong> <br>
+                 <p>${r.reviewText}</p>
+                 <small>🕒 ${r.reviewDate.replace('T', ' ').slice(0, 16)} | ✍️ ${r.reviewerName}</small>
+                 <div style="margin-top:5px;">
+                     <button onclick="editReview(${r.id})">수정</button>
+                     <button onclick="deleteReview(${r.id})">삭제</button>
+                 </div>
+             </div>
+           `).join('');
+         })
+         .catch(err => {
+            console.error("❌ 리뷰 리스트 불러오기 실패:", err);
+            document.getElementById("reviewList").innerHTML = "<p>리뷰를 불러올 수 없습니다.</p>";
+         });
+      }
 });
 
 function fetchEmergencyHours(hospitalName, address) {
@@ -236,7 +240,7 @@ function fetchHospitalHours(hospitalName, address) {
 }
 
 function updateHoursTable(data) {
-	const mon = data.mon || "";
+   const mon = data.mon || "";
     const tues = data.tues || "";
     const wednes = data.wednes || "";
     const thurs = data.thurs || "";
@@ -283,11 +287,11 @@ function goToReviewWrite() {
     const lat = "[[${latitude}]]";
     const lng = "[[${longitude}]]";
     if(category === "약국"){
-    	alert("약국은 리뷰를 작성할 수 없습니다.");
-    	return;
+       alert("약국은 리뷰를 작성할 수 없습니다.");
+       return;
     } else if(category === "응급실"){
-    	alert("응급실은 리뷰를 작성할 수 없습니다.");
-    	return;
+       alert("응급실은 리뷰를 작성할 수 없습니다.");
+       return;
     }
     const url = `/review/write/${hospitalCode}?` +
                 `name=${encodeURIComponent(hospitalName)}` +
@@ -299,6 +303,57 @@ function goToReviewWrite() {
     window.location.href = url;
 }
 
+function deleteReview(id) {
+    if (!confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
+
+    fetch(`/review/delete/${id}`, {
+        method: "DELETE"
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("삭제 실패");
+        location.reload();
+    })
+    .catch(err => {
+        console.error("❌ 리뷰 삭제 실패:", err);
+        alert("리뷰 삭제에 실패했습니다.");
+    });
+}
+
+function editReview(id) {
+    const reviewDiv = document.querySelector(`[data-id="${id}"]`);
+    const reviewText = reviewDiv.querySelector("p").innerText;
+    const ratingText = reviewDiv.querySelector("strong").innerText.match(/\d+/)[0];
+
+    const newText = prompt("리뷰 내용을 수정하세요:", reviewText);
+    const newRating = prompt("별점을 수정하세요 (숫자만):", ratingText);
+
+    if (newText === null || newRating === null) return;
+
+    const payload = {
+        id: id,
+        reviewText: newText,
+        rating: parseInt(newRating),
+        reviewDate: new Date().toISOString(),
+        hospitalCode: "[[${hospitalCode}]]", // Thymeleaf
+        reviewerName: "수정자"
+    };
+
+    fetch("/review/update", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("수정 실패");
+        location.reload();
+    })
+    .catch(err => {
+        console.error("❌ 리뷰 수정 실패:", err);
+        alert("리뷰 수정에 실패했습니다.");
+    });
+}
 
 
 </script>

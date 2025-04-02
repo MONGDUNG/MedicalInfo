@@ -32,7 +32,38 @@
             	</li>
             </div>
         </ul>
-    </div>
+    </section>
+
+    <!-- 진료과목 섹션 -->
+    <section class="mb-5">
+        <h3 class="mb-3">🩺 진료과목별 병원 검색</h3>
+        <div class="d-flex flex-wrap gap-3">
+            <a th:href="@{/hospital/list?category=내과}" class="btn btn-outline-primary">내과</a>
+            <a th:href="@{/hospital/list?category=정형외과}" class="btn btn-outline-primary">정형외과</a>
+            <a th:href="@{/hospital/list?category=피부과}" class="btn btn-outline-primary">피부과</a>
+            <a th:href="@{/hospital/list?category=이비인후과}" class="btn btn-outline-primary">이비인후과</a>
+            <a th:href="@{/hospital/list?category=치과}" class="btn btn-outline-primary">치과</a>
+        </div>
+    </section>
+    
+    <section class="mb-5">
+  <h3 class="mb-3">📊 인기 병원 순위</h3>
+  <ul id="popularList" class="list-group"></ul>
+</section>
+    
+    <!-- 최신 리뷰 섹션 -->
+    <section>
+        <h3 class="mb-3">📝 최신 리뷰</h3>
+        <div class="card mb-3" th:each="review : ${reviewList}">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${review.hospitalName}">병원 이름</h5>
+                <p class="card-text" th:text="${review.content}">리뷰 내용</p>
+                <p class="card-text"><small class="text-muted" th:text="${review.createdDate}">작성일</small></p>
+            </div>
+        </div>
+    </section>
+
+
 </div>
 
 <script>
@@ -51,3 +82,8 @@ window.onload = function() {
     }
 };
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</html>
+

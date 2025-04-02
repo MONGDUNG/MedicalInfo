@@ -35,6 +35,7 @@ public interface MedinstRepository extends JpaRepository<MedinstEntity, Long> {
     Optional<String> findHCdByHNmAndAdr(@Param("hospitalName") String hospitalName, @Param("address") String address);
     
     MedinstEntity findByHospitalCode(String hospitalCode);
+    List<MedinstEntity> findByHospitalCodeIn(List<String> hospitalCodes);
     
     //hospitalCode로 병원을 찾아 리뷰수를 1 증가시키는 쿼리
     @Transactional

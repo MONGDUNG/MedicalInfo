@@ -50,7 +50,7 @@ public class ReviewController {
     // ✅ 리뷰 저장 처리
     @PostMapping("/save")
     public String saveReview(
-    		Principal principal,
+            Principal principal,
             ReviewDTO reviewDTO,
             @RequestParam("name") String name,
             @RequestParam("address") String address,
@@ -59,22 +59,32 @@ public class ReviewController {
             @RequestParam("lng") String lng,
             @RequestParam("category") String category,
             Model model) {
-    	
-    	reviewDTO.setReviewDate(LocalDateTime.now());
-    	String username = principal.getName();
-    	MemberEntity loginMember = memberRepository.findByUsername(username).orElseThrow();
-        reviewService.saveReview(reviewDTO, loginMember); 
 
-        model.addAttribute("message", "리뷰가 성공적으로 저장되었습니다.");
+        reviewDTO.setReviewDate(LocalDateTime.now());
+        String username = principal.getName();
+        MemberEntity loginMember = memberRepository.findByUsername(username).orElseThrow();
 
-        
+        boolean alreadyReviewed = reviewService.hasReviewed(reviewDTO.getHospitalCode(), loginMember);
+        if (alreadyReviewed) {
+            // 병원 상세 정보도 다시 넘겨줘야 form이 재구성됨
+            model.addAttribute("message", "이미 이 병원에 대한 리뷰를 작성하셨습니다.");
+            model.addAttribute("name", name);
+            model.addAttribute("address", address);
+            model.addAttribute("phone", phone);
+            model.addAttribute("lat", lat);
+            model.addAttribute("lng", lng);
+            model.addAttribute("category", category);
+            return "map/reviewWrite";
+        }
+
+        reviewService.saveReview(reviewDTO, loginMember);
+
         return "redirect:/map/hospitaldetail?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8)
-        + "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8)
-        + "&phone=" + URLEncoder.encode(phone, StandardCharsets.UTF_8)
-        + "&lat=" + URLEncoder.encode(lat, StandardCharsets.UTF_8)
-        + "&lng=" + URLEncoder.encode(lng, StandardCharsets.UTF_8)
-        + "&category=" + URLEncoder.encode(category, StandardCharsets.UTF_8);
-
+                + "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8)
+                + "&phone=" + URLEncoder.encode(phone, StandardCharsets.UTF_8)
+                + "&lat=" + URLEncoder.encode(lat, StandardCharsets.UTF_8)
+                + "&lng=" + URLEncoder.encode(lng, StandardCharsets.UTF_8)
+                + "&category=" + URLEncoder.encode(category, StandardCharsets.UTF_8);
     }
 
     // ✅ 특정 병원의 리뷰 목록 페이지
@@ -90,9 +100,6 @@ public class ReviewController {
         model.addAttribute("hospitalCode", hospitalCode);
 
         return "map/reviewWrite";
-        
-        
-        
     }
 
     @GetMapping("/list")
@@ -118,5 +125,4 @@ public class ReviewController {
        reviewService.updateReview(reviewDTO);
     }
 
-    
 }

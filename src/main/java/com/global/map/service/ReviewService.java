@@ -23,6 +23,12 @@ public class ReviewService {
 	private final MapService mapService;
 
 	public void saveReview(ReviewDTO reviewDTO, MemberEntity member) {
+		boolean exists = reviewRepository.existsByHospitalCodeAndMember(reviewDTO.getHospitalCode(), member);
+		
+		if(exists) {
+			throw new IllegalArgumentException("이미 리뷰를 작성하셨습니다.");
+		}
+		
 		ReviewEntity reviewEntity = ReviewEntity.builder()
 				.hospitalCode(reviewDTO.getHospitalCode())
 				.reviewDate(reviewDTO.getReviewDate())
@@ -96,4 +102,7 @@ public class ReviewService {
 		mapService.updateAvgRating(hospitalCode, avgRating);
 	}
 	
+	public boolean hasReviewed(String hospitalCode, MemberEntity member) {
+	    return reviewRepository.existsByHospitalCodeAndMember(hospitalCode, member);
+	}
 }

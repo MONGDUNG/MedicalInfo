@@ -347,9 +347,9 @@
 			let category = document.getElementById("modalCategory").innerText;
 			
 	        // 🔥 여기서 lat, lng 값을 제대로 가져오고 있는지 확인!
-	        let lat = document.getElementById("modalLat")?.innerText || "0.0"; 
-	        let lng = document.getElementById("modalLng")?.innerText || "0.0"; 
-
+	        let lat = document.getElementById("modalLat")?.innerText; 
+	        let lng = document.getElementById("modalLng")?.innerText; 
+            console.log("📍 위도:", lat, "📍 경도:", lng);
 	        let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}&category=${encodeURIComponent(category)}`;
 	        console.log("🔗 이동할 URL:", url);
 	        window.location.href = url;
@@ -389,6 +389,8 @@
 	        document.getElementById("modalAddress").innerText = place.ADDRESS || "정보 없음";
 	        document.getElementById("modalPhone").innerText = place.PHONE || "정보 없음";
 	        document.getElementById("modalCategory").innerText = place.CATEGORY_NAME || "정보 없음";
+			document.getElementById("modalLat").innerText = place.LAT || "정보 없음";
+			document.getElementById("modalLng").innerText = place.LNG || "정보 없음";
 			// 리뷰 데이터 표시
 			        fetch(`/map/getReviewInfo?hospitalName=${place.NAME}&address=${place.ADDRESS}`)
 			            .then(response => response.json())
@@ -419,7 +421,7 @@
 	    let phone = document.getElementById("modalPhone").innerText;
 	    let category = document.getElementById("modalCategory").innerText; // 카테고리 추가
 
-	    let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(category)}`;
+	    let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(category)}&lat=${document.getElementById("modalLat").innerText}&lng=${document.getElementById("modalLng").innerText}`;
 	    window.location.href = url;
 	};
 

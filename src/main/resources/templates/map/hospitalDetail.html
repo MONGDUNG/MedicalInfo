@@ -272,7 +272,12 @@ function openKakaoDirections() {
     var latitude = "[[${latitude}]]";
     var longitude = "[[${longitude}]]";
 
-    var url = `https://map.kakao.com/link/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
+    // 서울시청 위도경도 (대략적인 값)
+    var startName = "서울시청";
+    var startLat = "37.5662952";
+    var startLng = "126.9779451";
+
+    var url = `https://map.kakao.com/link/from/${encodeURIComponent(startName)},${startLat},${startLng}/to/${encodeURIComponent(hospitalName)},${latitude},${longitude}`;
 
     window.open(url, "_blank"); 
 }

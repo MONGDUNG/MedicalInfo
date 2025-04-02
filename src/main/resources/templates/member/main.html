@@ -39,17 +39,17 @@
 window.onload = function() {     
     //주소 없을시 자동으로 수정폼으로 이동 + alert
     if("[[${dto}]]" !== "null" || "[[${dto}]]" !== "") {
-       if ("[[${dto.address}]]" === "null" || "[[${dto.address}]]" === "") { 
-           console.log("주소 값이 null임. alert를 띄우고 페이지를 이동합니다.");
-           
-           // alert 띄우기
-           alert("주소 및 개인정보가 필요합니다. 해당 페이지에서 수정해주세요.");
-   
-           // 강제로 /member/modify 페이지로 이동
-           window.location.href = "/member/modify";
-       } else {
-           console.log("주소 값이 null이 아님. 페이지 이동하지 않음.");
-       }
+	    if ("[[${dto.address}]]" === "null" || "[[${dto.address}]]" === "") { 
+	        console.log("주소 값이 null임. alert를 띄우고 페이지를 이동합니다.");
+	        
+	        // alert 띄우기
+	        alert("주소 및 개인정보가 필요합니다. 해당 페이지에서 수정해주세요.");
+	
+	        // 강제로 /member/modify 페이지로 이동
+	        window.location.href = "/member/modify";
+	    } else {
+	        console.log("주소 값이 null이 아님. 페이지 이동하지 않음.");
+	    }
     }
 };
 </script>

@@ -60,13 +60,10 @@ public class MedinstEntity {
     //경도
     @Column(name = "LONGITUDE", length = 20, nullable = false)
     private String longitude;
-	
-    //default 0 으로 설정
-    
+
     @Column(name = "REVIEW_COUNT", columnDefinition = "INT default 0")
     private Integer reviewCount;
     
     @Column(name = "RATING_AVG", columnDefinition = "DOUBLE default 0.0")
     private Double ratingAvg;
-
 }

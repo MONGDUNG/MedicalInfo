@@ -18,9 +18,12 @@
                 <li class="nav-item me-3">
                     <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/logout}"> 로그아웃</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item me-3">
                     <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/member/signup}"> 회원가입</a>
-                </li>
+                
+                <li class="nav-item me-3" sec:authorize="isAuthenticated()" th:if="${session.memberStatus != null and session.memberStatus == 'admin'}">
+    				<a class="nav-link" th:href="@{/member/admin}"> 관리자 페이지</a>
+				</li>
             </ul>
         </div>
     </div>

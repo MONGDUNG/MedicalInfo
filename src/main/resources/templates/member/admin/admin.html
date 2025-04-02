@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+layout:decorate="~{/layout}">
 <head>
     <title>회원 목록</title>
     <!-- 부트스트랩 추가 -->
@@ -7,7 +8,7 @@
     <style>
         body {
             background-color: #f8f9fa;
-            padding: 20px;
+            
         }
         .container {
             background-color: #ffffff;
@@ -49,6 +50,7 @@
         }
     </style>
 </head>
+<div layout:fragment="content">
 <body>
     <div class="container">
         <h2 class="text-center text-primary">회원 목록</h2>
@@ -100,4 +102,5 @@
         <a th:href="@{/member/time}" class="btn btn-secondary btn-main">메인으로 이동</a>
     </div>
 </body>
+</div>
 </html>

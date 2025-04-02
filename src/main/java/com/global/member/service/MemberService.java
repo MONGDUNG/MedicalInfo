@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.global.member.dto.ClassificationDTO;
@@ -25,7 +26,6 @@ import com.global.member.entity.MemberTierEntity;
 import com.global.member.repository.ClassificationRepository;
 import com.global.member.repository.MemberRepository;
 import com.global.member.repository.MemberTierRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -130,7 +130,8 @@ public class MemberService {
 		
 
 	public void memberModify(String username ,MemberDTO dto) {		
-			MemberEntity me = mr.findByUsername(username).get();			
+			MemberEntity me = mr.findByUsername(username).get();
+		  
 			me.setBirth(dto.getBirth());
 			me.setAddress(dto.getAddress());
 			me.setDetailaddress(dto.getDetailaddress());
@@ -146,7 +147,6 @@ public class MemberService {
 			me.setMemberstatus(dto.getMemberstatus());
 			mr.save(me);
 		
-	
 	}
 	
 	public void delete(String username) {  // 계정 삭제 		

@@ -1,5 +1,9 @@
 package com.global.map.dto;
 
+import java.io.Serializable;
+
+import com.global.map.entity.MedinstEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MedinstDTO {
+public class MedinstDTO implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 
     private Long id;               // 번호
     private String hospitalCode;    // 요양기호
@@ -24,4 +30,12 @@ public class MedinstDTO {
     private double latitude;        // 위도 (double로 변환 추천)
     private double longitude;       // 경도 (double로 변환 추천)
     private double distance;        // 현재 위치(서울시청 등)와의 거리 (추가 필드)
+    
+    
+    public MedinstDTO(MedinstEntity entity) {
+        this.hospitalCode = entity.getHospitalCode();
+        this.hospitalName = entity.getHospitalName();
+        this.address = entity.getAddress();
+    }
 }
+

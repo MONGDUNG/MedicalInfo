@@ -65,6 +65,7 @@
     <input type="hidden" name="lat" th:value="${param.lat}" />
     <input type="hidden" name="lng" th:value="${param.lng}" />
     <input type="hidden" name="category" th:value="${param.category}" />
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
       <!-- 병원 코드: URL에서 전달된 값 -->
       <input type="hidden" name="hospitalCode" th:value="${hospitalCode}" />
       <label for="reviewerName">작성자 이름</label>

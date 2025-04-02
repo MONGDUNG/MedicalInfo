@@ -1,17 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{/layout}">
 <head>
     <title>등급 추가</title>
-    <!-- Bootstrap CSS 추가 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f8f9fa;
             margin: 0;
+            background-color: #f8f9fa;
         }
         .form-container {
             background-color: #ffffff;
@@ -19,6 +14,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 400px;
+            margin: 80px auto; /* 상단 여백 추가 */
         }
         h2 {
             text-align: center;
@@ -41,6 +37,7 @@
     </style>
 </head>
 <body>
+<div layout:fragment="content">
     <div class="form-container">
         <h2>등급 추가</h2>
         <form th:action="@{/member/admin/new}" method="post">
@@ -56,5 +53,6 @@
         </form>
         <a th:href="@{/member/admin/list}">이전으로</a>
     </div>
+</div>
 </body>
 </html>

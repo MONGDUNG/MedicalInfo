@@ -12,24 +12,18 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
-
 import com.global.member.dto.ClassificationDTO;
 import com.global.member.dto.MemberDTO;
 import com.global.member.dto.MemberTierDTO;
 import com.global.member.entity.MemberTierEntity;
 import com.global.member.naver.NaverService;
 import com.global.member.service.MemberService;
-
-import jakarta.servlet.http.HttpSession;
 
 
 
@@ -83,7 +77,11 @@ public class MemberController {
 	}
 	
 	@GetMapping("main")
-	public String main() {		
+	public String main(Principal principal,Model model) {		
+		String username = principal.getName();		
+		ms.update(username); // 시간 수정
+		 //정보 불러오기
+		model.addAttribute("dto", ms.readUser(username)); // model로 main으로 dto 넘기기
 		return "/member/main";
 	}
 	
@@ -98,10 +96,9 @@ public class MemberController {
 	
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("modify") // 수정 저장
-	public String modifypro( Principal principal , MemberDTO dto, 
-			Model model) {
-		String username = principal.getName();
-		ms.memberModify(username ,dto);
+	public String modifypro( Principal principal , MemberDTO dto) {
+		 	String username = principal.getName();
+		 	ms.memberModify(username ,dto);    
 		return "redirect:/member/time";
 	}
 	
@@ -113,14 +110,6 @@ public class MemberController {
 		return "redirect:/member/logout";
 	}
 	
-	@GetMapping("/mypage") // 마이페이지
-	public String mypage(Principal principal, Model model) {
-	    String username = principal.getName(); // 로그인한 사용자의 이름을 얻어옴
-	    MemberDTO memberDTO = ms.readUser(username); 
-	    model.addAttribute("memberDTO", memberDTO);
-	    return "/member/myPage"; // Thymeleaf 템플릿 경로 (resources/templates/member/myPage.html)
-	}
-
 	
 	@Autowired
 	private MailService mailService;

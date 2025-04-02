@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	layout:decorate="~{/layout}">
-	
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>의료정보 플랫폼</title>
@@ -10,7 +8,13 @@
 </head>
 <body>
 
-<div layout:fragment="content">
+<!-- 오른쪽 상단 로그인 / 회원가입 -->
+<div class="d-flex justify-content-end align-items-center pe-4 pt-2" style="background-color: white;">
+    <div sec:authorize="isAnonymous()">
+        <a th:href="@{/member/login}" class="btn btn-sm btn-outline-primary me-2">로그인</a>
+        <a th:href="@{/member/signup}" class="btn btn-sm btn-outline-success">회원가입</a>
+    </div>
+</div>
 
 <!-- 로고 (왼쪽 정렬, nav 위에 위치) -->
 <div class="py-4" style="padding-left: 120px; background-color: white; border-bottom: 1px solid #ddd;">
@@ -169,7 +173,12 @@
             <a th:href="@{/hospital/list?category=치과}" class="btn btn-outline-primary">치과</a>
         </div>
     </section>
-
+    
+    <section class="mb-5">
+  <h3 class="mb-3">📊 인기 병원 순위</h3>
+  <ul id="popularList" class="list-group"></ul>
+</section>
+    
     <!-- 최신 리뷰 섹션 -->
     <section>
         <h3 class="mb-3">📝 최신 리뷰</h3>
@@ -197,6 +206,7 @@
 
   mapBtn.addEventListener('click', (e) => {
     mapClickCount++;
+
     // 첫 번째 클릭은 드롭다운만 열기
     if (mapClickCount === 1) {
       setTimeout(() => { mapClickCount = 0; }, 500);  // 0.5초 안에 두 번 클릭해야 이동
@@ -205,6 +215,26 @@
     }
   });
 </script>
-</div>
+   <script>
+    fetch("/map/popular")
+      .then(res => res.json())
+      .then(data => {
+                     const list = document.getElementById("popularList");
+                     list.innerHTML = "";
+
+      if (data.length === 0) {
+                     const li = document.createElement("li");
+                     li.className = "list-group-item";
+                     li.innerText = "📭 인기 병원이 아직 없습니다.";
+                     list.appendChild(li);
+      }
+      data.forEach((h, i) => {
+                     const li = document.createElement("li");
+                     li.className = "list-group-item";
+                     li.innerText = `${i + 1}위 🏥 ${h.hospitalName} (${h.address})`;
+                     list.appendChild(li);
+                         });
+      });
+   </script>
 </body>
 </html>

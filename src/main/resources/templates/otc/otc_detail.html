@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .otc-detail {
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .otc-detail img {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .otc-detail h2 {
+            text-align: center;
+        }
+
+        .otc-detail p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="otc-detail">
+        <img th:src="@{'/images/otc/' + ${otc.medicineName} + '.png'}" alt="약 이미지" />
+        <p><strong>품목명:</strong> <span th:text="${otc.medicineName}"></span></p>
+        <p><strong>효능:</strong> <span th:text="${otc.indications}"></span></p>
+        <p><strong>복용방법:</strong> <span th:text="${otc.dosageInstructions}"></span></p>
+        <p><strong>주의사항:</strong> <span th:text="${otc.precautions}"></span></p>
+    </div>
+</body>
+</html>

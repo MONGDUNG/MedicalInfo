@@ -69,5 +69,19 @@ public class MapController {
     @ResponseBody
     public List<MedinstDTO> getPopularHospitals(){
     	return redisService.getTopHospitals(5);
-    }        
+    }
+    @GetMapping("/search")
+    public String searchByDepartment(@RequestParam("dept") String dept, Model model, Principal principal) throws JsonProcessingException {
+        // 로그인 정보 처리
+        if (principal != null) {
+            model.addAttribute("dto", ms.readUser(principal.getName()));
+            model.addAttribute("isLoggedIn", true);
+        } else {
+            model.addAttribute("isLoggedIn", false);
+        }
+        
+        // 선택된 진료과목을 모델에 추가
+        model.addAttribute("selectedDept", dept);
+        return "map/kakaoMapTest";
+    }
 }

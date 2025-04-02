@@ -41,6 +41,17 @@ dependencies {
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	//mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.lettuce:lettuce-core'
+    
+	//Webflux for kakao
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	
+	implementation 'org.json:json:20230227' // JSON 파싱용 라이브러리
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1' 
+
 }
 
 tasks.named('test') {

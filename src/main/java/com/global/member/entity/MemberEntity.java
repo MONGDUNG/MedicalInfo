@@ -2,7 +2,7 @@ package com.global.member.entity;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,7 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -46,8 +46,7 @@ public class MemberEntity {
 	    private Double longitude; // 경도
 		
 		private String postcode; //우편번호
-		private Date birth; //생일
-		@Column(unique = true) 
+		private Date birth; //생일		
 		private String email;	//e메일로 id , password 조회 중복시 에러 
 		private String sex; //성별
 		private String underlyingcondition; //기저질환

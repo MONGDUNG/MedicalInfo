@@ -2,14 +2,13 @@ package com.global.disease.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.global.disease.entity.Disease;
 import com.global.disease.entity.Search;
-import com.global.disease.repository.DiseaseRepository;
 import com.global.disease.repository.SearchRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +20,10 @@ import org.springframework.data.domain.Pageable;
 @Service
 public class DiseaseService {
 
-	private final DiseaseRepository diseaseRepository;
 	
-    public DiseaseService(DiseaseRepository diseaseRepository) {
-        this.diseaseRepository = diseaseRepository;
-    }
     
     @Autowired
-    private SearchRepository SearchRepo;
+    private SearchRepository searchRepo;
 
 	
 	//페이징, 검색
@@ -40,7 +35,7 @@ public class DiseaseService {
 		Pageable pageable = PageRequest.of(page, 20, Sort.by(sorts)); // 한 페이지에 20개의 질병 내용을 보여줌
 		
 		Specification<Search> spec = search(keyword);
-		Page<Search> pages = SearchRepo.findAll(spec, pageable);
+		Page<Search> pages = searchRepo.findAll(spec, pageable);
 				
 		return pages;
 	}
@@ -49,9 +44,9 @@ public class DiseaseService {
 	public long totalCount(String keyword) {
 		if(!keyword.trim().isEmpty()) {
 			Specification<Search> spec = search(keyword);
-			return SearchRepo.count(spec);
+			return searchRepo.count(spec);
 		}
-		return SearchRepo.count();
+		return searchRepo.count();
 	}
 	
 	//검색 처리
@@ -64,17 +59,30 @@ public class DiseaseService {
 		);
 	}
 	
-
-    public List<Disease> recommendDiseases(Long bodyPartId, List<Long> symptomIds) {
-        return diseaseRepository.findDiseasesByBodyPartAndSymptoms(bodyPartId, symptomIds);
-    }
-	
     
     public List<Search> picked(String name){
-    	List<Search> pick = new ArrayList<>();
-    	pick = SearchRepo.findByDiseaseNameStartingWith(name);
-    	System.out.println("----------------------------------------------------------------" + pick);
-    	return pick;
+    	List<Search> pick = searchRepo.findByDiseaseNameStartingWith(name);
+    	return pick.stream().distinct().collect(Collectors.toList());
     } 
+    
+    public List<Search> diagnosis(String bodyPart){
+    	
+    	List<Search> result = searchRepo.findByBodyPart(bodyPart);
+    	
+    	return result;
+    }
+    
+    public List<Search> diagnosis(String bodyPart, List<String> symptom){
+    	
+    	String symptom1 = symptom.size() > 0 ? symptom.get(0) : "";
+    	String symptom2 = symptom.size() > 1 ? symptom.get(1) : "";
+    	String symptom3 = symptom.size() > 2 ? symptom.get(2) : "";
+    	String symptom4 = symptom.size() > 3 ? symptom.get(3) : "";
+    	String symptom5 = symptom.size() > 4 ? symptom.get(4) : "";
+    	
+    	List<Search> result = searchRepo.findByBodyPartContainingAndSymptom(bodyPart, symptom1, symptom2, symptom3, symptom4, symptom5);
+    	return result;
+    }
+    
 }
 	

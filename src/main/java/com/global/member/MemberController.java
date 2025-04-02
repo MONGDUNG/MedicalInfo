@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,23 +12,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
-
 import com.global.member.dto.ClassificationDTO;
 import com.global.member.dto.MemberDTO;
 import com.global.member.dto.MemberTierDTO;
 import com.global.member.entity.MemberTierEntity;
+import com.global.member.naver.NaverService;
 import com.global.member.service.MemberService;
 
-import jakarta.servlet.http.HttpSession;
+
 
 @RequestMapping("/member/")
 @Controller
@@ -35,9 +33,18 @@ public class MemberController {
 	
 	@Autowired
 	private MemberService ms;
-	
+		
 	@Autowired
 	private PasswordEncoder passwordencoder;
+	
+	@Autowired
+	private NaverService ns;
+	
+	 @Value("${KAKAO_CLIENT_ID}")
+	 private String client_id;
+
+	 @Value("${KAKAO_SERVER_REDIRECT_URI}")
+	 private String redirect_uri;
 	
 	
 	
@@ -52,10 +59,13 @@ public class MemberController {
 		return "redirect:/member/login";
 	}
 	
-	@GetMapping("login")
-	public String login() {
-		return "/member/login";
-	}	
+	 @GetMapping("/login") //로그인 폼  카카오 버튼 추가  //post 는 시큐리티에서
+	    public String loginPage(Model model) {
+	        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+client_id+"&redirect_uri="+redirect_uri;
+	        model.addAttribute("location", location);
+	        model.addAttribute("naverUrl", ns.getNaverLogin());
+	        return "/member/login";
+	  }
 	
 	@GetMapping("time")  // 최종접속시간 저장 , 6개월 지날시 휴먼처리
 	public String time(Principal principal,Model model , HttpSession session) {
@@ -69,7 +79,11 @@ public class MemberController {
 	}
 	
 	@GetMapping("main")
-	public String main() {	
+	public String main(Principal principal,Model model) {		
+		String username = principal.getName();		
+		ms.update(username); // 시간 수정
+		 //정보 불러오기
+		model.addAttribute("dto", ms.readUser(username)); // model로 main으로 dto 넘기기
 		return "/member/main";
 	}
 	
@@ -84,10 +98,9 @@ public class MemberController {
 	
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("modify") // 수정 저장
-	public String modifypro( Principal principal , MemberDTO dto, 
-			Model model) {
-		String username = principal.getName();
-		ms.memberModify(username ,dto);
+	public String modifypro( Principal principal , MemberDTO dto) {
+		 	String username = principal.getName();
+		 	ms.memberModify(username ,dto);    
 		return "redirect:/member/time";
 	}
 	
@@ -99,6 +112,7 @@ public class MemberController {
 		return "redirect:/member/logout";
 	}
 	
+
 	@GetMapping("/mypage") // 마이페이지
 	public String mypage(Principal principal, Model model) {
 	    String username = principal.getName(); // 로그인한 사용자의 이름을 얻어옴
@@ -145,7 +159,7 @@ public class MemberController {
 	 	
  	 	//비밀번호 재 설정
 	 	@PostMapping("/newpassword")	 	
-	    public String changePassword(@RequestParam("username") String username, Model model) {
+	    public String changePassword(@RequestParam("username") String username, Model model ,Principal principal) {
 	        model.addAttribute("username", username);
 	        return "member/newpassword";
 	    }

@@ -1,13 +1,10 @@
 package com.global.member.service;
 
-import java.lang.foreign.Linker.Option;
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,17 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.User;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.global.member.dto.ClassificationDTO;
 import com.global.member.dto.MemberDTO;
@@ -38,12 +26,6 @@ import com.global.member.entity.MemberTierEntity;
 import com.global.member.repository.ClassificationRepository;
 import com.global.member.repository.MemberRepository;
 import com.global.member.repository.MemberTierRepository;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -73,44 +55,52 @@ public class MemberService {
 	        return mr.findByEmail(email).isPresent();
 	    }
 	
-	
-	public void createId(MemberDTO dto) { //회원가입	
-		MemberEntity me = MemberEntity.builder()  // 멤버 엔티티
-				.birth(dto.getBirth())
-				.username(dto.getUsername())
-				.password(passwordEncoder.encode(dto.getPassword()))
-				.name(dto.getName())
-				.address(dto.getAddress())
-				.detailaddress(dto.getDetailaddress())
-				.postcode(dto.getPostcode())
-				.latitude(dto.getLatitude())
-				.longitude(dto.getLongitude())
-				.email(dto.getEmail())
-				.sex(dto.getSex())
-				.underlyingcondition(dto.getUnderlyingcondition())
-				.signuppath(dto.getSignuppath())				
-				.lastlogindate(LocalDateTime.now())
-				.memberstatus(dto.getMemberstatus())				
-				.build();
-		me = mr.save(me);		
-		
-		Optional<MemberTierEntity> mteOptional = mt.findByTier(me.getMemberstatus());		
-		    MemberTierEntity mte = mteOptional.get();
-		    
-		    ClassificationEntity cfe = ClassificationEntity.builder() 
-		    		.username(me.getUsername())
-		            .memberId(me)
-		            .tierId(mte) 
-		            .build();       
-		    cfe = cf.save(cfe);
-		
-		
-		    me = mr.findByUsername(dto.getUsername()).get();
-		    me.setTierId(mte);
-	    	me.setClassiId(cfe);	    
-	    	mr.save(me);
-	}
-	
+
+	 public void createId(MemberDTO dto) { // 회원가입
+	     MemberEntity me = MemberEntity.builder() // 멤버 엔티티 생성
+	         .birth(dto.getBirth())
+	         .username(dto.getUsername())
+	         .password(passwordEncoder.encode(dto.getPassword()))
+	         .name(dto.getName())
+	         .address(dto.getAddress())
+	         .detailaddress(dto.getDetailaddress())
+	         .postcode(dto.getPostcode())
+	         .latitude(dto.getLatitude())
+	         .longitude(dto.getLongitude())
+	         .email(dto.getEmail())
+	         .sex(dto.getSex())
+	         .underlyingcondition(dto.getUnderlyingcondition())
+	         .signuppath(dto.getSignuppath())
+	         .lastlogindate(LocalDateTime.now())
+	         .memberstatus(dto.getMemberstatus())
+	         .build();
+
+	     me = mr.save(me); // 멤버 저장
+
+	     Optional<MemberTierEntity> mteOptional = mt.findByTier(dto.getMemberstatus());
+	     if (mteOptional.isPresent()) {
+	         MemberTierEntity mte = mteOptional.get();
+
+	         // 중복 데이터 체크 및 저장
+	         if (!cf.existsByMemberIdAndTierId(me, mte)) { // 이미 저장된 데이터인지 확인
+	             ClassificationEntity cfe = ClassificationEntity.builder()
+	                 .username(me.getUsername())
+	                 .memberId(me)
+	                 .tierId(mte)
+	                 .build();
+
+	             cfe = cf.save(cfe); // 클래스 저장
+
+	             me.setTierId(mte);
+	             me.setClassiId(cfe);
+	             mr.save(me); // 멤버 업데이트
+	         } else {
+	             System.out.println("중복된 데이터가 이미 존재합니다.");
+	         }
+	     } else {
+	         throw new RuntimeException("MemberTierEntity를 찾을 수 없습니다.");
+	     }
+	 }
 	
 	public MemberDTO readUser(String username) {  // 유저정보 불러오기
 		MemberEntity entity = mr.findByUsername(username).get();
@@ -141,7 +131,7 @@ public class MemberService {
 
 	public void memberModify(String username ,MemberDTO dto) {		
 			MemberEntity me = mr.findByUsername(username).get();
-			me.setPassword(dto.getPassword());
+		  
 			me.setBirth(dto.getBirth());
 			me.setAddress(dto.getAddress());
 			me.setDetailaddress(dto.getDetailaddress());
@@ -149,8 +139,7 @@ public class MemberService {
 			me.setLatitude(dto.getLatitude());
 			me.setLongitude(dto.getLongitude());
 			me.setLastlogindate(LocalDateTime.now());			
-			me.setName(dto.getName());
-			me.setPassword(passwordEncoder.encode(dto.getPassword()));
+			me.setName(dto.getName());			
 			me.setPostcode(dto.getPostcode());
 			me.setSex(dto.getSex());
 			me.setSignuppath(dto.getSignuppath());
@@ -158,7 +147,6 @@ public class MemberService {
 			me.setMemberstatus(dto.getMemberstatus());
 			mr.save(me);
 		
-	
 	}
 	
 	public void delete(String username) {  // 계정 삭제 		

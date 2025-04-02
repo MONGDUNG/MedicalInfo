@@ -8,4 +8,5 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     List<ReviewEntity> findByHospitalCode(String hospitalCode);
     List<ReviewEntity> findByMember(MemberEntity member);
+    boolean existsByHospitalCodeAndMember(String hospitalCode, MemberEntity member);
 }

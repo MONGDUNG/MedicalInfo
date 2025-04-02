@@ -259,7 +259,8 @@
 	    document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
 
 	    let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
-	        item.innerText.includes(place.NAME || "장소")
+	        parseFloat(item.getAttribute('data-lat')) === parseFloat(place.LAT) &&
+	        parseFloat(item.getAttribute('data-lng')) === parseFloat(place.LNG)
 	    );
 
 	    if (targetItem) {
@@ -346,9 +347,9 @@
 			let category = document.getElementById("modalCategory").innerText;
 			
 	        // 🔥 여기서 lat, lng 값을 제대로 가져오고 있는지 확인!
-	        let lat = document.getElementById("modalLat")?.innerText || "0.0"; 
-	        let lng = document.getElementById("modalLng")?.innerText || "0.0"; 
-
+	        let lat = document.getElementById("modalLat")?.innerText; 
+	        let lng = document.getElementById("modalLng")?.innerText; 
+            console.log("📍 위도:", lat, "📍 경도:", lng);
 	        let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&lat=${lat}&lng=${lng}&category=${encodeURIComponent(category)}`;
 	        console.log("🔗 이동할 URL:", url);
 	        window.location.href = url;
@@ -359,19 +360,21 @@
 	    var item = document.createElement('div');
 	    item.className = 'hospital-item';
 	    item.innerText = `${place.NAME || "장소"}`;
+		item.setAttribute('data-lat', place.LAT);
+		item.setAttribute('data-lng', place.LNG);
 
-	    item.onclick = function() {
-	        // 기존 하이라이트 제거
-	        document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+		item.onclick = function () {
+		       document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
+		       item.classList.add('highlight');
 
-	        // 클릭된 리스트 항목에 하이라이트 적용
-	        item.classList.add('highlight');
+		       let selectedMarker = markers.find(marker => {
+		           return parseFloat(marker.getPosition().getLat().toFixed(6)) === parseFloat(place.LAT.toFixed(6)) &&
+		               parseFloat(marker.getPosition().getLng().toFixed(6)) === parseFloat(place.LNG.toFixed(6));
+		       });
 
-	        // 마커 찾기
-	        var selectedMarker = markers.find(marker => {
-	            return parseFloat(marker.getPosition().getLat().toFixed(6)) === parseFloat(place.LAT.toFixed(6)) &&
-	                   parseFloat(marker.getPosition().getLng().toFixed(6)) === parseFloat(place.LNG.toFixed(6));
-	        });
+		       if (selectedMarker) {
+		           selectMarker(selectedMarker, place);
+		       }
 
 	        console.log("🔍 찾은 마커:", selectedMarker);
 
@@ -386,6 +389,8 @@
 	        document.getElementById("modalAddress").innerText = place.ADDRESS || "정보 없음";
 	        document.getElementById("modalPhone").innerText = place.PHONE || "정보 없음";
 	        document.getElementById("modalCategory").innerText = place.CATEGORY_NAME || "정보 없음";
+			document.getElementById("modalLat").innerText = place.LAT || "정보 없음";
+			document.getElementById("modalLng").innerText = place.LNG || "정보 없음";
 			// 리뷰 데이터 표시
 			        fetch(`/map/getReviewInfo?hospitalName=${place.NAME}&address=${place.ADDRESS}`)
 			            .then(response => response.json())
@@ -416,7 +421,7 @@
 	    let phone = document.getElementById("modalPhone").innerText;
 	    let category = document.getElementById("modalCategory").innerText; // 카테고리 추가
 
-	    let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(category)}`;
+	    let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(category)}&lat=${document.getElementById("modalLat").innerText}&lng=${document.getElementById("modalLng").innerText}`;
 	    window.location.href = url;
 	};
 

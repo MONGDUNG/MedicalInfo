@@ -26,6 +26,7 @@ public class ReviewDTO {
 
     // 생성자: Entity → DTO 변환용
     public ReviewDTO(ReviewEntity entity) {
+    	this.id = entity.getId(); // id가 null되서 추가함
         this.hospitalCode = entity.getHospitalCode();
         this.reviewDate = entity.getReviewDate();
         this.rating = entity.getRating();

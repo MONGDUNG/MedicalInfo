@@ -32,12 +32,11 @@ public class SecurityConfig {
 	    http.authorizeHttpRequests( // URL 권한 확인(권한 없을 시 403 에러)
 	        (ah) -> ah.requestMatchers( // 요청 URL 패턴에 대한 규칙(보안 규칙 설정)
 	            new AntPathRequestMatcher("/member/admin")).hasRole("ADMIN") // 관리자페이지 어드민만
-	            .requestMatchers(new AntPathRequestMatcher("/**"))   // URL경로 설정 /**모든(URL)권한
-	            .permitAll() // 모든 권한 허용.
+	            .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()   // URL경로 설정 /**모든(URL)권한
+	           
 	    )
 	    .csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2/**"), 
-	    		new AntPathRequestMatcher("/member/**"),
-	    	    new AntPathRequestMatcher("/review/**"))) // 이거 연결되고 지워야됨!
+	    		new AntPathRequestMatcher("/member/**"))) 
 	        // 해당 경로(h2) 제외 설정. ( ?/ 파라미터 관련 보안 설정)
 	    .headers((header) -> header.addHeaderWriter(new XFrameOptionsHeaderWriter(
 	        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))) // H2 콘솔 페이지 출력 셋팅
@@ -49,7 +48,7 @@ public class SecurityConfig {
 	        // 로그인 설정(로그인 시 어디로 가는지) 로그인 시 최종 로그인 기록을 위해 time으로 이동 
 	    .logout((logout) -> logout
 	        .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout"))
-	        .logoutSuccessUrl("/member/main")
+	        .logoutSuccessUrl("/member/login")
 	        .invalidateHttpSession(true)); // 로그아웃 시 세션 삭제
 
 	    /* .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole("ADMIN") // admin 페이지 권한을 가진 사용자만, 임의의 아이디

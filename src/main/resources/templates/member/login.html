@@ -8,17 +8,18 @@
     <style>
         body, html {
             height: 100%;
+
             display: flex;
             justify-content: center;
             align-items: center;
             background-color: #f8f9fa;
         }
         .login-container {
-            max-width: 400px;
+            max-width: 500px;
             padding: 20px;
             background-color: white;
             border: 1px solid #dee2e6;
-            border-radius: 10px;
+            border-radius: 30px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
@@ -48,6 +49,19 @@
             <li class="form-group">
                 <a class="link"  th:href="@{/member/signup}">회원가입</a>
             </li>
-    </div>
+            
+            		<!--  카카오 -->
+             <div class="container" style="display: flex; justify-content: center; align-content: center; align-items: center; flex-direction: column; margin: 10px auto; ">   			 
+    			 <a th:href="${location}">
+        			<img src="/image/kakao/kakao_login_medium_narrow.png" >
+    			 </a>
+			 </div>
+            		<!--  네이버 -->
+            	<div class="container" style="display: flex; justify-content: center; align-content: center; align-items: center; flex-direction: column; margin: 10px auto; ">   			 
+            		 <a th:href="@{|${naverUrl}|}">
+            		<img src="/image/naver/btnD_아이콘원형.png" class="naver-btn" alt="네이버 로그인">
+        			</a>
+    			</div>
+    	</div>		
 </body>
 </html>

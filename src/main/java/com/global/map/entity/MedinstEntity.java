@@ -60,7 +60,7 @@ public class MedinstEntity {
     //경도
     @Column(name = "LONGITUDE", length = 20, nullable = false)
     private String longitude;
-	
+
     @Column(name = "REVIEW_COUNT", columnDefinition = "INT default 0")
     private Integer reviewCount;
     

@@ -1,0 +1,27 @@
+<!-- navbar.html -->
+<nav th:fragment="navbarFragment" class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/member/main}">Dr.geo</a>
+       
+         <div class="navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav flex-row">
+                <li class="nav-item me-3">
+                    <a class="nav-link active" aria-current="page" th:href="@{/map/main}">지도</a>
+                </li>
+                <li class="nav-item me-3">
+                    <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/member/login}"> 로그인</a>
+                </li>
+                <li class="nav-item me-3">
+                    <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/mypage}"> 내 정보</a>
+                </li>
+                <li class="nav-item me-3">
+                    <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/member/logout}"> 로그아웃</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/member/signup}"> 회원가입</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

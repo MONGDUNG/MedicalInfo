@@ -116,12 +116,13 @@ public class ReviewController {
     @DeleteMapping("/delete/{id}")
     @ResponseBody
     public void deleteReview(@PathVariable("id") Long id) {
-		reviewService.deleteReview(id);
-	}
+      reviewService.deleteReview(id);
+   }
     
     @PutMapping("/update")
     @ResponseBody
     public void updateReview(@RequestBody ReviewDTO reviewDTO) {
-    	reviewService.updateReview(reviewDTO);
+       reviewService.updateReview(reviewDTO);
     }
+
 }

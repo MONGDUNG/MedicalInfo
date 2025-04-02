@@ -36,8 +36,7 @@ public class SecurityConfig {
 	            .permitAll() // 모든 권한 허용.
 	    )
 	    .csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2/**"), 
-	    		new AntPathRequestMatcher("/member/**"),
-	    	    new AntPathRequestMatcher("/review/**"))) // 이거 연결되고 지워야됨!
+	    		new AntPathRequestMatcher("/member/**"))) 
 	        // 해당 경로(h2) 제외 설정. ( ?/ 파라미터 관련 보안 설정)
 	    .headers((header) -> header.addHeaderWriter(new XFrameOptionsHeaderWriter(
 	        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))) // H2 콘솔 페이지 출력 셋팅
@@ -49,7 +48,7 @@ public class SecurityConfig {
 	        // 로그인 설정(로그인 시 어디로 가는지) 로그인 시 최종 로그인 기록을 위해 time으로 이동 
 	    .logout((logout) -> logout
 	        .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout"))
-	        .logoutSuccessUrl("/member/main")
+	        .logoutSuccessUrl("/member/login")
 	        .invalidateHttpSession(true)); // 로그아웃 시 세션 삭제
 
 	    /* .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole("ADMIN") // admin 페이지 권한을 가진 사용자만, 임의의 아이디

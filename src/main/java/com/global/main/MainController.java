@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 public class MainController {
 	
 	@GetMapping("/")
-	public String main(Model model) {
-	    return "member/main";
+	public String main() {
+		return "member/main";
+
 	}
 }

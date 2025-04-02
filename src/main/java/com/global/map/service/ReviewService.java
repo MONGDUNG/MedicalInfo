@@ -10,7 +10,6 @@ import com.global.map.dto.ReviewDTO;
 import com.global.map.entity.ReviewEntity;
 import com.global.map.repository.ReviewRepository;
 import com.global.member.entity.MemberEntity;
-import com.global.member.repository.MemberRepository;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -44,14 +43,15 @@ public class ReviewService {
 		updateAvgRating(reviewDTO.getHospitalCode());
 	}
 	public void deleteReview(Long id) {
-	    ReviewEntity review = reviewRepository.findById(id)
-	        .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. ID: " + id));
+	       ReviewEntity review = reviewRepository.findById(id)
+	           .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. ID: " + id));
 
-	    String hospitalCode = review.getHospitalCode(); 
-	    reviewRepository.deleteById(id);               
-	    decreaseReviewCount(hospitalCode);             
-	    updateAvgRating(hospitalCode);
-	}
+	       String hospitalCode = review.getHospitalCode(); 
+	       reviewRepository.deleteById(id);               
+	       decreaseReviewCount(hospitalCode);             
+	       updateAvgRating(hospitalCode);
+	   }
+
 	@Transactional
 	public void updateReview(ReviewDTO reviewDTO) {
 	    // 1. 기존 리뷰 찾기 (예외 처리 포함)

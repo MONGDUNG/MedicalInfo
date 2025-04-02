@@ -166,7 +166,7 @@
                 <input type="text" id="postcode" name="postcode" placeholder="우편번호" readonly required>
                 <button type="button" class="btn btn-secondary" onclick="daumPost()">우편번호 찾기</button><br>
                 <input class="form-control" type="text" name="address" id="address" placeholder="주소" required>
-                <input class="form-control" type="text" name="detailaddress" id="detailaddress" placeholder="상세주소" required>
+                <input class="form-control" type="text" name="detailaddress" id="detailaddress" placeholder="상세주소" required >
             </div>
             
             <div class="form-group">
@@ -197,7 +197,7 @@
             </div>
             	<!-- 가입방식 -->
             <div class="form-group">
-        		<input class="form-control" id="signuppath" name="signuppath" th:value="*{signuppath}" type="hidden">
+        		<input class="form-control" id="signuppath" name="signuppath" th:value="1" type="hidden">
     		</div>
             <input type="hidden" id="latitude" name="latitude" th:value="*{latitude}">
             <input type="hidden" id="longitude" name="longitude" th:value="*{longitude}">

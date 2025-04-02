@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>의심 질병 목록</title>
+</head>
+<body>
+    <h2>의심 질병 목록</h2>
+
+    <div th:if="${#lists.isEmpty(diseases)}">
+        <p>해당 조건에 맞는 질병이 없습니다.</p>
+    </div>
+
+    <ul th:unless="${#lists.isEmpty(diseases)}">
+        <li th:each="disease : ${diseases}">
+            <strong th:text="${disease.diseaseName}"></strong> <br>
+            <span th:text="${disease.symptom}"></span><br>
+            <em>진료과: <span th:text="${disease.mediDepart}"></span></em>
+			<p th:text="'동의어: ' + ${disease.synonyms}"></p>
+            <p th:text="'관련질환: ' + ${disease.related}"></p>
+			<hr>
+        </li>
+    
+	<span>본 서비스는 의사나 기타 의료전문가를 대신할 수 없으므로, 이에 근거하여 의학적 판단을 내리거나
+		<br>약물 복용 등의 조치를 취하거나 중단해서는 안 되며 반드시 의료기관 내원을 통한 진료를 받아야 합니다.
+		<br>또한 본 서비스를 생명을 위협하거나 응급한 상황에서 사용하지 마십시오.
+		<br>본 서비스는 이용자가 이에 근거하여 의료기관에의 내원 없이 취한 질병에 관한 조치의 결과에 대해 책임이 없음을 알려드립니다.
+	</span>
+	<br><br>
+	
+    <a href="/diagnosis/body-parts">처음으로</a>
+	</ul>
+</body>
+</html>

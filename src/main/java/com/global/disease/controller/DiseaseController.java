@@ -3,7 +3,6 @@ package com.global.disease.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -30,14 +29,5 @@ public class DiseaseController {
 	@GetMapping("self_diagnosis")
 	public String diagnosis() {
 		return "search/self_diagnosis";
-	}
-	
-	@GetMapping("self_diagnosis/{orderNum}")
-	public String common(@PathVariable("orderNum") int orderNum, Model model , @RequestParam(value="txt",defaultValue="" ,required = false) String txt) {
-		//@RequestParam(required=false) 뜻: 이것의 기본값은 null 로 정한다는 뜻이다.
-		//현재 질문 가져오기
-		model.addAttribute("orderNum", orderNum);
-		
-		return "search/common";
 	}
 }

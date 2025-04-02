@@ -68,10 +68,12 @@ public class MemberController {
 	  }
 	
 	@GetMapping("time")  // 최종접속시간 저장 , 6개월 지날시 휴먼처리
-	public String time(Principal principal,Model model) {
+	public String time(Principal principal,Model model , HttpSession session) {
 		String username = principal.getName();		
 		ms.update(username); // 시간 수정
 		 //정보 불러오기
+		MemberDTO dto = ms.readUser(username);		 
+		session.setAttribute("memberStatus", dto.getMemberstatus());
 		model.addAttribute("dto", ms.readUser(username)); // model로 main으로 dto 넘기기
 		return "/member/main";
 	}
@@ -108,6 +110,15 @@ public class MemberController {
 		String username = principal.getName();	
 		ms.delete(username);
 		return "redirect:/member/logout";
+	}
+	
+
+	@GetMapping("/mypage") // 마이페이지
+	public String mypage(Principal principal, Model model) {
+	    String username = principal.getName(); // 로그인한 사용자의 이름을 얻어옴
+	    MemberDTO memberDTO = ms.readUser(username); 
+	    model.addAttribute("memberDTO", memberDTO);
+	    return "/member/myPage"; // Thymeleaf 템플릿 경로 (resources/templates/member/myPage.html)
 	}
 	
 	
@@ -201,13 +212,11 @@ public class MemberController {
 	        ms.markInactiveUsers();  // 6개월마다 휴먼처리
 	        	        	   
 	 	}
-	 	
-	 	
-	 	 
-	 	
+
 	 	
 	 	@GetMapping("/admin")
-	 	public String admin(Principal principal) {
+	 	public String admin() {
+
 	 		return "member/admin/main";
 	 	}
 	 	 

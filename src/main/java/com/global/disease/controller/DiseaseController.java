@@ -23,11 +23,11 @@ public class DiseaseController {
 			model.addAttribute("list", diseaseService.diseasePage(page, keyword));
 			model.addAttribute("count", diseaseService.totalCount(keyword));
 			model.addAttribute("keyword", keyword);
-		return "search/disease_list";
+		return "disease/search/disease_list";
 	}
 	
 	@GetMapping("self_diagnosis")
 	public String diagnosis() {
-		return "search/self_diagnosis";
+		return "disease/search/self_diagnosis";
 	}
 }

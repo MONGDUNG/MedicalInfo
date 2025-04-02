@@ -25,6 +25,8 @@ import com.global.member.entity.MemberTierEntity;
 import com.global.member.naver.NaverService;
 import com.global.member.service.MemberService;
 
+import jakarta.servlet.http.HttpSession;
+
 
 
 @RequestMapping("/member/")
@@ -79,11 +81,10 @@ public class MemberController {
 	}
 	
 	@GetMapping("main")
-	public String main(Principal principal,Model model) {		
-		String username = principal.getName();		
-		ms.update(username); // 시간 수정
-		 //정보 불러오기
-		model.addAttribute("dto", ms.readUser(username)); // model로 main으로 dto 넘기기
+	public String main(Model model) {		
+		MemberDTO dto = new MemberDTO();
+		dto.setAddress("비로그인");
+		model.addAttribute("dto", dto);
 		return "/member/main";
 	}
 	

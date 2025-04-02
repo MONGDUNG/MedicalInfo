@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko"
+layout:decorate="~{/layout}">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,6 +8,7 @@
 		<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
 	</head>
 	<body>
+	<div layout:fragment="content">
 		<div class="container mt-5">
 			<ul class="nav nav-tabs mb-3">
 				<li class="nav-item">
@@ -88,6 +90,7 @@
 			</div>
 			<!-- 페이징 처리 종료-->
 		<script th:src="@{/js/bootstrap.min.js}"></script>
+		</div>
 	</body>
 </html>
 

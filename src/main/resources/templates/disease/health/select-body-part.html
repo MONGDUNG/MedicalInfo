@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+        layout:decorate="~{/layout}">
 <head>
     <title>신체 부위 선택</title>
 </head>
 <body>
+<div layout:fragment="content">
     <h2>어디가 불편하신가요?</h2>
     <form th:action="@{/diagnosis/symptoms}" method="get">
         <select name="bodyPart" required>
@@ -14,5 +16,6 @@
         </select>
         <button type="submit">다음</button>
     </form>
+    </div>
 </body>
 </html>

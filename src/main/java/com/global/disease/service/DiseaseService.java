@@ -74,11 +74,11 @@ public class DiseaseService {
     
     public List<Search> diagnosis(String bodyPart, List<String> symptom){
     	
-    	String symptom1 = symptom.size() > 0 ? symptom.get(0) : "";
-    	String symptom2 = symptom.size() > 1 ? symptom.get(1) : "";
-    	String symptom3 = symptom.size() > 2 ? symptom.get(2) : "";
-    	String symptom4 = symptom.size() > 3 ? symptom.get(3) : "";
-    	String symptom5 = symptom.size() > 4 ? symptom.get(4) : "";
+    	String symptom1 = symptom.size() > 0 ? symptom.get(0) : "없다";
+    	String symptom2 = symptom.size() > 1 ? symptom.get(1) : "없다";
+    	String symptom3 = symptom.size() > 2 ? symptom.get(2) : "없다";
+    	String symptom4 = symptom.size() > 3 ? symptom.get(3) : "없다";
+    	String symptom5 = symptom.size() > 4 ? symptom.get(4) : "없다";
     	
     	List<Search> result = searchRepo.findByBodyPartContainingAndSymptom(bodyPart, symptom1, symptom2, symptom3, symptom4, symptom5);
     	return result;

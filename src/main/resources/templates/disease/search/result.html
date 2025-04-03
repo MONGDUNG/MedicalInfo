@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+        layout:decorate="~{/layout}">
 	<head>
 		<title>의심 질병 목록</title>
 	</head>
 	<body>
+	    <div layout:fragment="content">
+	    <h2>의심 질병 목록</h2>
 		<div th:each="pick : ${pick}" class="col-md-4 mb-3">
 			<h5 th:text="${pick.diseaseName}"></h5>
 			<p th:text="${pick.symptom != null} ? '증상: ' + ${pick.symptom} : ''"></p>
 			<p th:text="${pick.related != null} ? '관련질환: ' + ${pick.related} : ''"></p>
 			<p th:text="${pick.mediDepart != null} ? '진료과: ' + ${pick.mediDepart} : ''"></p>
 			<p th:text="${pick.synonyms != null} ? '동의어: ' + ${pick.synonyms} : ''"></p>
+		</div>
 		</div>
 	</body>
 </html>

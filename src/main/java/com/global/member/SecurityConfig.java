@@ -32,6 +32,7 @@ public class SecurityConfig {
 	    http.authorizeHttpRequests( // URL 권한 확인(권한 없을 시 403 에러)
 	        (ah) -> ah.requestMatchers( // 요청 URL 패턴에 대한 규칙(보안 규칙 설정)
 	            new AntPathRequestMatcher("/member/admin")).hasRole("ADMIN") // 관리자페이지 어드민만
+	        	.requestMatchers(new AntPathRequestMatcher("/member/main")).permitAll()
 	            .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()   // URL경로 설정 /**모든(URL)권한
 	           
 	    )

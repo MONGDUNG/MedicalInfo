@@ -1,18 +1,29 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{/layout}">
 <head>
     <title>신체 부위 선택</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 </head>
 <body>
-    <h2>어디가 불편하신가요?</h2>
-    <form th:action="@{/diagnosis/symptoms}" method="get">
-        <select name="bodyPart" required>
-            <option value="">부위를 선택하세요</option>
-            <option th:each="part : ${bodyParts}"
-                    th:value="${part.name}"
-                    th:text="${part.name}"></option>
-        </select>
-        <button type="submit">다음</button>
-    </form>
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">어디가 불편하신가요?</h3>
+                <form th:action="@{/diagnosis/symptoms}" method="get" class="text-center">
+                    <div class="mb-3">
+                        <select class="form-select w-50 mx-auto" name="bodyPart" required>
+                            <option value="">부위를 선택하세요</option>
+                            <option th:each="part : ${bodyParts}"
+                                    th:value="${part.name}"
+                                    th:text="${part.name}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary px-4">다음</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

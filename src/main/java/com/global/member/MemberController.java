@@ -77,15 +77,14 @@ public class MemberController {
 		MemberDTO dto = ms.readUser(username);		 
 		session.setAttribute("memberStatus", dto.getMemberstatus());
 		model.addAttribute("dto", ms.readUser(username)); // model로 main으로 dto 넘기기
-		return "/member/main";
+		return "/main";
 	}
 	
 	@GetMapping("main")
-	public String main(Principal principal,Model model) {		
-		String username = principal.getName();		
-		ms.update(username); // 시간 수정
-		 //정보 불러오기
-		model.addAttribute("dto", ms.readUser(username)); // model로 main으로 dto 넘기기
+	public String main(Model model) {		
+		MemberDTO dto = new MemberDTO();
+		dto.setAddress("비로그인");
+		model.addAttribute("dto", dto);
 		return "/member/main";
 	}
 	

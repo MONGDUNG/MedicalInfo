@@ -5,6 +5,14 @@
     <title>의료정보 플랫폼</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+    .link-hover:hover {
+      text-decoration: underline;
+      font-weight: bold;
+      opacity: 0.85;
+    }
+    </style>
 </head>
 <body>
 
@@ -44,19 +52,19 @@
         <ul class="dropdown-menu p-3" style="width: 800px;">
         <div class="d-flex flex-row gap-4">
           <li class="dropdown-item">
-            <strong>커뮤니티</strong>
-            <ul class="list-unstyled ps-3">
-              <li>영양제정보</li>
-              <li>편의점 상비약</li>
-              <li>약국판매약</li>
-              <li>문의</li>
-            </ul>
+           <strong>커뮤니티</strong>
+           <ul class="list-unstyled ps-3">
+               <li><a href="/supplement/all" class="nav-link px-0 fw-semibold link-hover text-dark">영양제정보</a></li>
+               <li><a href="/otc/list" class="nav-link px-0 fw-semibold link-hover text-dark">편의점 상비약</a></li>
+               <li><a href="/category/all" class="nav-link px-0 fw-semibold link-hover text-dark">약국판매약</a></li>
+               <li><a href="/contact" class="nav-link px-0 fw-semibold link-hover text-dark">문의</a></li>
+           </ul>
           </li>
           <li class="dropdown-item">
             <strong>질병정보</strong>
             <ul class="list-unstyled ps-3">
-              <li>자가진단</li>
-              <li>질병검색</li>
+              <li><a href="/disease/list" class="nav-link px-0 fw-semibold link-hover text-dark">자가진단</a></li>
+              <li><a href="/disease/ㄴㄷ" class="nav-link px-0 fw-semibold link-hover text-dark">질병검색</a></li>
             </ul>
           </li>
           <li class="dropdown-item">

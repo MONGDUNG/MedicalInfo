@@ -1,0 +1,57 @@
+<html layout:decorate="~{/layout}">
+<div layout:fragment="content">
+    <div class="container my-5">
+        <!-- 페이지 제목 -->
+        <a href="/question/list" class="text-decoration-none">
+    	<h1 class="text-center mb-4">문의 게시판</h1>
+		</a>
+
+        <!-- 질문쓰기 버튼 -->
+        <div class="text-right mb-3">
+            <a class="btn btn-primary" sec:authorize="isAuthenticated()" href="/question/create">
+                질문쓰기
+            </a>
+        </div>
+
+        <!-- 테이블 -->
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>번 호</th>
+                    <th>제 목</th>
+                    <th>글쓴이</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="questionDTO : ${list}" class="text-center">
+                    <td th:text="${questionDTO.id}"></td>
+                    <td>
+                        <a th:href="@{|/question/detail/${questionDTO.id}|}" th:text="${questionDTO.subject}"></a>
+                        <!-- 답글이 있을 경우 배지와 '해결' 텍스트 표시 -->
+                        <span th:if="${questionDTO.answerList != null && #lists.size(questionDTO.answerList) > 0 }"
+                              th:text="|[${#lists.size(questionDTO.answerList)}] 해결|" class="badge bg-secondary"></span>
+                    </td>
+                    <td th:text="${questionDTO.username}"></td>
+                    <td th:text="${#temporals.format(questionDTO.createDate,'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 페이지네이션 -->
+        <div th:if="${#lists.size(list) > 0}" class="text-center">
+            <ul class="pagination justify-content-center">
+                <li th:each="pageNum : ${#numbers.sequence(1, count / 10 + (count % 10 == 0 ? 0 : 1))}" class="page-item">
+                    <a th:href="@{|/question/list?page=${pageNum-1}|}" class="page-link" th:text="${pageNum}"></a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 검색 폼 -->
+        <form th:action="@{/question/list}" class="d-flex justify-content-center mt-4">
+            <input type="text" name="kw" class="form-control w-50" placeholder="검색어를 입력하세요">
+            <input type="submit" value="검색" class="btn btn-outline-primary ml-2">
+        </form>
+    </div>
+</div>
+</html>

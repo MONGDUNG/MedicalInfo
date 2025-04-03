@@ -1,0 +1,48 @@
+<html layout:decorate="~{/layout}">
+<div layout:fragment="content">
+	<div class="container my-3">
+		
+		<a href="/question/list" class="text-decoration-none">
+    	<h1 class="text-center mb-4">문의 게시판</h1>
+		</a>
+		
+		<!-- 제목 부분 -->
+		<h2 class="border-bottom py-2" th:text="${questionDTO.subject}"></h2>
+		<div class="card-body">
+			<div th:text="${questionDTO.content}" class="card-text"></div>
+		</div>
+		
+		<!-- 글쓴이 이름 표시 -->
+		<div class="mb-3">
+			<strong>글쓴이: </strong><span th:text="${questionDTO.username}"></span>
+		</div>
+		
+		<!-- 비공개 게시글 처리 -->
+		<div th:if="${questionDTO.visibility == 'PRIVATE'}" class="alert alert-warning">
+			비공개 게시글입니다.
+		</div>
+		
+		
+		<!-- 수정 및 삭제 버튼 -->
+		<div class="my-3">
+		    <a class="delete btn btn-success" th:href="@{|/question/modify/${questionDTO.id}|}" th:text="수정"></a>
+		    <a class="delete btn btn-success" th:href="@{|/question/delete/${questionDTO.id}|}" th:text="삭제"></a>
+		</div>
+		
+		
+		<!--답변 개수를 나타냄-->
+		<h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(questionDTO.answerList)} 개의 답변이 있습니다.|"></h5>
+		
+		<!--답변(answer) 반복을 나타냄-->
+		<div th:each="answerDTO : ${questionDTO.answerList}"><!--questionDTO의 answerList를 반복함-->
+			<div class="card-body">
+				<div class="card-text" th:text="${answerDTO.content}"></div>
+			</div>
+		</div>
+		<form method="post" th:action="@{|/answer2/create/${questionDTO.id}|}"> <!--||vertical line을 써야하는 이유는 이걸 안쓰면 사이에 있는걸 코드로 인식 안하고 문자로 인식한다.-->
+			<textarea class="form-control" rows="5" cols="20" name="content"></textarea>
+			<button type="submit" class="btn btn-primary my-2">답변등록</button>
+		</form>
+	</div>
+</div>
+</html>

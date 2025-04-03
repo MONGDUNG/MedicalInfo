@@ -1,0 +1,39 @@
+<html layout:decorate="~{/layout}">
+<div layout:fragment="content">
+	<div class="container my-3">
+		<h5 class="border-bottom my-3 pb-2" th:if="${questionDTO.id == null}">질문 등록</h5>
+		<h5 class="border-bottom my-3 pb-2" th:if="${questionDTO.id > 0}">질문 수정</h5> <!--혹은 !=null일떄-->
+		<form method="post" enctype="multipart/form-data"> <!--action 생략가능 action을 적으면 submit할 시 해당경로로 이동하지만 ex)/question/creaete 없을 경우 왔던주소로 되돌아감-->
+			
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+			
+			<div class="mb-3">
+				<label for="subject" class="form-label">제목</label>
+				<input type="text" name="subject" id="subject" class="form-control" th:value="${questionDTO.subject}"> <!--value는 수정해서 올떄만 작동을 하기 떄문에 값을 못받아오면 create에 오류가 뜬다-->
+			</div>
+			<div class="mb-3">
+				<label for="save" class="form-label">파일</label>
+				<input type="file" name="save" id="save" class="form-control">
+				<span th:text="${questionDTO.filename}"></span> <!--null을 출력하지 않는다.-->
+			</div>
+			<div class="mb-3">
+				<label for="content" class="form-label">내용</label>
+				<textarea name="content" rows="10" id="content" class="form-control">[[${questionDTO.content}]]</textarea> <!--그냥 출력하고 싶을땐 앞뒤로 대괄호를 두개씩 넣어줘야함-->
+			</div>
+			
+			<!-- 공개/비공개 설정 수정검토 -->
+	        <div class="mb-3">
+	            <label class="form-label">공개 여부</label>
+	            <div>
+	                <input type="radio" name="visibility" id="visibility_public" value="PUBLIC" th:checked="${questionDTO.visibility == null || questionDTO.visibility == 'PUBLIC'}">
+	                <label for="visibility_public">공개</label>
+	                <input type="radio" name="visibility" id="visibility_private" value="PRIVATE" th:checked="${questionDTO.visibility == 'PRIVATE'}">
+	                <label for="visibility_private">비공개</label>
+	            </div>
+	        </div>
+        
+			<input type="submit" value="질문등록" class="btn btn-primary my-2" />
+		</form>
+	</div>
+</div>
+</html>

@@ -25,6 +25,8 @@ import com.global.member.entity.MemberTierEntity;
 import com.global.member.naver.NaverService;
 import com.global.member.service.MemberService;
 
+import jakarta.servlet.http.HttpSession;
+
 
 
 @RequestMapping("/member/")

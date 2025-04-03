@@ -77,7 +77,7 @@ public class MemberController {
 		MemberDTO dto = ms.readUser(username);		 
 		session.setAttribute("memberStatus", dto.getMemberstatus());
 		model.addAttribute("dto", ms.readUser(username)); // model로 main으로 dto 넘기기
-		return "/member/main";
+		return "/main";
 	}
 	
 	@GetMapping("main")

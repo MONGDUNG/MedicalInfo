@@ -41,7 +41,6 @@ public class OtcController {
                 sortedOtcByType.put(type, otcByType.get(type));
             }
         }
-
         model.addAttribute("otcByType", sortedOtcByType);
         return "otc/otc_list";
     }

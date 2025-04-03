@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+layout:decorate="~{/layout}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +25,7 @@
     </style>
 </head>
 <body>
+<div layout:fragment="content">
     <div class="container centered">
         <div class="card">
             <div class="card-body text-center">
@@ -41,6 +44,7 @@
                 </form>
             </div>
         </div>
+    </div>
     </div>
 </body>
 </html>

@@ -10,6 +10,7 @@
 
 <div class="d-flex justify-content-end align-items-center pe-4 pt-2" style="background-color: white; gap: 0.5rem;">
     <!-- 비로그인 상태 -->
+
     <div sec:authorize="isAnonymous()">
         <a th:href="@{/member/login}" class="btn btn-sm btn-outline-primary me-2">로그인</a>
         <a th:href="@{/member/signup}" class="btn btn-sm btn-outline-success">회원가입</a>

@@ -1,28 +1,38 @@
 <!DOCTYPE html>
-<html lang="ko">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>질병 목록</title>
-		<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
-	</head>
-	<body>
-		<div class="container mt-5">
-			<ul class="nav nav-tabs mb-3">
-				<li class="nav-item">
-					<a class="nav-link" aria-current="page" th:href="@{/disease/list}">질병 리스트</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link active" th:href="@{/disease/self_diagnosis}">자가진단</a>
-				</li>
-			</ul>
-			<hr>
-			<div>
-				<p>안녕하세요? 현재 느껴지는 증상을 선택하시면 예상 가능한 병명과 관련 진료과를 알려드립니다.</p>
-			</div>
-			<div class="container text-center mt-5">
-				<a class="btn btn-primary" th:href="@{/diagnosis/body-parts}">시작하기</a>
-			</div>
-		</div>
-	</body>
+<html lang="ko" layout:decorate="~{/layout}">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>질병 목록</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}" />
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'list'} ? 'active'" th:href="@{/disease/list}">질병 리스트</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'self'} ? 'active'" th:href="@{/disease/self_diagnosis}">자가진단</a>
+            </li>
+        </ul>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-4">자가진단 안내</h5>
+                <p class="card-text">
+                    안녕하세요? 현재 느껴지는 증상을 선택하시면<br>
+                    예상 가능한 병명과 관련 진료과를 알려드립니다.
+                </p>
+                <div class="text-center mt-4">
+                    <a class="btn btn-lg btn-primary px-5" th:href="@{/diagnosis/body-parts}">
+                        시작하기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
 </html>

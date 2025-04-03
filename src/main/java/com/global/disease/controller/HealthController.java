@@ -31,7 +31,7 @@ public class HealthController {
     @GetMapping("body-parts")
     public String showBodyParts(Model model) {
         model.addAttribute("bodyParts", bodyPartRepo.findAll());
-        return "health/select-body-part";
+        return "disease/health/select-body-part";
     }
 
     // 2단계: 증상 선택
@@ -40,7 +40,7 @@ public class HealthController {
         List<SymptomsEntity> symptoms= symptomsRepo.findByBodyPart(bodyPart);
         model.addAttribute("symptoms", symptoms);
         model.addAttribute("bodyPart", bodyPart);
-        return "health/select-symptoms";
+        return "disease/health/select-symptoms";
     }
 
     // 3단계: 질병 추천 결과
@@ -53,12 +53,12 @@ public class HealthController {
     		symptom = new ArrayList<>();
     		List<Search> diseases = diseaseService.diagnosis(bodyPart);
     		model.addAttribute("diseases", diseases);
-    		return "health/disease-results";
+    		return "disease/health/disease-results";
     	}
         List<Search> diseases = diseaseService.diagnosis(bodyPart, symptom);
         model.addAttribute("diseases", diseases);
                 
-        return "health/disease-results";
+        return "disease/health/disease-results";
     }   
 }
 

@@ -55,13 +55,29 @@
 	document.getElementById('nearbyCheckbox').addEventListener('change', function(event) {
 	    if (!window.isLoggedIn) {
 	        alert('로그인이 필요합니다.');
-	        event.preventDefault();  // 체크박스 상태 변경 방지
-	        this.checked = false;    // 체크박스 상태를 강제로 해제
+	        event.preventDefault();
+	        this.checked = false;
 	        return;
 	    }
 	    
 	    if (this.checked) {
 	        moveMapToUserLocation();
+	        
+	        // 현재 활성화된 카테고리와 진료과목 확인
+	        const activeButton = document.querySelector('#category-btns button.active, #hidden-btns button.active');
+	        const deptSelect = document.getElementById('deptSelect');
+	        
+	        if (activeButton) {
+	            const category = activeButton.getAttribute('data-category');
+	            
+	            if (deptSelect && deptSelect.value) {
+	                // 진료과목이 선택된 경우
+	                fetchNearbyHospitalsByDept(category, deptSelect.value);
+	            } else {
+	                // 카테고리만 선택된 경우
+	                fetchNearbyHospitals(category);
+	            }
+	        }
 	    }
 	});
 	function moveMapToUserLocation() {
@@ -424,5 +440,29 @@
 	    let url = `/map/hospitaldetail?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(category)}&lat=${document.getElementById("modalLat").innerText}&lng=${document.getElementById("modalLng").innerText}`;
 	    window.location.href = url;
 	};
+	document.addEventListener('DOMContentLoaded', function() {
+	    // URL에서 진료과목 파라미터 가져오기
+	    const urlParams = new URLSearchParams(window.location.search);
+	    const dept = urlParams.get('dept');
+	    
+	    if (dept) {
+	        // 의원 카테고리 버튼 자동 클릭
+	        const clinicBtn = document.querySelector('button[data-category="의원"]');
+	        if (clinicBtn) {
+	            clinicBtn.click();
+	            
+	            // 진료과 선택박스가 로드될 때까지 대기
+	            const checkDeptSelect = setInterval(() => {
+	                const deptSelect = document.getElementById('deptSelect');
+	                if (deptSelect) {
+	                    clearInterval(checkDeptSelect);
+	                    deptSelect.value = dept;
+	                    // 진료과 검색 실행
+	                    deptSelect.dispatchEvent(new Event('change'));
+	                }
+	            }, 100);
+	        }
+	    }
+	});
 
     window.onload = initMap;

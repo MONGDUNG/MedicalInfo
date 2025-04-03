@@ -128,14 +128,14 @@ layout:decorate="~{/layout}">
                 <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th><th>공휴일</th>
             </tr>
             <tr>
-                <td id="mon">-</td>
-                <td id="tues">-</td>
-                <td id="wednes">-</td>
-                <td id="thurs">-</td>
-                <td id="fri">-</td>
-                <td id="satur">-</td>
-                <td id="sun">-</td>
-                <td id="holi">-</td>
+                <td id="mon"></td>
+                <td id="tues"></td>
+                <td id="wednes"></td>
+                <td id="thurs"></td>
+                <td id="fri"></td>
+                <td id="satur"></td>
+                <td id="sun"></td>
+                <td id="holi"></td>
             </tr>
         </table>
         </div>
@@ -240,31 +240,34 @@ function fetchHospitalHours(hospitalName, address) {
 }
 
 function updateHoursTable(data) {
-   const mon = data.mon || "";
+    const mon = data.mon || "";
     const tues = data.tues || "";
     const wednes = data.wednes || "";
     const thurs = data.thurs || "";
     const fri = data.fri || "";
+    const satur = data.satur || "";
+    const sun = data.sun || "";
+    const holi = data.holi || "";
 
-    const isAllWeekdaysEmpty = !mon && !tues && !wednes && !thurs && !fri;
+    // 모든 요일의 데이터가 비어있는지 체크
+    const isAllEmpty = !mon && !tues && !wednes && !thurs && !fri && !satur && !sun && !holi;
 
     const wrapper = document.getElementById("hoursTableWrapper");
 
-    if (isAllWeekdaysEmpty) {
-        wrapper.style.display = "none";
-        return;
-    } else {
-        wrapper.style.display = "block";
-    }
+    // 모든 데이터가 비어있으면 wrapper 자체를 숨김
+    wrapper.style.display = isAllEmpty ? "none" : "block";
 
-    document.getElementById("mon").innerText = mon || "정보 없음";
-    document.getElementById("tues").innerText = tues || "정보 없음";
-    document.getElementById("wednes").innerText = wednes || "정보 없음";
-    document.getElementById("thurs").innerText = thurs || "정보 없음";
-    document.getElementById("fri").innerText = fri || "정보 없음";
-    document.getElementById("satur").innerText = data.satur || "정보 없음";
-    document.getElementById("sun").innerText = data.sun || "정보 없음";
-    document.getElementById("holi").innerText = data.holi || "정보 없음";
+    // wrapper가 보이는 경우에만 데이터 업데이트
+    if (!isAllEmpty) {
+        document.getElementById("mon").innerText = mon || "정보 없음";
+        document.getElementById("tues").innerText = tues || "정보 없음";
+        document.getElementById("wednes").innerText = wednes || "정보 없음";
+        document.getElementById("thurs").innerText = thurs || "정보 없음";
+        document.getElementById("fri").innerText = fri || "정보 없음";
+        document.getElementById("satur").innerText = satur || "정보 없음";
+        document.getElementById("sun").innerText = sun || "정보 없음";
+        document.getElementById("holi").innerText = holi || "정보 없음";
+    }
 }
 
 function openKakaoDirections() {

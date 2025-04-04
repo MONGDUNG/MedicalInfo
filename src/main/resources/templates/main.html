@@ -57,14 +57,14 @@
                <li><a href="/supplement/all" class="nav-link px-0 fw-semibold link-hover text-dark">영양제정보</a></li>
                <li><a href="/otc/list" class="nav-link px-0 fw-semibold link-hover text-dark">편의점 상비약</a></li>
                <li><a href="/category/all" class="nav-link px-0 fw-semibold link-hover text-dark">약국판매약</a></li>
-               <li><a href="/contact" class="nav-link px-0 fw-semibold link-hover text-dark">문의</a></li>
+               <li><a href="/question/list" class="nav-link px-0 fw-semibold link-hover text-dark">문의</a></li>
            </ul>
           </li>
           <li class="dropdown-item">
             <strong>질병정보</strong>
             <ul class="list-unstyled ps-3">
-              <li><a href="/disease/list" class="nav-link px-0 fw-semibold link-hover text-dark">자가진단</a></li>
-              <li><a href="/disease/ㄴㄷ" class="nav-link px-0 fw-semibold link-hover text-dark">질병검색</a></li>
+              <li><a href="/disease/self_diagnosis" class="nav-link px-0 fw-semibold link-hover text-dark">자가진단</a></li>
+              <li><a href="/disease/list" class="nav-link px-0 fw-semibold link-hover text-dark">질병검색</a></li>
             </ul>
           </li>
           <li class="dropdown-item">
@@ -149,6 +149,45 @@
 
 <!-- 메인 콘텐츠 -->
 <div class="container mt-5">
+    <!-- 검색창 -->
+    <div class="row justify-content-center mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" id="mainSearchInput" class="form-control form-control-lg" 
+                       placeholder="지역이나 병원명으로 검색하세요">
+                <button class="btn btn-primary btn-lg" type="button" onclick="searchHospital()">
+                    <i class="bi bi-search"></i> 검색
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 우리동네 병원 검색 버튼 (로그인 시에만 표시) -->
+    <div class="row justify-content-center mb-5" sec:authorize="isAuthenticated()">
+        <div class="col-md-6">
+            <div class="d-flex gap-2 justify-content-center">
+                <select id="neighborCategory" class="form-select">
+				    <option value="">병원 구분</option>
+				    <option value="상급종합">상급종합</option>
+				    <option value="종합병원">종합병원</option>
+				    <option value="병원">병원</option>
+				    <option value="정신병원">정신병원</option>
+				    <option value="의원">의원</option>
+				    <option value="치과병원">치과병원</option>
+				    <option value="치과의원">치과의원</option>
+				    <option value="한방병원">한방병원</option>
+				    <option value="한의원">한의원</option>
+				    <option value="요양병원">요양병원</option>
+				</select>
+                <select id="neighborDept" class="form-select">
+                    <option value="">진료과 선택</option>
+                </select>
+                <button class="btn btn-success" onclick="searchNeighborhood()">
+                    <i class="bi bi-geo-alt"></i> 우리동네 병원찾기
+                </button>
+            </div>
+        </div>
+    </div>
     
    <div class="position-absolute top-50 end-0 translate-middle-y me-5" style="width: 280px;">
     <div class="card shadow-sm">
@@ -218,6 +257,69 @@ window.onload = function() {
                      list.appendChild(li);
                          });
       });
+    function searchHospital() {
+        const keyword = document.getElementById('mainSearchInput').value.trim();
+        if (keyword) {
+            location.href = `/map/main?keyword=${encodeURIComponent(keyword)}`;
+        } else {
+            alert('검색어를 입력해주세요.');
+        }
+    }
+
+    // 엔터키로도 검색되도록 설정
+    document.getElementById('mainSearchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchHospital();
+        }
+    });
+    const deptList = {
+    	    "A": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과"],
+    	    "B": ["치과", "구강악안면외과", "치과보철과", "치과교정과", "소아치과", "치주과", "치과보존과", "구강내과", "영상치의학과", "구강병리과", "예방치과", "통합치의학과"],
+    	    "C": ["한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
+    	    "D": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과", "한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
+    	    "E": []
+    	};
+
+    	function getGroupByCategory(category) { 
+    	    if (["상급종합", "종합병원", "병원", "정신병원", "의원"].includes(category)) return "A";
+    	    if (["치과병원", "치과의원"].includes(category)) return "B";
+    	    if (["한방병원", "한의원"].includes(category)) return "C";
+    	    if (["요양병원"].includes(category)) return "D";
+    	    return "E";
+    	}
+
+    	// 진료 유형 변경 시, 진료과 select 동적 변경
+    	document.getElementById('neighborCategory').addEventListener('change', function() {
+    	    const category = this.value;
+    	    const deptSelect = document.getElementById('neighborDept');
+    	    deptSelect.innerHTML = '<option value="">진료과 선택</option>';  // 초기화
+
+    	    if (!category) return;
+
+    	    const group = getGroupByCategory(category);
+    	    const depts = deptList[group];
+
+    	    if (!depts || depts.length === 0) return;
+
+    	    depts.forEach(dept => {
+    	        const opt = document.createElement("option");
+    	        opt.value = dept;
+    	        opt.textContent = dept;
+    	        deptSelect.appendChild(opt);
+    	    });
+    	});
+
+    	function searchNeighborhood() {
+    	    const category = document.getElementById('neighborCategory').value;
+    	    const dept = document.getElementById('neighborDept').value;
+
+    	    if (!category) {
+    	        alert('진료 유형을 선택해주세요.');
+    	        return;
+    	    }
+
+    	    location.href = `/map/main?category1=${encodeURIComponent(category)}&dept1=${encodeURIComponent(dept)}&nearby=true`;
+    	}
     </script>
    
 </body>

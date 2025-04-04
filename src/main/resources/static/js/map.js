@@ -2,12 +2,24 @@
     var selectedMarker = null;
     var listElement = document.getElementById('hospitalList');
     var markers = []; // 마커를 저장할 배열
-    function initMap() {
-        map = new kakao.maps.Map(document.getElementById('map'), {
-            center: new kakao.maps.LatLng(37.5665, 126.9780),
-            level: 4
-        });
-    }
+	function initMap() {
+	    const params = new URLSearchParams(window.location.search);
+	    const nearby = params.get("nearby");
+
+	    let centerLat = 37.5665; // 기본값: 서울시청
+	    let centerLng = 126.9780;
+
+	    // nearby=true이고 유저 정보 있으면 지도 중심 변경
+	    if (nearby === "true" && window.isLoggedIn && window.userLatitude && window.userLongitude) {
+	        centerLat = parseFloat(window.userLatitude);
+	        centerLng = parseFloat(window.userLongitude);
+	    }
+
+	    map = new kakao.maps.Map(document.getElementById('map'), {
+	        center: new kakao.maps.LatLng(centerLat, centerLng),
+	        level: 4
+	    });
+	}
     document.getElementById('more-btn').addEventListener('click', function(event) {
         event.stopPropagation(); // 이벤트 버블링 방지
         var hiddenBtns = document.getElementById('hidden-btns');
@@ -179,29 +191,35 @@
             });
     }
 
-    function fetchSearchResults() {
-        let keyword = document.getElementById('searchInput').value.trim();
-        if (keyword === "") {
-            alert('검색어를 입력하세요');
-            return;
-        }
+	function fetchSearchResults() {
+	    let keyword = document.getElementById('searchInput').value.trim();
+	    if (!keyword) {
+	        keyword = new URLSearchParams(window.location.search).get('keyword'); // URL에서 키워드 가져오기
+	    }
+	    
+	    if (!keyword) {
+	        alert('검색어를 입력하세요');
+	        return;
+	    }
 
-        clearMarkers(); // Clear existing markers
+	    clearMarkers(); // 기존 마커 제거
 
-        fetch(`/map/search/item?keyword=${encodeURIComponent(keyword)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                updateHospitalList(data);
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
-    }
+	    fetch(`/map/search/item?keyword=${encodeURIComponent(keyword)}`)
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error('Network response was not ok ' + response.statusText);
+	            }
+	            return response.json();
+	        })
+	        .then(data => {
+	            console.log('검색 결과:', data); // 디버깅용
+	            updateHospitalList(data);
+	        })
+	        .catch(error => {
+	            console.error('검색 중 오류 발생:', error);
+	            alert('검색 중 오류가 발생했습니다.');
+	        });
+	}
 
     function clearMarkers() {
         markers.forEach(marker => marker.setMap(null)); // 지도에서 마커 제거
@@ -467,6 +485,62 @@
 	                    deptSelect.dispatchEvent(new Event('change'));
 	                }
 	            }, 100);
+	        }
+	    }
+	});
+	// 페이지 로드 시 URL 파라미터 확인하여 검색 실행
+	document.addEventListener('DOMContentLoaded', function() {
+	    const urlParams = new URLSearchParams(window.location.search);
+	    const keyword = urlParams.get('keyword');
+	    
+	    if (keyword) {
+	        document.getElementById('searchInput').value = keyword; // 검색창에 키워드 입력
+	        fetchSearchResults(); // 검색 실행
+	    }
+	});
+	document.addEventListener('DOMContentLoaded', function () {
+	    const params = new URLSearchParams(window.location.search);
+	    const nearby = params.get("nearby");
+	    const category1 = params.get("category1");
+	    const dept1 = params.get("dept1");
+
+	    // ✅ 1. nearby=true면 체크박스 자동 체크 및 위치 이동
+	    if (nearby === "true") {
+	        const nearbyCheckbox = document.getElementById("nearbyCheckbox");
+	        if (nearbyCheckbox) {
+	            nearbyCheckbox.checked = true;
+	        }
+
+	        // ✅ 2. category + dept 모두 있을 때 자동 검색 실행
+	        if (category1 && dept1) {
+	            const targetBtn = [...document.querySelectorAll('button[data-category]')].find(btn => btn.getAttribute('data-category') === category1);
+				console.log("targetBtn:", targetBtn);
+	            if (targetBtn) {
+	                targetBtn.click(); // 버튼 클릭 => active 부여 + 진료과 리스트 구성
+
+	                // 진료과 select박스 등장까지 대기 (100ms 간격으로 최대 2초간 확인)
+	                const tryDept = setInterval(() => {
+	                    const deptSelect = document.getElementById('deptSelect');
+	                    if (deptSelect) {
+	                        deptSelect.value = dept1;
+	                        deptSelect.dispatchEvent(new Event('change'));  // 검색 실행
+	                        clearInterval(tryDept);
+	                    }
+	                }, 100);
+
+	                setTimeout(() => clearInterval(tryDept), 2000);  // 2초 후 강제 중단
+	            }
+	        }
+
+	        // ✅ 3. category만 있고 dept는 없는 경우
+	        else if (category1 && (!dept1 || dept1 === ""|| dept1 === "null")) {
+	            const targetBtn = [...document.querySelectorAll('button[data-category]')].find(btn => btn.getAttribute('data-category') === category1);
+	            if (targetBtn) {//0.2초 뒤 버튼 클릭
+					
+					                    setTimeout(() => {
+                        targetBtn.click(); // 버튼 클릭 => active 부여 + 진료과 리스트 구성
+                    }, 200);
+	            }
 	        }
 	    }
 	});

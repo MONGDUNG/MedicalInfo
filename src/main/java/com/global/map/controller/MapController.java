@@ -32,15 +32,26 @@ public class MapController {
     private final RedisService redisService;
 
     @GetMapping("main")
-    public String mapMain(Model model, Principal principal) throws JsonProcessingException {
+    public String mapMain( @RequestParam(name = "category", required = false) String category,
+				    	    @RequestParam(name = "dept", required = false) String dept,
+				    	    @RequestParam(name = "nearby", required = false) Boolean nearby,
+                          Model model, Principal principal) throws JsonProcessingException {
+
         if (principal != null) {
             model.addAttribute("dto", ms.readUser(principal.getName()));
             model.addAttribute("isLoggedIn", true);
         } else {
             model.addAttribute("isLoggedIn", false);
-        } 
-        return "map/kakaoMapTest";  // Thymeleaf 뷰 반환
-    }    
+        }
+
+        // 검색 필터용 파라미터도 모델에 추가
+        model.addAttribute("category", category);
+        model.addAttribute("dept", dept);
+        model.addAttribute("nearby", nearby != null ? nearby : false);
+
+        return "map/kakaoMapTest";
+    }
+
 
     @GetMapping("nearbyHospitals")
     @ResponseBody

@@ -27,11 +27,11 @@ public class MainController {
 		
 		return "main";
 	}
+	
 	@GetMapping("/api/news")
 	@ResponseBody
 	public ResponseEntity<?> getNewsJson() {
 		try {
-			// Windows 절대경로: 로컬에 저장된 최신 JSON 읽기
 			File file = new File("C:/Users/14A/mohw_news.json");
 			String json = Files.readString(file.toPath());
 			return ResponseEntity.ok().body(json);

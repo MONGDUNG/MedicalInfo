@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html layout:decorate="~{/layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +30,7 @@
     
 </head>
 <body>
+<div layout:fragment="content">
     <div class="container">
         <h4 class="text-center">정보수정</h4>
         <form method="post" th:object="${memberDTO}">
@@ -95,7 +96,7 @@
 </form>
         
     </div>
-    
+</div>    
      <script>
     
     // 정보 수정 버튼 클릭 시 alert 표시

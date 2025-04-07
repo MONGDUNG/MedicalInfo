@@ -1,263 +1,86 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html layout:decorate="~{/layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <style>
-        form {
-            width: 50%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+<div layout:fragment="content">
+    <div class="container my-3">
+        <!-- 게시판 제목 -->
+        <a href="/post/list" class="text-decoration-none">
+            <h1 class="text-center mb-4">커뮤니티 게시판</h1>
+        </a>
 
-        .textarea-container {
-            margin-bottom: 15px;
-        }
+        <!-- 게시글 제목 -->
+        <h2 class="border-bottom py-2" th:text="${postDTO.subject}"></h2>
 
-        textarea.form-control {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: none;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+        <!-- 게시글 내용 -->
+        <div class="card-body">
+            <!-- 이미지 -->
+            <div th:each="file : ${postDTO.FileList}" class="mb-3">
+                <img th:src="@{|/post/display?filename=${file.filename}|}" class="img-fluid" />
+            </div>
+            <!-- 내용 -->
+            <div th:text="${postDTO.content}" class="card-text"></div>
+        </div>
 
-        textarea.form-control:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-
-        button.btn-primary {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button.btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .container {
-            max-width: 50%;
-            margin: 0 auto;
-            padding-top: 20px;
-        }
-
-        .content-table {
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .content-table td, .content-table th {
-            vertical-align: middle;
-            text-align: center;
-            padding: 10px;
-        }
-
-        .content-table th {
-            background-color: #f8f9fa;
-        }
-
-        .btn-group {
-            display: flex;
-            justify-content: flex-start;
-        }
-
-        .btn-group a {
-            margin-right: 10px;
-        }
-
-        .table-bordered td, .table-bordered th {
-            padding: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        .main-content {
-            margin-left: 0;
-            padding: 20px;
-        }
-
-        .img-fluid {
-            max-width: 70%;
-            height: auto;
-        }
-
-        .pagination {
-            justify-content: center;
-            margin-top: 20px;
-        }
-         /* 댓글 테이블 스타일 */
-    .reply-table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse; /* 테이블 간 여백 제거 */
-    }
-
-    .reply-table td, .reply-table th {
-        padding: 12px; /* 셀 내 여백 조정 */
-        text-align: center; /* 중앙 정렬 */
-        font-size: 1rem; /* 글자 크기 조정 */
-        vertical-align: middle; /* 텍스트 가운데 정렬 */
-        border: 1px solid #dee2e6; /* 테두리 추가 */
-    }
-
-    .reply-table th {
-        background-color: #f8f9fa; /* 헤더 배경색 */
-        font-weight: bold;
-    }
-
-    .reply-table tr:nth-child(even) {
-        background-color: #f9f9f9; /* 짝수 행 배경색 */
-    }
-
-    .reply-table tr:hover {
-        background-color: #e9ecef; /* 마우스 오버 시 배경색 */
-    }
-
-    /* 버튼 크기 조정 */
-    .btn-group .btn {
-        padding: 8px 12px; /* 버튼 내 여백 */
-        font-size: 0.9rem; /* 버튼 폰트 크기 조정 */
-    }
-
-    /* 댓글 영역 전반적 너비 조정 */
-    .container {
-        max-width: 80%; /* 댓글 관련 표가 화면을 덜 차지하도록 조정 */
-    }
-        
-        
-    </style>
-
-    <div class="container">
-        <!-- 게시글 제목 및 정보 테이블 -->
-        <table class="table content-table table-bordered">
-            <tbody>
-                <tr>
-                    <th>제목</th>
-                    <td><h2 class="mb-0" th:text="${postDTO.subject}"></h2></td>
-                </tr>
-                <tr>
-                    <th>작성자</th>
-                    <td th:text="${postDTO.member.username}"></td>
-                </tr>
-                <tr>
-                    <th>이미지</th>
-                    <td>
-                        <div th:each="file : ${postDTO.FileList}">
-                            <img th:src="@{|/post/display?filename=${file.filename}|}" class="img-fluid" /><br />
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <th>내용</th>
-                    <td th:text="${postDTO.content}"></td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- 글쓴이 이름 표시 -->
+        <div class="mb-3">
+            <strong>글쓴이: </strong><span th:text="${postDTO.member.username}"></span>
+        </div>
 
         <!-- 수정 및 삭제 버튼 -->
-        <div class="my-3" th:if="${postDTO.member.username != null && postDTO.member.username == #authentication.getPrincipal().getUsername()}">
-            <div class="btn-group">
-                <a class="btn btn-success" th:href="@{|/post/modify/${postDTO.id}|}" th:text="'수정'"></a>
-                <a class="btn btn-danger" th:href="@{|/post/delete/${postDTO.id}|}" th:text="'삭제'"></a>
+        <div class="my-3">
+            <div th:if="${postDTO.member.username != null && postDTO.member.username == #authentication.getPrincipal().getUsername()}">
+                <a class="btn btn-success" th:href="@{|/post/modify/${postDTO.id}|}">수정</a>
+                <a class="btn btn-danger" th:href="@{|/post/delete/${postDTO.id}|}">삭제</a>
             </div>
+            <a class="btn btn-secondary" th:href="@{/post/list}">목록으로</a>
         </div>
-        <div class="btn-group">
-            <a class="btn btn-danger" th:href="@{/post/list}" th:text="'목록으로'"></a>
+
+        <!-- 댓글 개수 -->
+        <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(postDTO.ReplList)} 개의 댓글이 있습니다.|"></h5>
+
+        <!-- 댓글 목록 -->
+        <div th:each="reply : ${postDTO.ReplList}" class="card my-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span th:if="${reply.member != null}">
+                            <span th:switch="${reply.member.memberstatus}" class="badge bg-secondary">
+                                <span th:case="'docter'">의사</span>
+                                <span th:case="'pharmacist'">약사</span>
+                                <span th:case="'admin'">관리자</span>
+                            </span>
+                            <span th:text="${reply.member.username}"></span>
+                        </span>
+                        <small class="text-muted" 
+                               th:text="${reply.createdate != null ? #temporals.format(reply.createdate, 'yyyy-MM-dd HH:mm') : '작성일 없음'}">
+                        </small>
+                    </div>
+                    <div th:if="${reply.member != null && reply.member.username == #authentication.getPrincipal().getUsername()}">
+                        <a class="btn btn-sm btn-outline-primary" 
+                           th:href="@{|/repl/modify/${reply.id}|}">수정</a>
+                        <a class="btn btn-sm btn-outline-danger" 
+                           th:href="@{|/repl/delete/${reply.id}|}">삭제</a>
+                    </div>
+                </div>
+                <div class="card-text mt-2" th:text="${reply.content}"></div>
+            </div>
         </div>
 
         <!-- 댓글 작성 폼 -->
-        <form th:action="@{|/repl/create/${postDTO != null ? postDTO.id : 0}|}" method="post">
-            <div class="textarea-container">
-                <textarea class="form-control" cols="20" rows="10" name="content" placeholder="답변을 입력하세요..."></textarea>
+        <form th:action="@{|/repl/create/${postDTO != null ? postDTO.id : 0}|}" method="post" class="my-3">
+            <div class="form-group">
+                <textarea class="form-control" name="content" rows="5" placeholder="댓글을 입력하세요..."></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">댓글등록</button>
+            <button type="submit" class="btn btn-primary mt-2">댓글등록</button>
         </form>
-
-        <!-- 댓글 수 -->
-        <div th:if="${postDTO.ReplList != null}">
-            <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(postDTO.ReplList)} 개의 댓글이 있습니다.|"></h5>
-
-            <!-- 댓글 목록 테이블 -->
-            <table class="table content-table table-bordered">
-                <thead>
-                    <tr>
-                        <th>글 번호</th>
-                        <th>작성자</th>
-                        <th>내용</th>
-                        <th>작성날짜</th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${postDTO.ReplList.size() == 0}">
-                        <td colspan="5">게시글이 없습니다.</td>
-                    </tr>
-                    <tr th:each="reply : ${postDTO.ReplList}">
-                        <td th:text="${reply.id}"></td>
-                        <td>
-                            <span th:if="${reply.member != null}">
-                                <span th:switch="${reply.member.memberstatus}">
-                                    <span th:case="'docter'">[의사]</span>
-                                    <span th:case="'pharmacist'">[약사]</span>
-                                    <span th:case="'admin'">[관리자]</span>
-                                    <span th:case="*"></span>
-                                </span>
-                                <span th:text="${reply.member.username}"></span>
-                            </span>
-                            <span th:if="${reply.member == null}">회원 정보 없음</span>
-                        </td>
-                        <td th:text="${reply.content}"></td>
-                        <td th:text="${reply.createdate != null ? #temporals.format(reply.createdate, 'yyyy-MM-dd HH:mm') : '작성일 없음'}"></td>
-                          
-                <!-- 내용 수정 폼 -->
-                <td>
-                <div  class="btn-group" th:if="${reply.member != null && reply.member.username == #authentication.getPrincipal().getUsername()}">
-                    <form th:action="@{/repl/modify/{id}(id=${reply.id})}" method="post">
-                        <input type="text" th:value="${reply.content}" id="content" name="content" class="form-control" />
-                        <button type="submit" class="btn btn-primary btn-sm mt-5">수정</button>
-                        <input type="hidden" th:value="${postDTO.id}" id="postId" name="postId">
-                    </form>
-                 </div>
-                </td>
-
-                <!-- 삭제 버튼 -->
-                <td>
-                    <div class="btn-group" th:if="${reply.member != null && reply.member.username == #authentication.getPrincipal().getUsername()}">
-                        <a class="btn btn-danger btn-sm" th:href="@{|/repl/delete/${reply.id}|}" th:text="'삭제'"></a>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    </div>
 </div>
 
-        </div>
-    </div>
-
-    <!-- Bootstrap JS 및 Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybEkK9bN3No9xAPjzWb6S5OB7u8+Iaa0s+S3hb85hIfDg5P+q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0lV+7k+3z7qZfB/bsv5uGzHc9JZb6ZmA0l2vD1Rqa5g90e7C" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

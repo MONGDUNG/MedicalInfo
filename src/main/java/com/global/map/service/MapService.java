@@ -202,6 +202,9 @@ public class MapService {
         return R * c;
     }
     private MedinstDTO medinstToDTO(MedinstEntity entity) {
+    	if (entity == null) {
+			return null; // entity가 null인 경우 null 반환
+		}
         return MedinstDTO.builder()
                 .id(entity.getId())
                 .hospitalCode(entity.getHospitalCode())

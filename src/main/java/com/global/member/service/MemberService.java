@@ -302,7 +302,6 @@ public class MemberService {
 	        	cfe.setBandate(LocalDateTime.now()); // 벤 날짜
 	        	cfe.setUnbandate(LocalDateTime.now().plusDays(7)); // 벤 해제 날짜
 	        }else {   //벤에서 해제 될시 혹은 벤이 아닐시
-	        	System.out.println("=====unBan====");
 	        		cfe.setBandate(null);
 	        		cfe.setUnbandate(null);
 	               

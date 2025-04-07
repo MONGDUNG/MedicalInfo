@@ -274,7 +274,6 @@ public class MemberController {
 	    @GetMapping("/check-email")
 	    @ResponseBody
 	    public Boolean checkEmailDuplicate(@RequestParam("email") String email){
-	    	System.out.println("=="+email);
 	    	return ms.checkEmailDuplicate(email);
 	    }
 	    

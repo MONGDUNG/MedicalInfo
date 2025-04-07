@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-layout:decorate="~{/layout}">
-
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +29,6 @@ layout:decorate="~{/layout}">
     </style>
     
 </head>
-<div layout:fragment="content">
 <body>
     <div class="container">
         <h4 class="text-center">정보수정</h4>
@@ -53,7 +50,7 @@ layout:decorate="~{/layout}">
     <div class="form-group">
         <input type="text" id="postcode" name="postcode" th:value="*{postcode}" placeholder="우편번호" readonly="readonly" required>
         <button type="button" class="btn btn-secondary" onclick="daumPost()">우편번호 찾기</button><br>
-        <input class="form-control" type="text" th:value="*{address}" name="address" id="address" placeholder="주소" required>
+        <input class="form-control" type="text" th:value="*{address}" name="address" id="address" placeholder="주소" readonly required>
         <input class="form-control" type="text" th:value="*{detailaddress}" name="detailaddress" id="detailaddress" placeholder="상세주소">
     </div>
     
@@ -150,5 +147,4 @@ layout:decorate="~{/layout}">
     </script>
     
 </body>
-</div>
 </html>

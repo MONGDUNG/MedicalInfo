@@ -79,7 +79,7 @@
 
       <!-- 중간 메뉴 -->
       <ul class="navbar-nav d-flex flex-row align-items-center" style="gap: 1.5rem;">
-        <li class="nav-item" th:if="${dto != null and dto.memberstatus == 'admin'}">
+        <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
           <a class="nav-link text-warning fw-bold" th:href="@{/member/admin}">관리자페이지</a>
         </li>
       </ul>

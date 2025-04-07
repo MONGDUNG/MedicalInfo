@@ -129,25 +129,34 @@ public class MemberService {
 	}
 		
 
-	public void memberModify(String username ,MemberDTO dto) {		
-			MemberEntity me = mr.findByUsername(username).get();
-		  
-			me.setBirth(dto.getBirth());
-			me.setAddress(dto.getAddress());
-			me.setDetailaddress(dto.getDetailaddress());
-			me.setEmail(dto.getEmail());
-			me.setLatitude(dto.getLatitude());
-			me.setLongitude(dto.getLongitude());
-			me.setLastlogindate(LocalDateTime.now());			
-			me.setName(dto.getName());			
-			me.setPostcode(dto.getPostcode());
-			me.setSex(dto.getSex());
-			me.setSignuppath(dto.getSignuppath());
-			me.setUnderlyingcondition(dto.getUnderlyingcondition());
-			me.setMemberstatus(dto.getMemberstatus());
-			mr.save(me);
-		
-	}
+	public void memberModify(String username ,MemberDTO dto) {      
+        MemberEntity me = mr.findByUsername(username).get();
+       
+        me.setBirth(dto.getBirth());
+        me.setAddress(dto.getAddress());
+        me.setDetailaddress(dto.getDetailaddress());
+        me.setEmail(dto.getEmail());
+        me.setLatitude(dto.getLatitude());
+        me.setLongitude(dto.getLongitude());
+        me.setLastlogindate(LocalDateTime.now());         
+        me.setName(dto.getName());         
+        me.setPostcode(dto.getPostcode());
+        me.setSex(dto.getSex());
+        me.setSignuppath(dto.getSignuppath());
+        me.setUnderlyingcondition(dto.getUnderlyingcondition());
+        me.setMemberstatus(dto.getMemberstatus());
+        me = mr.save(me);
+                 
+         MemberTierEntity mte = mt.findByTier(dto.getMemberstatus()).get();
+         
+         ClassificationEntity cfe = cf.findByUsername(username).get();
+         cfe.setTierId(mte);
+         cf.save(cfe);
+         
+         me.setTierId(mte);
+            me.setClassiId(cfe);
+            mr.save(me);       
+  }
 	
 	public void delete(String username) {  // 계정 삭제 		
 		MemberEntity me = mr.findByUsername(username).get();

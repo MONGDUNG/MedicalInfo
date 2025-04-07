@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-layout:decorate="~{/layout}">
+<html lang="ko">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,7 +7,6 @@ layout:decorate="~{/layout}">
 		<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
 	</head>
 	<body>
-	<div layout:fragment="content">
 		<div class="container mt-5">
 			<ul class="nav nav-tabs mb-3">
 				<li class="nav-item">
@@ -35,10 +33,10 @@ layout:decorate="~{/layout}">
 					<div th:each="diseaseEntity : ${list}" class="col-md-4 mb-3">
 						<div class="card-body">
 							<h5 th:text="${diseaseEntity.diseaseName}" class="card-title"></h5>
-							<p th:text="'증상: ' + ${diseaseEntity.symptom}" class="card-text"></p>
-							<p class="card-text mb-1"><small th:text="'동의어: ' + ${diseaseEntity.synonyms}"  class="text-muted"></small></p>
-							<p class="card-text m-0"><small th:text="'진료과: ' + ${diseaseEntity.mediDepart}"  class="text-muted"></small></p>
-							<p class="card-text m-0"><small th:text="'관련질환: ' + ${diseaseEntity.related}"  class="text-muted"></small></p>
+							<p th:if="${diseaseEntity.symptom != null}" th:text="'증상: ' + ${diseaseEntity.symptom}" class="card-text"></p>
+							<p th:if="${diseaseEntity.synonyms != null}" class="card-text mb-1"><small th:text="'동의어: ' + ${diseaseEntity.synonyms}"  class="text-muted"></small></p>
+							<p th:if="${diseaseEntity.mediDepart != null}" class="card-text m-0"><small th:text="'진료과: ' + ${diseaseEntity.mediDepart}"  class="text-muted"></small></p>
+							<p th:if="${diseaseEntity.related != null}" class="card-text m-0"><small th:text="'관련질환: ' + ${diseaseEntity.related}"  class="text-muted"></small></p>
 						</div>
 					</div>
 				</div>
@@ -90,9 +88,7 @@ layout:decorate="~{/layout}">
 			</div>
 			<!-- 페이징 처리 종료-->
 		<script th:src="@{/js/bootstrap.min.js}"></script>
-		</div>
 	</body>
 </html>
-
 
 

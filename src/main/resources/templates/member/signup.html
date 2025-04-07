@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html layout:decorate="~{/layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,6 +135,7 @@
     </script>
 </head>
 <body>
+<div layout:fragment="content">
     <div class="container">
         <h4 class="text-center">회원 가입</h4>
         <form method="post">
@@ -206,6 +207,7 @@
                 <input type="reset" class="btn btn-secondary" value="다시 입력">
             </div>
         </form>
+    </div>
     </div>
 </body>
 </html>

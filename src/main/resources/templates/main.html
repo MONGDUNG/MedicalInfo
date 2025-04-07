@@ -254,19 +254,9 @@ fetch("/api/news")
       "<li class='list-group-item'>뉴스 데이터를 불러올 수 없습니다.</li>";
   });
 
-  let mapClickCount = 0;
-  const mapBtn = document.getElementById('mapDropdown');
-
-  mapBtn.addEventListener('click', (e) => {
-    mapClickCount++;
-
-    // 첫 번째 클릭은 드롭다운만 열기
-    if (mapClickCount === 1) {
-      setTimeout(() => { mapClickCount = 0; }, 500);  // 0.5초 안에 두 번 클릭해야 이동
-    } else if (mapClickCount === 2) {
-      location.href = '/map/main';
-    }
-  });
+    document.getElementById('mapDropdown').addEventListener('click', function () {
+	  location.href = '/map/main';
+	});
 
     fetch("/map/popular")
       .then(res => res.json())

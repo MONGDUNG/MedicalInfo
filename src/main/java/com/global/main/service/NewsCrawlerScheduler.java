@@ -18,8 +18,7 @@ public class NewsCrawlerScheduler {
 	 private ResourceLoader resourceLoader;
 
 	
-	//@Scheduled(cron = "0 0 12 * * *") // 3분마다 실행
-	@Scheduled(cron = "0 */1 * * * *")
+	@Scheduled(cron = "0 0 12 * * *") // 3분마다 실행
 	public void runPythonCrawler() {
 	    try {
 	    	

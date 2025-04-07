@@ -49,6 +49,9 @@ public class OtcController {
     @GetMapping("/otc/detail/{id}")
     public String getOtcDetail(@PathVariable("id") Integer id, Model model) {
         
+    	
+    	
+    	
         // 카테고리 정보 가져오기
         OtcDTO otc = otcService.getOtcDetail(id);
         model.addAttribute("otc", otc);

@@ -188,7 +188,16 @@
             </div>
         </div>
     </div>
-    
+   
+   <div class="container my-5">
+     <div class="card">
+       <div class="card-header bg-info text-white fw-bold">
+         📰 보건복지부 최신 뉴스
+       </div>
+      <ul id="newsList" class="list-group list-group-flush"></ul>
+     </div>
+   </div>
+
    <div class="position-absolute top-50 end-0 translate-middle-y me-5" style="width: 280px;">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white fw-bold">
@@ -320,6 +329,26 @@ window.onload = function() {
 
     	    location.href = `/map/main?category1=${encodeURIComponent(category)}&dept1=${encodeURIComponent(dept)}&nearby=true`;
     	}
+    	
+    	// ✅ 뉴스 JSON 가져오기 추가
+    	  fetch("/api/news")
+    	    .then(res => res.json())
+    	    .then(data => {
+    	      const list = document.getElementById("newsList");
+    	      for (let i = 0; i < data.title.length; i++) {
+    	        const li = document.createElement("li");
+    	        li.className = "list-group-item";
+    	        li.innerHTML = `<a href="${data.link[i]}" target="_blank" class="text-decoration-none text-dark">
+    	          ${data.title[i]} <small class="text-muted">(${data.date[i]})</small>
+    	        </a>`;
+    	        list.appendChild(li);
+    	      }
+    	    })
+    	    .catch(err => {
+    	      console.error("❌ 뉴스 로딩 실패:", err);
+    	      document.getElementById("newsList").innerHTML =
+    	        "<li class='list-group-item'>뉴스 데이터를 불러올 수 없습니다.</li>";
+    	    });
     </script>
    
 </body>

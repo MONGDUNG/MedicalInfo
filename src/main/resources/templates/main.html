@@ -294,16 +294,18 @@ fetch("/api/news")
                      const li = document.createElement("li");
                      li.className = "list-group-item";
                      li.innerHTML = `<a href="/map/hospitaldetail?name=${encodeURIComponent(h.hospitalName)}&address=${encodeURIComponent(h.address)}&phone=${encodeURIComponent(h.phoneNumber)}&category=${encodeURIComponent(h.category)}&lat=${h.latitude}&lng=${h.longitude}" class="text-decoration-none text-dark">
+
                          ${i + 1}위 🏥 ${h.hospitalName} (${h.address})
                        </a>`;
                        li.addEventListener('click', () => {
+
                         document.querySelectorAll('#popularList .list-group-item')
                           .forEach(item => item.classList.remove('clicked-item'));
                         li.classList.add('clicked-item');
                         
                         window.open(url, "_blank");
                       });
-                       
+
                      list.appendChild(li);
                          });
       });

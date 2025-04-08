@@ -51,7 +51,6 @@ public class DiseaseService {
 	
 	//검색 처리
 	private Specification<Search> search(String keyword){
-		System.out.println("-----------------------------" + keyword);
 		return (root, query,criteriaBuilder) -> criteriaBuilder.or( // Specification 은 메서드가 하나만 있어서 람다식으로 바로 표현이 가능하다.(메서드 구현부분 생략 가능)
 			criteriaBuilder.like(root.get("diseaseName"), "%" + keyword + "%"),  //같은 클래스(criteriaBuilder)안의 다른 메서드를 호출하여 나온 결과 값을 매개변수로 사용 가능
 			criteriaBuilder.like(root.get("symptom"), "%" + keyword + "%"),

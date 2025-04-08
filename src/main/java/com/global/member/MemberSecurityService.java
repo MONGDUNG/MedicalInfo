@@ -98,7 +98,6 @@ public class MemberSecurityService implements UserDetailsService {
      if (username == null || username.isEmpty()) {
     	    throw new BadCredentialsException("카카오 로그인에서 유효하지 않은 username이 전달되었습니다.");
     	}
-    	System.out.println("카카오에서 전달된 username: " + username);
 
      
      

@@ -6,7 +6,7 @@
     <title>회원 가입</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1b1fa6d69135cfce980c3daf91775a4b&libraries=services"></script>
     <style>
         .container {
             max-width: 600px;
@@ -186,16 +186,16 @@
                 <label for="underlyingcondition">기저질환</label>
                 <input class="form-control" id="underlyingcondition" name="underlyingcondition" type="text" value="없음">
             </div>
-            	<!-- 회원 등급 -->
-            <div class="form-group">
-                <label for="memberstatus">구분</label>
-                <select class="form-control" id="memberstatus" name="memberstatus" required>
-                    <option value="general" selected>일반</option>
-                    <option value="doctor">의사</option>
-                    <option value="pharmacist">약사</option>
-                    <option value="admin">관리자</option>
-                </select>
-            </div>
+            <!-- 회원 등급 -->
+			<div class="form-group">
+			    <label for="memberstatus">구분</label>
+			    <select class="form-control" id="memberstatus" name="memberstatus" required>
+			        <option value="general" selected>일반</option>
+			    </select>
+			    <p style="color: red; font-size: 0.9rem; margin-top: 5px;">
+			        의사/약사 회원은 일반회원으로 가입 후 문의게시판에 문의해주시기 바랍니다.
+			    </p>
+			</div>
             	<!-- 가입방식 -->
             <div class="form-group">
         		<input class="form-control" id="signuppath" name="signuppath" th:value="1" type="hidden">

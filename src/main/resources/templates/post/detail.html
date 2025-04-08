@@ -32,7 +32,7 @@
 
         <!-- 수정 및 삭제 버튼 -->
         <div class="my-3">
-            <div th:if="${postDTO.member.username != null && postDTO.member.username == #authentication.getPrincipal().getUsername()}">
+            <div sec:authorize="isAuthenticated()"  th:if="${postDTO.member.username != null && postDTO.member.username == #authentication.getPrincipal().getUsername()}">
                 <a class="btn btn-success" th:href="@{|/post/modify/${postDTO.id}|}">수정</a>
                 <a class="btn btn-danger" th:href="@{|/post/delete/${postDTO.id}|}">삭제</a>
             </div>
@@ -59,7 +59,7 @@
                                th:text="${reply.createdate != null ? #temporals.format(reply.createdate, 'yyyy-MM-dd HH:mm') : '작성일 없음'}">
                         </small>
                     </div>
-                    <div th:if="${reply.member != null && reply.member.username == #authentication.getPrincipal().getUsername()}">
+                    <div sec:authorize="isAuthenticated()"  th:if="${reply.member != null && reply.member.username == #authentication.getPrincipal().getUsername()}">
                         <a class="btn btn-sm btn-outline-primary" 
                            th:href="@{|/repl/modify/${reply.id}|}">수정</a>
                         <a class="btn btn-sm btn-outline-danger" 
@@ -71,7 +71,7 @@
         </div>
 
         <!-- 댓글 작성 폼 -->
-        <form th:action="@{|/repl/create/${postDTO != null ? postDTO.id : 0}|}" method="post" class="my-3">
+        <form sec:authorize="isAuthenticated()"   th:action="@{|/repl/create/${postDTO != null ? postDTO.id : 0}|}" method="post" class="my-3">
             <div class="form-group">
                 <textarea class="form-control" name="content" rows="5" placeholder="댓글을 입력하세요..."></textarea>
             </div>

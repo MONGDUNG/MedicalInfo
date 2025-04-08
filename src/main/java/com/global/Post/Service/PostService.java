@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,7 +39,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -46,12 +48,14 @@ public class PostService {
 	
 	@Autowired
 	PostRepository pr;
+		
 	private final MemberRepository mr;
 	public List<ReplDTO> ReplList;
 	public List<PostDTO> PostList;
 	public List<FileEntity> fileList;
 	private final FileRepository fr;
-	
+	@Autowired
+	 private ResourceLoader resourceLoader;
 	
 	
 	public void PostCreate(PostDTO dto, @RequestParam("save") List<MultipartFile> files ,
@@ -70,25 +74,36 @@ public class PostService {
 	}
 	
 	public void saveFile(List<MultipartFile>files ,PostEntity pe ) { 
+		
+		 String staticUploadPath = "";
+	     
+		
 		 if(files != null && !files.isEmpty()) {
 			 this.fileList = new ArrayList<>();
 			 for(MultipartFile mf : files) {
 				 String ofilename = mf.getOriginalFilename();
-				 	if(ofilename != null && !ofilename.isEmpty()) {
-				 		long time = System.currentTimeMillis();
-				 		String filename = time + ofilename;
-				 		File f = new File("c:/upload/" + filename);
-		 				try {
-		 					mf.transferTo(f);				 					
-		 					FileEntity file = new FileEntity();
-		 							file.setPost(pe);
-		 							file.setFilename(filename);
-		 							file.setPath("c:/upload/");
-		 					fr.save(file);
-		 					fileList.add(file);
-		 				}catch(Exception e) {		 					
-		 				}
-				 	}
+				 if(ofilename != null && !ofilename.equals("")) {
+			 		long time = System.currentTimeMillis();
+			 		String filename = time + ofilename;
+			 		
+	 				try {
+	 					staticUploadPath = resourceLoader.getResource("classpath:/static/").getFile().getAbsolutePath();
+	 					System.out.println(staticUploadPath);
+	 					File dir = new File(staticUploadPath+"/uploads");
+	 					System.out.println(dir.mkdir()); 
+	 					
+	 					File dir2 = new File(staticUploadPath+"/uploads/"+filename);
+	 					mf.transferTo(dir2);				 					
+	 					FileEntity file = new FileEntity();
+	 							file.setPost(pe);
+	 							file.setFilename(filename);
+	 							file.setPath("uploads");
+	 					fr.save(file);
+	 					fileList.add(file);
+	 				}catch(Exception e) {	
+	 					e.printStackTrace();
+	 				}
+			 	}
 			 }
 		 }	 
 	}
@@ -219,14 +234,18 @@ public class PostService {
 	
 	
 	public String saveFile(MultipartFile mf) { // 파일 업로드작업
+		System.out.println("=====saveFile=====>> "+mf);
 		String filename = null;
 		if(mf != null) {
 			String org = mf.getOriginalFilename();
 			if(org != null && !org.equals("") ) {
 				long time = System.currentTimeMillis();
 				filename = time+org;  //파일 이름 작업
-				File copy = new File("c:/upload/"+filename); 
+				
 				try {
+					Resource resource = resourceLoader.getResource("classpath:static/uploads/"+filename);
+			 		File copy = resource.getFile();
+			 		System.out.println("=====sing=====>> "+copy.canExecute());
 					mf.transferTo(copy); // 덮어쓰기 작업
 				}catch(Exception e){
 					e.printStackTrace(); 

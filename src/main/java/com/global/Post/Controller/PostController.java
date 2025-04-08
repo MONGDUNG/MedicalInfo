@@ -1,5 +1,6 @@
 package com.global.Post.Controller;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,8 @@ public class PostController {
 	
 	@Autowired
 	MemberRepository mr;
-	
+	@Autowired
+	private ResourceLoader resourceLoader;
 	
 	
 	@GetMapping("list")
@@ -99,24 +102,33 @@ public class PostController {
 	return "redirect:/post/list";
 	}
 	
-	@GetMapping("display") //이미지 경로 작업
-	public ResponseEntity<Resource> display(@RequestParam("filename") String fn){  	
-		
-		String path = "c:/upload/"; 
-		Resource resource = new FileSystemResource(path + fn); 
-		if(!resource.exists()) { 
-			return new ResponseEntity<Resource>(HttpStatus.NOT_FOUND); 
-		}
-			HttpHeaders header = new HttpHeaders
-					(); 
-			Path filePath = null;
-			try {
-				 filePath = Paths.get(path+fn); 
-				 header.add("Content-type" , Files.probeContentType(filePath));
-			}catch(Exception e) {}
-		
-		return new ResponseEntity<Resource>(resource , header , HttpStatus.OK); 
-	}	
+	@GetMapping("display")
+	public ResponseEntity<Resource> display(@RequestParam("filename") String fn) {
+
+	    Resource resource = null;
+	    HttpHeaders header = new HttpHeaders();
+	    
+	    try {
+	        // classpath:/static/ 경로 가져오기
+	        String staticUploadPath = resourceLoader.getResource("classpath:/static/").getFile().getAbsolutePath();
+	        
+	        // uploads 디렉토리 포함한 전체 경로
+	        Path filePath = Paths.get(staticUploadPath + File.separator + "uploads" + File.separator + fn);
+	        resource = new FileSystemResource(filePath);
+	        
+	        if (!resource.exists()) {
+	            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	        }
+
+	        header.add("Content-Type", Files.probeContentType(filePath));
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+
+	    return new ResponseEntity<>(resource, header, HttpStatus.OK);
+	}
 		
 	@GetMapping("detail/{id}") //와일드카드 맵핑 (주소형태를 받을때)  리드
 	public String detail(@PathVariable("id") Integer id , Model model) {

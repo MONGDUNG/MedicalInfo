@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>페이지를 찾을 수 없습니다</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- 스타일 파일이 있으면 유지 -->
+    <style>
+        /* 페이지 전체 중앙 정렬 */
+        body, html {
+            height: 100vh; /* 전체 화면 높이 사용 */
+            margin: 0;
+            display: flex;
+            justify-content: center; /* 가로 가운데 정렬 */
+            align-items: center; /* 세로 가운데 정렬 */
+            background-color: white; /* 여기를 원하는 색으로 바꾸면 돼 */
+        }
+
+        /* 컨텐츠 스타일 */
+        .content-box {
+            text-align: center;
+            background-color: transparent; /* 박스를 투명하게 설정 */
+        }
+
+        img {
+            width: 300px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-box">
+        <img src="/images/not-found.png" alt="페이지를 찾을 수 없습니다">
+        <h1>404 - 페이지를 찾을 수 없습니다</h1>
+        <p>요청하신 페이지는 존재하지 않습니다. 다른 페이지로 이동해주세요.</p>
+        <a href="/">홈으로 가기</a>
+    </div>
+</body>
+</html>

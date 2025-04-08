@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class MedinstDTO implements Serializable{
-	
-	private static final long serialVersionUID = 1L;
+   
+   private static final long serialVersionUID = 1L;
 
     private Long id;               // 번호
     private String hospitalCode;    // 요양기호

@@ -19,7 +19,7 @@
     border-left: 5px solid #00bcd4;
     }
     </style>
-    
+
 </head>
 <body>
 
@@ -240,17 +240,17 @@
 window.onload = function() {     
     //주소 없을시 자동으로 수정폼으로 이동 + alert
     if("[[${dto}]]" !== "null" || "[[${dto}]]" !== "") {
-	    if ("[[${dto.address}]]" === "null" || "[[${dto.address}]]" === "") { 
-	        console.log("주소 값이 null임. alert를 띄우고 페이지를 이동합니다.");
-	        
-	        // alert 띄우기
-	        alert("주소 및 개인정보가 필요합니다. 해당 페이지에서 수정해주세요.");
-	
-	        // 강제로 /member/modify 페이지로 이동
-	        window.location.href = "/member/modify";
-	    } else {
-	        console.log("주소 값이 null이 아님. 페이지 이동하지 않음.");
-	    }
+       if ("[[${dto.address}]]" === "null" || "[[${dto.address}]]" === "") { 
+           console.log("주소 값이 null임. alert를 띄우고 페이지를 이동합니다.");
+           
+           // alert 띄우기
+           alert("주소 및 개인정보가 필요합니다. 해당 페이지에서 수정해주세요.");
+   
+           // 강제로 /member/modify 페이지로 이동
+           window.location.href = "/member/modify";
+       } else {
+           console.log("주소 값이 null이 아님. 페이지 이동하지 않음.");
+       }
     }
 };
 
@@ -275,8 +275,8 @@ fetch("/api/news")
   });
 
     document.getElementById('mapDropdown').addEventListener('click', function () {
-	  location.href = '/map/main';
-	});
+     location.href = '/map/main';
+   });
 
     fetch("/map/popular")
       .then(res => res.json())
@@ -294,16 +294,18 @@ fetch("/api/news")
                      const li = document.createElement("li");
                      li.className = "list-group-item";
                      li.innerHTML = `<a href="/map/hospitaldetail?name=${encodeURIComponent(h.hospitalName)}&address=${encodeURIComponent(h.address)}&phone=${encodeURIComponent(h.phoneNumber)}&category=${encodeURIComponent(h.category)}&lat=${h.latitude}&lng=${h.longitude}" class="text-decoration-none text-dark">
-                    	  ${i + 1}위 🏥 ${h.hospitalName} (${h.address})
-                    	</a>`;
-                    	li.addEventListener('click', () => {
+
+                         ${i + 1}위 🏥 ${h.hospitalName} (${h.address})
+                       </a>`;
+                       li.addEventListener('click', () => {
+
                         document.querySelectorAll('#popularList .list-group-item')
                           .forEach(item => item.classList.remove('clicked-item'));
                         li.classList.add('clicked-item');
                         
                         window.open(url, "_blank");
                       });
-                    	
+
                      list.appendChild(li);
                          });
       });
@@ -323,56 +325,57 @@ fetch("/api/news")
         }
     });
     const deptList = {
-    	    "A": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과"],
-    	    "B": ["치과", "구강악안면외과", "치과보철과", "치과교정과", "소아치과", "치주과", "치과보존과", "구강내과", "영상치의학과", "구강병리과", "예방치과", "통합치의학과"],
-    	    "C": ["한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
-    	    "D": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과", "한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
-    	    "E": []
-    	};
+           "A": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과"],
+           "B": ["치과", "구강악안면외과", "치과보철과", "치과교정과", "소아치과", "치주과", "치과보존과", "구강내과", "영상치의학과", "구강병리과", "예방치과", "통합치의학과"],
+           "C": ["한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
+           "D": ["내과", "신경과", "정신건강의학과", "외과", "정형외과", "신경외과", "심장혈관흉부외과", "성형외과", "마취통증의학과", "산부인과", "소아청소년과", "안과", "이비인후과", "피부과", "비뇨의학과", "영상의학과", "방사선종양학과", "병리과", "진단검사의학과", "결핵과", "재활의학과", "핵의학과", "가정의학과", "응급의학과", "직업환경의학과", "예방의학과", "한방내과", "한방부인과", "한방소아과", "한방안·이비인후·피부과", "한방신경정신과", "침구과", "한방재활의학과", "사상체질과", "한방응급"],
+           "E": []
+       };
 
-    	function getGroupByCategory(category) { 
-    	    if (["상급종합", "종합병원", "병원", "정신병원", "의원"].includes(category)) return "A";
-    	    if (["치과병원", "치과의원"].includes(category)) return "B";
-    	    if (["한방병원", "한의원"].includes(category)) return "C";
-    	    if (["요양병원"].includes(category)) return "D";
-    	    return "E";
-    	}
+       function getGroupByCategory(category) { 
+           if (["상급종합", "종합병원", "병원", "정신병원", "의원"].includes(category)) return "A";
+           if (["치과병원", "치과의원"].includes(category)) return "B";
+           if (["한방병원", "한의원"].includes(category)) return "C";
+           if (["요양병원"].includes(category)) return "D";
+           return "E";
+       }
 
-    	// 진료 유형 변경 시, 진료과 select 동적 변경
-    	document.getElementById('neighborCategory').addEventListener('change', function() {
-    	    const category = this.value;
-    	    const deptSelect = document.getElementById('neighborDept');
-    	    deptSelect.innerHTML = '<option value="">진료과 선택</option>';  // 초기화
+       // 진료 유형 변경 시, 진료과 select 동적 변경
+       document.getElementById('neighborCategory').addEventListener('change', function() {
+           const category = this.value;
+           const deptSelect = document.getElementById('neighborDept');
+           deptSelect.innerHTML = '<option value="">진료과 선택</option>';  // 초기화
 
-    	    if (!category) return;
+           if (!category) return;
 
-    	    const group = getGroupByCategory(category);
-    	    const depts = deptList[group];
+           const group = getGroupByCategory(category);
+           const depts = deptList[group];
 
-    	    if (!depts || depts.length === 0) return;
+           if (!depts || depts.length === 0) return;
 
-    	    depts.forEach(dept => {
-    	        const opt = document.createElement("option");
-    	        opt.value = dept;
-    	        opt.textContent = dept;
-    	        deptSelect.appendChild(opt);
-    	    });
-    	});
+           depts.forEach(dept => {
+               const opt = document.createElement("option");
+               opt.value = dept;
+               opt.textContent = dept;
+               deptSelect.appendChild(opt);
+           });
+       });
 
-    	function searchNeighborhood() {
-    	    const category = document.getElementById('neighborCategory').value;
-    	    const dept = document.getElementById('neighborDept').value;
+       function searchNeighborhood() {
+           const category = document.getElementById('neighborCategory').value;
+           const dept = document.getElementById('neighborDept').value;
 
-    	    if (!category) {
-    	        alert('진료 유형을 선택해주세요.');
-    	        return;
-    	    }
+           if (!category) {
+               alert('진료 유형을 선택해주세요.');
+               return;
+           }
 
-    	    location.href = `/map/main?category1=${encodeURIComponent(category)}&dept1=${encodeURIComponent(dept)}&nearby=true`;
-    	}
-    	
-    	
+           location.href = `/map/main?category1=${encodeURIComponent(category)}&dept1=${encodeURIComponent(dept)}&nearby=true`;
+       }
+       
+       
     </script>
+
    
 </body>
 </html>

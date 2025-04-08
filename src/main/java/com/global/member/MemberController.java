@@ -114,7 +114,7 @@ public class MemberController {
 	}
 	
 
-	@GetMapping("/myPage") // 마이페이지
+	@GetMapping("/mypage") // 마이페이지
 	public String mypage(Principal principal, Model model) {
 	    String username = principal.getName(); // 로그인한 사용자의 이름을 얻어옴
 	    MemberDTO memberDTO = ms.readUser(username); 

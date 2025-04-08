@@ -1,11 +1,16 @@
+
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layout}">
 <head>
     <title>주변 병원 찾기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1b1fa6d69135cfce980c3daf91775a4b&libraries=services"></script>
+    
     <style>
-        #map { width: 75%; height: 800px; float: right; }
+
+        #map { width: 85%; height: 800px; float: right; }
         #sidebar {
-            width: 25%;
+            width: 15%;
             height: 750px;
             float: left;
             background: #f8f9fa;
@@ -17,6 +22,7 @@
         #searchContainer {
             display: flex;
             margin-bottom: 10px;
+            align-items: center;
         }
         #searchInput {
             flex: 1;
@@ -38,6 +44,11 @@
         }
         #searchButton:hover {
             background-color: #0056b3;
+        }
+        #nearbyCheckboxContainer {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
         #hospitalList {
             flex-grow: 1;
@@ -75,170 +86,181 @@
         .directions-btn:hover {
             background: #bfbfbf;
         }
+        #category-btns {
+          position: absolute;
+          top: 17px;
+          left: 10px;
+          z-index: 10;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+      }
+      
+      #category-btns button {
+          padding: 8px;
+          margin: 2px;
+          cursor: pointer;
+      }
+      
+      #more-btn {
+          position: relative; /* 상대 위치 기준점으로 설정 */
+          font-weight: bold;
+      }
+      
+      #hidden-btns {
+          position: absolute;
+          top: 100%; /* 더보기 버튼의 바로 아래쪽으로 위치 설정 */
+          right: 0; /* 더보기 버튼의 오른쪽 끝에 맞춤 */
+          background: #fff;
+          border: 1px solid #ccc;
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+          white-space: nowrap; /* 버튼이 한 줄로 표시되도록 유지 */
+      }
+      
+      #hidden-btns button {
+          display: block;
+          width: 100%;
+          text-align: left;
+          border: none;
+          background: none;
+          margin: 3px 0;
+      }
+      
+      #hidden-btns button:hover {
+          background-color: #f0f0f0;
+      }
+      
+      .modal123 {
+            display: none;
+          position: absolute;
+          top: 120px;  /* 상단에서 적당한 위치 */
+          left: 330px; /* 📍 지도 왼쪽 (사이드바 오른쪽) */
+          width: 300px;
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+      }
+        .modal-content123 {
+            text-align: center;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .close-btn {
+            background: #6c757d;
+       }
+        .close-btn:hover {
+            background: #5a6268;
+       }
+       
+        #reviewSection {
+        width: 20%; /* 기존 25%에서 20%로 줄임 */
+        padding: 20px;
+        background: #f8f9fa;
+        border-top: 2px solid #ccc;
+        margin-top: 20px;
+        float: left;
+       }
+        #reviewList {
+        width: 75%;
+        padding: 20px;
+        background: #f8f9fa;
+        border-top: 2px solid #ccc;
+        margin-top: 0; /* margin-top 값을 0으로 설정 */
+        float: right;
+      }
+      
     </style>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1590e9c87b932ff3afa865646fc52061&libraries=services"></script>
+    
 </head>
 <body>
+<div layout:fragment="content">
     <div id="sidebar">
         <div id="searchContainer">
             <input type="text" id="searchInput" placeholder="병원 이름 검색">
             <button id="searchButton" onclick="fetchSearchResults()">검색</button>
         </div>
+        <div id="nearbyCheckboxContainer">
+            <input type="checkbox" id="nearbyCheckbox" onchange="toggleNearbyHospitals()">
+            <label for="nearbyCheckbox">내 주변 보기</label>
+        </div>
+        <div id="deptList"></div>
         <div id="hospitalList"></div>
         <div class="directions-container">
             <button class="directions-btn" onclick="openKakaoDirections()">길찾기</button>
         </div>
     </div>
-    <div id="map"></div>
+    <div id="map">
+        <div id="category-btns">
+            <!-- 항상 보이는 주요 버튼 -->
+            <button data-category="종합병원">🏥 종합병원</button>
+            <button data-category="의원">🏥 의원</button>
+            <button data-category="치과의원">🦷 치과의원</button>
+            <button data-category="한의원">🌿 한의원</button>
+            <button data-category="보건소">🏥 보건소</button>
+            <button data-category="약국">💊 약국</button>
+            <button data-category="응급실">🚑 응급실</button>
+            <!-- 더보기 버튼 -->
+            <button id="more-btn">⋯</button>
 
-    <script>
-        var map;
-        var selectedMarker = null;
-        var listElement = document.getElementById('hospitalList');
+            <!-- 숨겨진 버튼 그룹 -->
+            <div id="hidden-btns" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:10px; border-radius:5px; box-shadow:0px 2px 4px rgba(0,0,0,0.2);">
+                <button data-category="상급종합">🏥 상급종합병원</button>
+                <button data-category="병원">🏥 병원</button>
+                <button data-category="요양병원">🏥 요양병원</button>
+                <button data-category="정신병원">🏥 정신병원</button>
+                <button data-category="치과병원">🦷 치과병원</button>
+                <button data-category="한방병원">🌿 한방병원</button>
+                <button data-category="보건진료소">🏥 보건진료소</button>
+                <button data-category="보건지소">🏥 보건지소</button>
+                <button data-category="조산원">🍼 조산원</button>
+            </div>
+        </div>
+    </div>
+    <div id="hospitalModal" class="modal123">
+    <div class="modal-content123">
+        <h2 id="modalTitle">병원 이름</h2>
+        <p><strong>주소:</strong> <span id="modalAddress"></span></p>
+        <p><strong>전화번호:</strong> <span id="modalPhone"></span></p>
+        <p><strong>카테고리:</strong> <span id="modalCategory"></span></p> <!-- 카테고리 추가 -->
+        <p id="reviewCount">리뷰: 0</p>
+        <p id="averageScore">평점: 0.0</p>
+        <!-- hidden으로 위도 경도 가져와서 넣기 -->
+        <input type="hidden" id="modalLat">
+        <input type="hidden" id="modalLng">
+        <div class="button-group">
+            <button class="btn detail-btn">🔍 상세보기</button>
+            <button class="btn close-btn">🔙 닫기</button>
+        </div>
+    </div>
+</div>
+</div>
+<th:block layout:fragment="script">
+	<script th:inline="javascript">
+	   window.isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+	   window.userLatitude = /*[[${dto?.latitude}]]*/ null;
+	   window.userLongitude = /*[[${dto?.longitude}]]*/ null;
+	</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        function initMap() {
-            map = new kakao.maps.Map(document.getElementById('map'), {
-                center: new kakao.maps.LatLng(37.5665, 126.9780),
-                level: 4
-            });
-
-            fetchHospitals();
-        }
-
-        function fetchNearbyHospitals() {
-            fetch("/map/nearbyHospitals")
-            .then(response => response.json())
-            .then(data => {
-                updateHospitalList(data);
-            });
-        }
-
-        function fetchSearchResults() {
-            let keyword = document.getElementById('searchInput').value.trim();
-            if (keyword === "") {
-                fetchHospitals();  // 검색어 없으면 전체 목록 다시 로드
-                return;
-            }
-
-            fetch(`/map/search/item?keyword=${encodeURIComponent(keyword)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Search results:', data);  // 콘솔에 검색 결과 출력
-                updateHospitalList(data);
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
-        }
-
-        function updateHospitalList(data) {
-            listElement.innerHTML = ""; // Clear existing list
-
-            if (data.length > 0) {
-                // Move the map to the location of the first search result
-                var firstPlace = data[0];
-                var position = new kakao.maps.LatLng(firstPlace.LAT, firstPlace.LNG);
-                map.setCenter(position);
-            }
-
-            data.forEach(place => {
-                var marker = createMarker(place);
-                var listItem = createSearchListItem(place);
-                listElement.appendChild(listItem);
-
-                kakao.maps.event.addListener(marker, 'click', function() {
-                    selectMarker(marker, place);
-                });
-            });
-        }
-
-        function createMarker(place) {
-            var position = new kakao.maps.LatLng(place.LAT, place.LNG);
-
-            var normalImage = new kakao.maps.MarkerImage(
-                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
-                new kakao.maps.Size(33, 36)
-            );
-
-            var clickImage = new kakao.maps.MarkerImage(
-                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-                new kakao.maps.Size(33, 36)
-            );
-
-            var marker = new kakao.maps.Marker({
-                position: position,
-                map: map,
-                image: normalImage
-            });
-
-            kakao.maps.event.addListener(marker, 'click', function() {
-                selectMarker(marker, place);
-            });
-
-            return marker;
-        }
-
-        function createSearchListItem(place) {
-            var item = document.createElement('div');
-            item.className = 'hospital-item';
-            var distanceText = place.distance !== undefined ? `${place.distance.toFixed(0)}m` : "거리 정보 없음";
-            item.innerText = `${place.NAME || "장소"} - ${distanceText}`;
-
-            item.onclick = function() {
-                window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.NAME || "장소")}&address=${encodeURIComponent(place.ADDRESS)}&lat=${place.LAT}&lng=${place.LNG}&phone=${place.PHONE}`;
-            };
-            return item;
-        }
-        function createNearbyListItem(place) {
-				var item = document.createElement('div');
-				item.className = 'hospital-item';
-				var distanceText = place.distance !== undefined ? `${place.distance.toFixed(0)}m` : "거리 정보 없음";
-				item.innerText = `${place.hospitalName || "장소"} - ${distanceText}`;
-
-				item.onclick = function () {
-					window.location.href = `/map/hospitaldetail?name=${encodeURIComponent(place.hospitalName || "장소")}&address=${encodeURIComponent(place.address)}&lat=${place.latitude}&lng=${place.longitude}&phone=${place.phoneNumber}`;
-				};
-				return item;
-			}
-
-        function selectMarker(marker, place) {
-            if (selectedMarker) selectedMarker.setImage(new kakao.maps.MarkerImage(
-                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
-                new kakao.maps.Size(33, 36)
-            ));
-
-            marker.setImage(new kakao.maps.MarkerImage(
-                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-                new kakao.maps.Size(33, 36)
-            ));
-
-            selectedMarker = marker;
-            map.setCenter(marker.getPosition());
-
-            highlightListItem(place);
-        }
-
-        function highlightListItem(place) {
-            document.querySelectorAll('.hospital-item').forEach(item => item.classList.remove('highlight'));
-            let targetItem = Array.from(document.querySelectorAll('.hospital-item')).find(item =>
-                item.innerText.includes(place.hospitalName || "장소")
-            );
-            if (targetItem) {
-                targetItem.classList.add('highlight');
-                targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        function openKakaoDirections() {
-            window.open("https://map.kakao.com", "_blank");
-        }
-
-        window.onload = initMap;
-    </script>
+    <script type="text/javascript" src="/js/map.js"></script>
+</th:block>
 </body>
 </html>

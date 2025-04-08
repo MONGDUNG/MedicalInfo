@@ -31,13 +31,14 @@ public class SupplementController {
                                     @RequestParam(value = "name", required = false) String name,
                                     @RequestParam(value = "primaryFnclty", required = false) String primaryFnclty,
                                     Model model) {
-        int pageIndex = page - 1; // 0-based index 변환
+        int pageIndex = page - 1;
+
         List<SupplementDTO> supplementDTOList = supplementService.searchSupplements(name, primaryFnclty, pageIndex);
 
         addPaginationDetails(page, model);
         model.addAttribute("list", supplementDTOList);
         model.addAttribute("searchTerm", name);
-        model.addAttribute("primaryFnclty", primaryFnclty);  // indications 값도 모델에 추가
+        model.addAttribute("primaryFnclty", primaryFnclty);
 
         return "supplement/supplement_list";
     }
@@ -62,15 +63,12 @@ public class SupplementController {
     // 카테고리 상세 페이지 조회
     @GetMapping("/detail/{id}")
     public String getSupplementDetail(@PathVariable("id") Long id, Model model, Principal principal) {
-        // 로그인한 사용자의 정보도 함께 모델에 추가
         model.addAttribute("principal", principal);
-
-        // 카테고리 정보 가져오기
         SupplementDTO supplementDTO = supplementService.getSupplementDetail(id);
         model.addAttribute("supplementDTO", supplementDTO);
-
         return "supplement/supplement_detail";
     }
+
 
     // 답변 추가
     @PostMapping("/answer/create/{supplementId}")
@@ -78,6 +76,7 @@ public class SupplementController {
         supplementService.addAnswer(supplementId, content);
         return "redirect:/supplement/detail/" + supplementId;
     }
+
 
     // 페이지네이션 세부사항 추가
     private void addPaginationDetails(int currentPage, Model model) {

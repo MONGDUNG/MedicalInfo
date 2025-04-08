@@ -128,6 +128,14 @@ public class CategoryService {
                 .content(answer.getContent())
                 .createDate(answer.getCreateDate())
                 .modifyDate(answer.getModifyDate())
+                .memberDTO(
+                    answer.getMember() != null ? 
+                    com.global.member.dto.MemberDTO.builder()
+                        .username(answer.getMember().getUsername())
+                        .build() 
+                    : null
+                )
                 .build();
     }
+    
 }

@@ -1,10 +1,4 @@
-<!DOCTYPE html>
 <html layout:decorate="~{layout}">
-<head>
-    <title>영양제 상세정보</title>
-    <link rel="stylesheet" type="text/css" href="/bootstrap.min.css">
-</head>
-<body>
     <div layout:fragment="content" class="container my-3">
         <h2 class="border-bottom py-2" th:text="${supplementDTO.prdlstNm}"></h2>
         <div class="card-body">
@@ -16,21 +10,30 @@
             <span class="badge rounded-pill bg-success" th:text="${supplementDTO.voter}"></span>
         </div>
         
+        <!-- 답변 개수 -->
         <h5 class="border-bottom my-3 py-2" th:text="${#lists.size(supplementDTO.answerList)} + ' 개의 답변이 있습니다.'"></h5>
 
+	<!-- 답변(answer) 반복 -->
         <div th:each="answerDTO : ${supplementDTO.answerList}">
             <div class="card-body">
                 <div class="card-text" th:text="${answerDTO.content}"></div>
+                <p class="text-muted" th:text="|작성자: ${answerDTO.memberDTO.username}|"></p>
+    <!-- 삭제하기 -->
+        <div class="my-2" sec:authorize="isAuthenticated()" 
+             th:if="${answerDTO.memberDTO != null and answerDTO.memberDTO.username == #authentication.name}">    
+            <a class="btn btn-success btn-sm"
+               th:href="@{|/answer/delete/${answerDTO.id}?redirectUrl=/supplement/detail/${supplementDTO.id}|}"
+               th:text="'삭제'"></a>
             </div>
         </div>    
+</div>
 
+	<!-- 답변 등록 폼 -->
         <form method="post" th:action="@{|/answer/create/supplement/${supplementDTO.id}|}">
             <textarea class="form-control" rows="5" cols="20" name="content"></textarea>
             <button type="submit" class="btn btn-primary my-2">답변등록</button>
         </form>
 
-        <a href="/member/main" class="btn btn-secondary mb-3">메인 페이지로 이동</a>
         <a href="/supplement/all" class="btn btn-secondary mb-3">의약품 페이지로 이동</a>
     </div>
-</body>
 </html>

@@ -46,8 +46,9 @@ public class SupplementService {
     // 이름과 효능 검색
     public List<SupplementDTO> searchSupplements(String name, String primaryFnclty, int page) {
         Specification<SupplementEntity> spec = searchByNameAndprimaryFnclty(name, primaryFnclty);
-        // 'voter' 필드를 기준으로 내림차순 정렬
-        Page<SupplementEntity> supplements = supplementRepository.findAll(spec, PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Order.desc("voter"))));
+        Sort sort = Sort.by(Sort.Order.desc("voter"), Sort.Order.asc("id"));
+        PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, sort);
+        Page<SupplementEntity> supplements = supplementRepository.findAll(spec, pageRequest);
         return supplements.stream()
                 .map(this::supplementToDTO)
                 .collect(Collectors.toList());
@@ -140,6 +141,13 @@ public class SupplementService {
                 .content(answer.getContent())
                 .createDate(answer.getCreateDate())
                 .modifyDate(answer.getModifyDate())
+                .memberDTO(
+                        answer.getMember() != null ? 
+                        com.global.member.dto.MemberDTO.builder()
+                            .username(answer.getMember().getUsername())
+                            .build() 
+                        : null
+                    )
                 .build();
     }
 

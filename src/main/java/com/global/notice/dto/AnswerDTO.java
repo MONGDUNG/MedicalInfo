@@ -21,4 +21,5 @@ public class AnswerDTO {
 	private LocalDateTime modifyDate;
 	private SupplementDTO supplementDTO;
     private CategoryDTO categoryDTO;
+    private MemberDTO memberDTO;
 }

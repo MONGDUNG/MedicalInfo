@@ -27,10 +27,5 @@ public interface SupplementRepository extends JpaRepository<SupplementEntity, Lo
     // 이름과 효능을 동시에 검색하는 메서드
     Page<SupplementEntity> findByPrdlstNmContainingAndPrimaryFncltyContaining(
         String prdlstNm, String primaryFnclty, Pageable pageable);
-    
- // 좋아요 순으로 정렬 (내림차순)
-    Page<SupplementEntity> findAllByOrderByVoterDesc(Pageable pageable);
-
-    // 좋아요 순으로 정렬 (오름차순)
-    Page<SupplementEntity> findAllByOrderByVoterAsc(Pageable pageable);
+   
 }

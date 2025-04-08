@@ -12,18 +12,25 @@
     <div th:each="answerDTO : ${categoryDTO.answerList}">
         <div class="card-body">
             <div class="card-text" th:text="${answerDTO.content}"></div>
-    	</div>
-    </div>    
+             <p class="text-muted" th:text="|작성자: ${answerDTO.memberDTO.username}|"></p>
+    	 <!-- 삭제하기 -->
+        <div class="my-2" sec:authorize="isAuthenticated()" 
+             th:if="${answerDTO.memberDTO != null and answerDTO.memberDTO.username == #authentication.name}">    
+            <a class="btn btn-success btn-sm"
+               th:href="@{|/answer/delete/${answerDTO.id}?redirectUrl=/category/detail/${categoryDTO.id}|}"
+               th:text="'삭제'"></a>
+        </div>
+    </div>
+</div>    
+	
 
     <!-- 답변 등록 폼 -->
     <form method="post" th:action="@{|/answer/create/category/${categoryDTO.id}|}">
         <textarea class="form-control" rows="5" cols="20" name="content"></textarea>
         <button type="submit" class="btn btn-primary my-2">답변등록</button>
     </form>
-
-    <!-- 메인 페이지 이동 -->
-    <a href="/member/main" class="btn btn-secondary mb-3">메인 페이지로 이동</a>
     
     <!-- 의약품 페이지 이동 -->
     <a href="/category/all" class="btn btn-secondary mb-3">의약품 페이지로 이동</a>
 </div>
+</html>

@@ -36,6 +36,9 @@ public class MedinstDTO implements Serializable{
         this.hospitalCode = entity.getHospitalCode();
         this.hospitalName = entity.getHospitalName();
         this.address = entity.getAddress();
+        this.phoneNumber = entity.getPhoneNumber();
+        this.latitude = Double.parseDouble(entity.getLatitude());
+        this.longitude = Double.parseDouble(entity.getLongitude());
     }
 }
 

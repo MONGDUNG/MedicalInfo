@@ -86,11 +86,12 @@
             </ul>
         </nav>
 
-        <!-- 버튼 그룹 -->
+         <!-- 버튼 그룹 -->
         <div class="btn-group d-flex justify-content-end">
             <a class="btn btn-danger" th:href="@{/post/list}">목록으로</a>
-            <a class="btn btn-primary ms-2" th:href="@{/post/create}">글쓰기</a>
+            <a sec:authorize="isAuthenticated()" class="btn btn-primary ms-2" th:href="@{/post/create}">글쓰기</a>
         </div>
+    </div>
     </div>
 </div>
     <!-- Bootstrap JS 추가 -->

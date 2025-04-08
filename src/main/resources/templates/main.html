@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>의료정보 플랫폼</title>
+    <title>닥터지오</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     
@@ -51,16 +51,21 @@
         </a>
         <ul class="dropdown-menu p-3" style="width: 800px;">
         <div class="d-flex flex-row gap-4">
-          <li class="dropdown-item">
-           <strong>커뮤니티</strong>
-           <ul class="list-unstyled ps-3">
-               <li><a href="/supplement/all" class="nav-link px-0 fw-semibold link-hover text-dark">영양제정보</a></li>
-               <li><a href="/otc/list" class="nav-link px-0 fw-semibold link-hover text-dark">편의점 상비약</a></li>
-               <li><a href="/category/all" class="nav-link px-0 fw-semibold link-hover text-dark">약국판매약</a></li>
-               <li><a href="/question/list" class="nav-link px-0 fw-semibold link-hover text-dark">문의</a></li>
-               <li><a href="/post/notice" class="nav-link px-0 fw-semibold link-hover text-dark">공지사항</a></li>
-               <li><a href="/post/list" class="nav-link px-0 fw-semibold link-hover text-dark">자유게시판</a></li>
-           </ul>
+           <li class="dropdown-item">
+	           <strong>커뮤니티</strong>
+	           <ul class="list-unstyled ps-3">
+	               <li><a href="/question/list" class="nav-link px-0 fw-semibold link-hover text-dark">문의</a></li>
+	               <li><a href="/post/notice" class="nav-link px-0 fw-semibold link-hover text-dark">공지사항</a></li>
+	               <li><a href="/post/list" class="nav-link px-0 fw-semibold link-hover text-dark">자유게시판</a></li>
+	           </ul>
+          </li>
+           <li class="dropdown-item">
+	           <strong>약품</strong>
+	           <ul class="list-unstyled ps-3">
+	               <li><a href="/supplement/all" class="nav-link px-0 fw-semibold link-hover text-dark">영양제정보</a></li>
+	               <li><a href="/otc/list" class="nav-link px-0 fw-semibold link-hover text-dark">편의점상비약</a></li>
+	               <li><a href="/category/all" class="nav-link px-0 fw-semibold link-hover text-dark">일반의약품</a></li>
+	           </ul>
           </li>
           <li class="dropdown-item">
             <strong>질병정보</strong>
@@ -166,49 +171,54 @@
     </div>
     
     <!-- 우리동네 병원 검색 버튼 (로그인 시에만 표시) -->
-    <div class="row justify-content-center mb-5" sec:authorize="isAuthenticated()">
-        <div class="col-md-6">
-            <div class="d-flex gap-2 justify-content-center">
-                <select id="neighborCategory" class="form-select">
-				    <option value="">병원 구분</option>
-				    <option value="상급종합">상급종합</option>
-				    <option value="종합병원">종합병원</option>
-				    <option value="병원">병원</option>
-				    <option value="정신병원">정신병원</option>
-				    <option value="의원">의원</option>
-				    <option value="치과병원">치과병원</option>
-				    <option value="치과의원">치과의원</option>
-				    <option value="한방병원">한방병원</option>
-				    <option value="한의원">한의원</option>
-				    <option value="요양병원">요양병원</option>
-				</select>
-                <select id="neighborDept" class="form-select">
-                    <option value="">진료과 선택</option>
-                </select>
-                <button class="btn btn-success" onclick="searchNeighborhood()">
-                    <i class="bi bi-geo-alt"></i> 우리동네 병원찾기
-                </button>
+	<div class="row justify-content-center mb-5" sec:authorize="isAuthenticated()">
+	    <div class="col-md-8">
+	        <div class="d-flex gap-3">
+	            <select id="neighborCategory" class="form-select">
+	                <option value="">병원 구분</option>
+	                <option value="상급종합">상급종합</option>
+	                <option value="종합병원">종합병원</option>
+	                <option value="병원">병원</option>
+	                <option value="정신병원">정신병원</option>
+	                <option value="의원">의원</option>
+	                <option value="치과병원">치과병원</option>
+	                <option value="치과의원">치과의원</option>
+	                <option value="한방병원">한방병원</option>
+	                <option value="한의원">한의원</option>
+	                <option value="요양병원">요양병원</option>
+	            </select>
+	            <select id="neighborDept" class="form-select">
+	                <option value="">진료과 선택</option>
+	            </select>
+	            <button class="btn btn-success px-4 fw-semibold" style="width: 300px;" onclick="searchNeighborhood()">
+	                <i class="bi bi-geo-alt"></i> 우리동네 병원찾기
+	            </button>
+	        </div>
+	    </div>
+	</div>
+   
+<div class="container my-5 position-relative">
+    <!-- 뉴스 섹션 -->
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-info text-white fw-bold">
+                    📰 보건복지부 최신 뉴스
+                </div>
+                <ul id="newsList" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+        
+        <!-- 인기병원 순위 -->
+        <div class="col-md-3">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white fw-bold">
+                    🔥 인기 병원 순위
+                </div>
+                <ul id="popularList" class="list-group list-group-flush"></ul>
             </div>
         </div>
     </div>
-   
-   <div class="container my-5">
-     <div class="card">
-       <div class="card-header bg-info text-white fw-bold">
-         📰 보건복지부 최신 뉴스
-       </div>
-      <ul id="newsList" class="list-group list-group-flush"></ul>
-     </div>
-   </div>
-
-   <div class="position-absolute top-50 end-0 translate-middle-y me-5" style="width: 280px;">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white fw-bold">
-            🔥 인기 병원 순위
-        </div>
-        <ul id="popularList" class="list-group list-group-flush"></ul>
-    </div>
-</div>
 </div>
 
 <!-- 하단 푸터 -->

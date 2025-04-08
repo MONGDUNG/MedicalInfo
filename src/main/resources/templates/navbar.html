@@ -1,11 +1,11 @@
 <!-- navbar.html -->
 <nav th:fragment="navbarFragment" class="navbar navbar-expand-lg navbar-dark bg-primary">
-
     <div class="container-fluid">
         <a class="navbar-brand" th:href="@{/}">Dr.geo</a>
-       
-         <div class="navbar-collapse" id="navbarNav">
+
+        <div class="navbar-collapse" id="navbarNav">
             <ul class="navbar-nav flex-row">
+                <!-- 기존 버튼들 -->
                 <li class="nav-item me-3">
                     <a class="nav-link active" aria-current="page" th:href="@{/map/main}">지도</a>
                 </li>
@@ -20,10 +20,45 @@
                 </li>
                 <li class="nav-item me-3">
                     <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/member/signup}"> 회원가입</a>
-                
+                </li>
                 <li class="nav-item me-3" sec:authorize="isAuthenticated()" th:if="${session.memberStatus != null and session.memberStatus == 'admin'}">
-    				<a class="nav-link" th:href="@{/member/admin}"> 관리자 페이지</a>
-				</li>
+                    <a class="nav-link" th:href="@{/member/admin}"> 관리자 페이지</a>
+                </li>
+
+                <!-- 커뮤니티 드롭다운 -->
+                <li class="nav-item dropdown me-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        커뮤니티
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="communityDropdown">
+                        <li><a class="dropdown-item" th:href="@{/question/list}">문의</a></li>
+                        <li><a class="dropdown-item" th:href="@{/post/notice}">공지사항</a></li>
+                        <li><a class="dropdown-item" th:href="@{/post/list}">자유게시판</a></li>
+                    </ul>
+                </li>
+
+                <!-- 약품 드롭다운 -->
+                <li class="nav-item dropdown me-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="medicineDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        약품
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="medicineDropdown">
+                        <li><a class="dropdown-item" th:href="@{/supplement/all}">영양제정보</a></li>
+                        <li><a class="dropdown-item" th:href="@{/otc/list}">편의점상비약</a></li>
+                        <li><a class="dropdown-item" th:href="@{/category/all}">일반의약품</a></li>
+                    </ul>
+                </li>
+
+                <!-- 질병정보 드롭다운 -->
+                <li class="nav-item dropdown me-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="diseaseDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        질병정보
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="diseaseDropdown">
+                        <li><a class="dropdown-item" th:href="@{/disease/self_diagnosis}">자가진단</a></li>
+                        <li><a class="dropdown-item" th:href="@{/disease/list}">질병검색</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>

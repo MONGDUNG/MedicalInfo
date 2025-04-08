@@ -10,9 +10,16 @@
     .link-hover:hover {
       text-decoration: underline;
       font-weight: bold;
-      opacity: 0.85;
+      opacity: 0.85;    
+    }
+    
+    .clicked-item {
+    background-color: #e0f7fa;
+    font-weight: bold;
+    border-left: 5px solid #00bcd4;
     }
     </style>
+    
 </head>
 <body>
 
@@ -286,7 +293,17 @@ fetch("/api/news")
       data.forEach((h, i) => {
                      const li = document.createElement("li");
                      li.className = "list-group-item";
-                     li.innerText = `${i + 1}위 🏥 ${h.hospitalName} (${h.address})`;
+                     li.innerHTML = `<a href="/map/hospitaldetail?name=${encodeURIComponent(h.hospitalName)}&address=${encodeURIComponent(h.address)}&phone=${encodeURIComponent(h.phoneNumber)}&category=${encodeURIComponent(h.category)}&lat=${h.latitude}&lng=${h.longitude}" class="text-decoration-none text-dark">
+                    	  ${i + 1}위 🏥 ${h.hospitalName} (${h.address})
+                    	</a>`;
+                    	li.addEventListener('click', () => {
+                        document.querySelectorAll('#popularList .list-group-item')
+                          .forEach(item => item.classList.remove('clicked-item'));
+                        li.classList.add('clicked-item');
+                        
+                        window.open(url, "_blank");
+                      });
+                    	
                      list.appendChild(li);
                          });
       });

@@ -245,7 +245,6 @@ public class PostService {
 	
 	public PostDTO postId(Integer id) { // 아이디로 정보 가져오기
 		PostEntity pe = pr.findById(id).get();
-		System.out.println("==========="+pe.getFileList());
 		return entityChange(pe);
 	}
 	

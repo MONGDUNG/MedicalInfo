@@ -73,7 +73,7 @@
                 <select class="form-control" id="category" name="category" required>
                     <option value="자유" th:selected="${postDTO.category == '자유'}">자유</option>
                     <option value="질문" th:selected="${postDTO.category == '질문'}">질문</option>
-                    <option value="공지" th:selected="${postDTO.category == '공지'}" th:if="${postDTO.member != null && postDTO.member.memberstatus == 'admin'}">
+                    <option value="공지사항" th:selected="${postDTO.category == '공지사항'}" th:if="${postDTO.member != null && postDTO.member.memberstatus == 'admin'}">
             			공지사항</option>
                 </select>
             </div>

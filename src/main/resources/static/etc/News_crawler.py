@@ -77,7 +77,7 @@ print("링크 수:", len(links))
 data = {"title": titles, "date": dates, "link": links}
 df = pd.DataFrame(data)
 
-df.to_csv("mohw_news.csv", index=False, encoding="utf-8-sig")
+df.to_csv("C:/Users/14A/mohw_news.csv", index=False, encoding="utf-8-sig")
 with open("C:/Users/14A/mohw_news.json", "w", encoding="utf-8") as f:
     json.dump(data, f, indent=2, ensure_ascii=False)
 

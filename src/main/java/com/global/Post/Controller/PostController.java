@@ -19,18 +19,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.global.Post.Data.FileDTO;
 import com.global.Post.Data.PostDTO;
 import com.global.Post.Service.PostService;
 import com.global.Post.Service.ReplService;
 import com.global.member.entity.MemberEntity;
 import com.global.member.repository.MemberRepository;
-import com.global.member.service.MemberService;
 
 
 @RequestMapping("/post/")
@@ -104,7 +101,6 @@ public class PostController {
 	
 	@GetMapping("display") //이미지 경로 작업
 	public ResponseEntity<Resource> display(@RequestParam("filename") String fn){  	
-		System.out.println("img========="+fn); //파일 업로드 체크 디버깅
 		
 		String path = "c:/upload/"; 
 		Resource resource = new FileSystemResource(path + fn); 

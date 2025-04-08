@@ -1,10 +1,6 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content" class="container my-3">
 
-	<!-- 메인페이지로 -->
-	<div class="mb-3">
-        <a href="/" class="btn btn-secondary"></a>
-    </div>
 	
     <!-- 검색 폼 -->
     <form th:action="@{|/category/all?page=1${searchTerm != null ? '&name=' + searchTerm : ''}${indications != null && indications != '' ? '&indications=' + indications : ''}|}" method="get" class="mb-4">

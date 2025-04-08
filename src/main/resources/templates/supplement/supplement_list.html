@@ -2,11 +2,6 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content" class="container my-3">
 
-    <!-- 메인페이지로 -->
-    <div class="mb-3">
-        <a href="/" class="btn btn-secondary"></a>
-    </div>
-
     <!-- 검색 폼 -->
     <form th:action="@{|/supplement/all?page=1${searchTerm != null ? '&name=' + searchTerm : ''}${primaryFnclty != null && primaryFnclty != '' ? '&primaryFnclty=' + primaryFnclty : ''}|}" method="get" class="mb-4">
         <div class="form-group">
@@ -18,10 +13,10 @@
             <label for="primaryFnclty">효과 검색</label>
             <input type="text" id="primaryFnclty" name="primaryFnclty" class="form-control" placeholder="효과로 검색" th:value="${primaryFnclty}">
         </div>
-
+        
         <button type="submit" class="btn btn-primary mt-3">검색</button>
     </form>
-
+	<p class="text-muted mt-2">※ 현재 정렬 기준: <strong>좋아요순(내림차순)</strong></p>
     <!-- 제품 목록 테이블 -->
     <table class="table">
         <thead class="table-dark">
@@ -29,7 +24,7 @@
                 <th>번 호</th>
                 <th>제품명</th>
                 <th>업체명</th>
-                <th>좋아요 수</th> <!-- 좋아요 수 추가 -->
+                <th>좋아요 수</th>
             </tr>
         </thead>
         <tbody>
@@ -39,8 +34,7 @@
                     <a th:href="@{|/supplement/detail/${supplementDTO.id}|}" th:text="${supplementDTO.prdlstNm}"></a>
                 </td>
                 <td th:text="${supplementDTO.bsshNm}"></td>
-                <td th:text="${supplementDTO.voter}">
-                </td>
+                <td th:text="${supplementDTO.voter}"></td>
             </tr>
         </tbody>
     </table>
@@ -67,5 +61,4 @@
     </div>
 
 </div>
-
 </html>

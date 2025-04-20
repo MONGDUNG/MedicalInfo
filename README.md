@@ -34,7 +34,7 @@
 사용자 → Spring Boot Controller → Service Layer → Elasticsearch (검색) / Redis (인기순 캐싱) / H2 Database (기본 데이터) → 외부 API (지도 및 인증)  
 
 ## 🧑‍🤝‍🧑 역할 분담  
-- 문동규: PL, 검색 알고리즘, 지도 API, Elasticsearch, 크롤링, 통합버전관리  
+- 문동규: PL, 통합/거리기반 검색 알고리즘, 지도 API, Elasticsearch, 크롤링/전처리, 통합버전관리
 - 조현호: 병원 랭킹, 리뷰 기능, 뉴스 크롤링, 응급실/진료정보, 카카오맵 마커  
 - 홍성준: DB 설계, 페이지 레이아웃, 네비게이션바, 오류 처리  
 - 이우진: 약국/건기식 검색, 리뷰 기능, 편의점 상비약  

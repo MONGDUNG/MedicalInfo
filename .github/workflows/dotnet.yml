@@ -23,3 +23,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t medicalinfo:ci .
+      - name: Smoke test container and Compose configuration
+        shell: bash
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          docker run -d --name medicalinfo-check -p 127.0.0.1:8080:8080 --read-only --tmpfs /tmp --cap-drop ALL medicalinfo:ci
+          trap 'docker logs medicalinfo-check; docker rm -f medicalinfo-check' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/health/live; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8080/ | grep 'Dr.Geo'
+          docker exec medicalinfo-check dotnet MedicalInfo.Web.dll --health-check
+          test "$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health/ready)" = 503

@@ -10,7 +10,7 @@
 - 빈 검색어, 좌표·지도 레벨 검증, 요청 제한, 서버 오류 503, 실패한 shard/timeout 거절
 - 기본 검색 화면. 지도 SDK 및 병원 상세 화면은 아직 미이식
 - 회귀 검사 및 실제 HTTP 서버 통합 검사: `dotnet run --project dotnet/MedicalInfo.Checks`
-- 회사 PC에서는 .NET 9 임시 호환 실행으로 28개 검사 통과. .NET 10 및 Docker 실행 검증은 CI에서 별도 확인 필요
+- 회사 PC에서는 .NET 9 임시 호환 실행으로 28개 검사 통과. GitHub CI에서도 .NET 10 Windows/Linux 검사 및 Docker 이미지 빌드 통과. 컨테이너 HTTP smoke 검사도 CI에 포함
 
 ## 집 PC에서 실행
 

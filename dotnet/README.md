@@ -52,7 +52,7 @@ ES 설정은 환경변수 `Elasticsearch__Url`, `Elasticsearch__Index`, `Elastic
 
 | 기능 | 상태 / 데이터 의존성 |
 |---|---|
-| 병원·약국 검색 | 이식, 실제 ES mapping/문서/버전 통합 검증 대기 |
+| 병원·약국 검색 | 이식, ES 8.17.3 / item 103,179건으로 실제 검색 5개 검사 통과 |
 | 지도 SDK | JavaScript 키·허용 도메인 설정 및 화면 이식 필요 |
 | 병원 상세·진료시간·응급실 | H2의 MEDINST/MEDINFO/Emergency 등 기초 데이터도 필요 |
 | 회원·관리자·메일·소셜 로그인 | ASP.NET Core Identity + PostgreSQL 이식 예정. 현재 새 앱에는 인증 기능 없음 |
@@ -77,3 +77,14 @@ PostgreSQL은 아직 연결하거나 데이터 스키마를 생성하지 않았�
 
 다운로드한 파일이 원본 CSV/JSON인지, Elasticsearch snapshot인지, 노드 data 폴더인지 먼저 확인합니다. 원본은 보존하고 복사본으로 복원합니다. ES 버전이 확인되기 전에는 최신 버전 이미지에 기존 data 폴더를 바로 연결하지 않습니다.
 복원 이후 `item` mapping의 `geoLocation: geo_point`, 진료과의 scalar/array 형식, 좌표, 검색 건수와 병원 식별자를 확인해야 합니다. 테스트 fixture는 가상 데이터이며 실제 의료 데이터 검증을 대신하지 않습니다.
+
+2026-10-15 검증: 보관된 ES 8.17.3 실행 폴더의 복사본에서 `item` 103,179건을 조회했습니다. nori 분석기, `geoLocation: geo_point`, 문자열 `DEPT_NAME`을 확인했고 geoLocation 누락 문서는 0건입니다. 한국어 키워드, 한의원 제외 조건, 주변 약국, 반경/거리순 정렬, 진료과 필터 검사를 통과했습니다. 기존 28개 검사와 합계 33개이며 로컬 .NET 9 호환 실행 기준입니다. 데이터의 현재 영업 여부나 의료정보 정확성을 검증한 것은 아닙니다.
+
+실제 데이터 검사는 선택적으로 실행합니다(기본 CI에는 의료 데이터가 필요하지 않음).
+
+```powershell
+$env:MEDICALINFO_LIVE_ES_URL = 'http://127.0.0.1:19200'
+dotnet run --project dotnet/MedicalInfo.Checks
+```
+
+필요하면 `MEDICALINFO_LIVE_ES_INDEX`, `MEDICALINFO_LIVE_ES_API_KEY`를 설정합니다. 실제 데이터 검사는 조회만 수행합니다. 스냅샷 이동 방법은 [복원 안내](RESTORE-SEARCH.md)를 참고하세요.

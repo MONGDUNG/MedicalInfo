@@ -121,6 +121,33 @@ finally {
     if (!process.HasExited) { process.Kill(entireProcessTree: true); await process.WaitForExitAsync(); }
     backend.Stop(); await backendTask;
 }
+var liveUrl = Environment.GetEnvironmentVariable("MEDICALINFO_LIVE_ES_URL");
+if (!string.IsNullOrWhiteSpace(liveUrl))
+{
+    using var liveHttp = new HttpClient { BaseAddress = new Uri(liveUrl.TrimEnd('/') + "/"), Timeout = TimeSpan.FromSeconds(10) };
+    var liveSearch = new FacilitySearch(liveHttp, Options.Create(new SearchOptions {
+        Index = Environment.GetEnvironmentVariable("MEDICALINFO_LIVE_ES_INDEX") ?? "item",
+        ApiKey = Environment.GetEnvironmentVariable("MEDICALINFO_LIVE_ES_API_KEY")
+    }));
+    var hospitals = await liveSearch.SearchAsync(SearchQuery.Keyword("서울 내과"), default);
+    Check(hospitals.Count is > 0 and <= 200, "live Korean keyword search returns bounded results");
+    var koreanMedicine = await liveSearch.SearchAsync(SearchQuery.Keyword("서울 한의원"), default);
+    Check(koreanMedicine.Count > 0 && koreanMedicine.All(x => x.Category != "의원" && x.Category != "치과의원"), "live Korean medicine exclusions work");
+    var nearby = await liveSearch.SearchAsync(SearchQuery.Nearby(37.5665, 126.978, 5, "약국"), default);
+    Check(nearby.Count > 0 && nearby.All(x => x.Category == "약국" && x.Latitude.HasValue && x.Longitude.HasValue), "live nearby pharmacy search returns coordinates");
+    double Distance(Facility facility)
+    {
+        const double radians = Math.PI / 180;
+        var dlat = (facility.Latitude!.Value - 37.5665) * radians;
+        var dlon = (facility.Longitude!.Value - 126.978) * radians;
+        var a = Math.Pow(Math.Sin(dlat / 2), 2) + Math.Cos(37.5665 * radians) * Math.Cos(facility.Latitude.Value * radians) * Math.Pow(Math.Sin(dlon / 2), 2);
+        return 6371008.8 * 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+    }
+    var distances = nearby.Select(Distance).ToArray();
+    Check(distances.All(x => x <= 2561) && distances.Zip(distances.Skip(1)).All(x => x.First <= x.Second + 1), "live results respect radius and nearest-first ordering");
+    var department = await liveSearch.SearchAsync(SearchQuery.Nearby(37.5665, 126.978, 5, "의원", "내과"), default);
+    Check(department.Count > 0 && department.All(x => x.Departments.Any(d => d.Contains("내과"))), "live department filter works");
+}
 Console.WriteLine($"{passed} checks passed.");
 
 sealed class StubHandler : HttpMessageHandler

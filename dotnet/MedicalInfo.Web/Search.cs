@@ -25,7 +25,8 @@ public sealed record Facility(
     [property: JsonPropertyName("CATEGORY_NAME")] string Category,
     [property: JsonPropertyName("DEPT_NAME")] string[] Departments,
     [property: JsonPropertyName("SOURCE")] string Source = "",
-    [property: JsonPropertyName("SOURCE_PERIOD")] string SourcePeriod = "");
+    [property: JsonPropertyName("SOURCE_PERIOD")] string SourcePeriod = "",
+    [property: JsonPropertyName("DETAILS")] Dictionary<string, string>? Details = null);
 
 public sealed class SearchInputException(string message) : Exception(message);
 public sealed class SearchUnavailableException(Exception inner) : Exception("Search backend is unavailable.", inner);
@@ -132,7 +133,16 @@ public sealed class FacilitySearch(HttpClient http, IOptions<SearchOptions> opti
             departments = dept.ValueKind == JsonValueKind.Array
                 ? dept.EnumerateArray().Where(v => v.ValueKind == JsonValueKind.String).Select(v => v.GetString()!).ToArray()
                 : dept.ValueKind == JsonValueKind.String ? [dept.GetString()!] : [];
+        var details = new Dictionary<string, string>();
+        if (source.TryGetProperty("RAW_DETAIL", out var raw) && raw.ValueKind == JsonValueKind.Object)
+            foreach (var field in raw.EnumerateObject()) {
+                if (!new[] { "진료시작시간_", "진료종료시간_", "점심시간_", "접수시간_", "휴진안내_", "주차_", "위치_" }
+                    .Any(prefix => field.Name.StartsWith(prefix, StringComparison.Ordinal))) continue;
+                if (field.Value.ValueKind is not (JsonValueKind.String or JsonValueKind.Number)) continue;
+                var value = field.Value.ToString().Trim();
+                if (value.Length > 0) details[field.Name] = value;
+            }
         return new Facility(hit.GetProperty("_id").GetString()!, Text("NAME"), Text("ADDRESS"),
-            Text("PHONE"), Number("LAT"), Number("LNG"), Text("CATEGORY_NAME"), departments, Text("SOURCE"), Text("SOURCE_PERIOD"));
+            Text("PHONE"), Number("LAT"), Number("LNG"), Text("CATEGORY_NAME"), departments, Text("SOURCE"), Text("SOURCE_PERIOD"), details);
     }
 }

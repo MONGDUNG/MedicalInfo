@@ -54,7 +54,7 @@ using var http = new HttpClient(handler) { BaseAddress = new Uri("http://localho
 var search = new FacilitySearch(http, Options.Create(new SearchOptions { ApiKey = "test-only" }));
 handler.Body = """
 {"hits":{"hits":[
-{"_id":"1","_source":{"NAME":"테스트 병원","LAT":"37.5","LNG":127.0,"DEPT_NAME":["내과","외과"]}},
+{"_id":"1","_source":{"NAME":"테스트 병원","LAT":"37.5","LNG":127.0,"DEPT_NAME":["내과","외과"],"RAW_DETAIL":{"진료시작시간_월요일":900,"휴진안내_일요일":"휴진","암호화요양기호":"internal","응급실_주간_운영여부":"Y","점심시간_평일":null}}},
 {"_id":"2","_source":{"NAME":"테스트 약국","DEPT_NAME":"약국"}}
 ]}}
 """;
@@ -62,6 +62,9 @@ var results = await search.SearchAsync(keyword, default);
 Check(results.Count == 2 && results[0].Latitude == 37.5, "numeric and string coordinates parsed");
 Check(results[0].Departments.Length == 2 && results[1].Departments[0] == "약국", "scalar and array departments supported");
 Check(results[1].Latitude is null, "missing coordinates do not become zero");
+Check(results[0].Details!["진료시작시간_월요일"] == "900" && results[0].Details!["휴진안내_일요일"] == "휴진", "official numeric hours and closure notices preserved");
+Check(results[0].Details!.Count == 2, "detail response excludes internal IDs, nulls, and emergency availability claims");
+Check(results[1].Details!.Count == 0, "missing detail stays unavailable rather than implying closed");
 Check(handler.Path == "/item/_search" && handler.Authorization == "ApiKey test-only", "configured index and API authentication used");
 var json = JsonSerializer.Serialize(results[0]);
 Check(json.Contains("\"NAME\"") && json.Contains("\"DEPT_NAME\""), "legacy response field casing preserved");

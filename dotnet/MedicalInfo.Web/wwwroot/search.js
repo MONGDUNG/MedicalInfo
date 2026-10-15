@@ -5,6 +5,32 @@ const results = document.querySelector('#results');
 let map, markers, boundary, requestId = 0, controller;
 function node(tag, text) { const e = document.createElement(tag); e.textContent = text; return e; }
 function coordinate(i) { return Number.isFinite(i.LAT) && Number.isFinite(i.LNG) && Math.abs(i.LAT) <= 90 && Math.abs(i.LNG) <= 180; }
+function time(value) {
+  if (!value) return '정보 없음';
+  const digits = String(value).padStart(4,'0');
+  if (/^\d{4}$/.test(digits) && Number(digits.slice(0,2)) <= 24 && Number(digits.slice(2)) < 60 && (Number(digits.slice(0,2)) < 24 || digits.slice(2) === '00')) return digits.slice(0,2)+':'+digits.slice(2);
+  return `${value} (원본 표기)`;
+}
+function facilityDetails(item) {
+  const section=node('details',''); section.append(node('summary','진료시간·이용 안내'));
+  const data=item.DETAILS || {};
+  if (!Object.keys(data).length) { section.append(node('p','제공된 진료시간·이용 안내가 없습니다. 방문 전 기관에 문의해주세요.')); return section; }
+  section.append(node('p',`${item.SOURCE_PERIOD || '제공 자료'} 기준 정보입니다. 임시 휴진이나 변경 사항은 방문 전 기관에 확인해주세요.`));
+  const table=node('table',''); table.append(node('caption','요일별 진료시간'));
+  for (const day of ['월요일','화요일','수요일','목요일','금요일','토요일','일요일']) {
+    const tr=node('tr',''), th=node('th',day); th.scope='row';
+    const start=data['진료시작시간_'+day], end=data['진료종료시간_'+day];
+    tr.append(th,node('td',start || end ? `${time(start)} ~ ${time(end)}` : data['휴진안내_'+day] || '정보 없음')); table.append(tr);
+  }
+  section.append(table);
+  const list=node('dl','');
+  for (const [key,raw] of Object.entries(data)) {
+    if (key.startsWith('진료시작시간_') || key.startsWith('진료종료시간_')) continue;
+    const value=key==='주차_비용 부담여부' && ['Y','N'].includes(raw) ? (raw==='Y'?'유료':'무료') : raw;
+    list.append(node('dt',key.replaceAll('_',' · ')),node('dd',value));
+  }
+  section.append(list); return section;
+}
 try {
   map = L.map('map').setView([37.5665, 126.978], 13);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).on('tileerror', () => { mapStatus.textContent = '배경 지도를 불러오지 못했습니다. 목록 검색은 계속 사용할 수 있습니다.'; }).addTo(map);
@@ -25,6 +51,7 @@ async function search(url, center = null, radius = null) {
     for (const [index,item] of items.entries()) {
       const li = node('li',''); li.tabIndex = -1; li.append(node('h2',item.NAME));
       for (const text of [item.CATEGORY_NAME,item.ADDRESS,item.PHONE,item.DEPT_NAME.join(' · ')]) if (text) li.append(node('p',text));
+      li.append(facilityDetails(item));
       if (item.SOURCE === 'HIRA') { const a = node('a',`출처: 건강보험심사평가원 · ${item.SOURCE_PERIOD} 기준`); a.href='https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925'; li.append(a); }
       if (map && coordinate(item)) {
         const position=[item.LAT,item.LNG]; points.push(position);

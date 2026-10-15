@@ -29,6 +29,13 @@ try {
     Invalid(() => catalog.Search(" ", 1), "blank drug search rejected");
     Invalid(() => catalog.Search("시험", 0), "invalid drug page rejected");
     Check(!new DrugCatalog(null).Available, "unconfigured drug dataset marked unavailable");
+    File.WriteAllText(drugFixture, """
+{"STTEMNT_NO":"123","PRDUCT":"유산균","ENTRPS":"제조사","REGIST_DT":"20200101","MAIN_FNCTN":"공식 기능성"}
+""");
+    var supplementCatalog = new DrugCatalog(drugFixture, true);
+    var supplementHits = JsonSerializer.SerializeToElement(supplementCatalog.Search("유산균", 1));
+    Check(supplementHits.GetProperty("items")[0].GetProperty("dateLabel").GetString() == "등록일", "supplement registration date not labeled as revision date");
+    Check(DrugCatalog.Text(supplementCatalog.Find("123")![0], "MAIN_FNCTN") == "공식 기능성", "supplement official functionality preserved");
 } finally { File.Delete(drugFixture); }
 Invalid(() => SearchQuery.Keyword(new string('a', 101)), "long keyword rejected");
 Invalid(() => SearchQuery.Nearby(double.NaN, 127, 3, null), "nonfinite coordinate rejected");
@@ -120,6 +127,12 @@ try {
     Check(home.Headers.Contains("Content-Security-Policy"), "security headers served");
     using var drugPage = await client.GetAsync("/drugs.html");
     Check(drugPage.IsSuccessStatusCode, "drug search page served");
+    using var supplementSearch = await client.GetAsync("/api/supplements?keyword=" + Uri.EscapeDataString("유산균"));
+    if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("Supplements__Path"))) {
+        Check(supplementSearch.IsSuccessStatusCode, "live supplement search succeeds");
+        using var supplementResult = JsonDocument.Parse(await supplementSearch.Content.ReadAsStringAsync());
+        Check(supplementResult.RootElement.GetProperty("total").GetInt32() > 0, "live supplement records found");
+    } else Check(supplementSearch.StatusCode == HttpStatusCode.ServiceUnavailable, "missing supplement data returns 503");
     using var drugSearch = await client.GetAsync("/api/drugs?keyword=" + Uri.EscapeDataString("타이레놀"));
     if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("Drugs__Path"))) {
         Check(drugSearch.IsSuccessStatusCode, "live drug search returns success");

@@ -14,6 +14,7 @@ if (args is ["--health-check"])
 }
 var builder = WebApplication.CreateBuilder(args);
 var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"]);
+var supplements = new DrugCatalog(builder.Configuration["Supplements:Path"], supplements: true);
 builder.Services.AddProblemDetails();
 builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteHandlerOptions>(options => options.ThrowOnBadRequest = false);
 builder.Services.AddOptions<SearchOptions>().BindConfiguration("Elasticsearch")
@@ -43,6 +44,16 @@ app.Use(async (context, next) => {
 app.UseRateLimiter();
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.MapGet("/api/supplements", (string? keyword, int? page) => {
+    if (!supplements.Available) return Results.Problem(statusCode: 503, title: "건강기능식품 데이터를 준비 중입니다.");
+    try { return Results.Ok(supplements.Search(keyword, page ?? 1)); }
+    catch (SearchInputException ex) { return Results.Problem(statusCode: 400, title: ex.Message); }
+}).RequireRateLimiting("search");
+app.MapGet("/api/supplements/{id}", (string id) => {
+    if (!supplements.Available) return Results.Problem(statusCode: 503, title: "건강기능식품 데이터를 준비 중입니다.");
+    var variants = supplements.Find(id);
+    return variants is null ? Results.NotFound() : Results.Ok(new { source = "https://apis.data.go.kr/1471000/HtfsInfoService03", variants });
+}).RequireRateLimiting("search");
 app.MapGet("/api/drugs", (string? keyword, int? page) => {
     if (!drugs.Available) return Results.Problem(statusCode: 503, title: "의약품 데이터를 준비 중입니다.");
     try { return Results.Ok(drugs.Search(keyword, page ?? 1)); }

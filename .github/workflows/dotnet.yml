@@ -1,9 +1,9 @@
 name: .NET migration checks
 on:
   push:
-    paths: ['dotnet/**', 'Dockerfile', '.dockerignore', '.github/workflows/dotnet.yml']
+    paths: ['dotnet/**', 'tools/**', 'compose*.yaml', 'Dockerfile*', '.dockerignore', '.github/workflows/dotnet.yml']
   pull_request:
-    paths: ['dotnet/**', 'Dockerfile', '.dockerignore', '.github/workflows/dotnet.yml']
+    paths: ['dotnet/**', 'tools/**', 'compose*.yaml', 'Dockerfile*', '.dockerignore', '.github/workflows/dotnet.yml']
 permissions:
   contents: read
 jobs:
@@ -18,6 +18,10 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - run: dotnet run --project dotnet/MedicalInfo.Checks --configuration Release
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m unittest discover -s tools -p "test_*.py"
   container:
     runs-on: ubuntu-latest
     steps:
@@ -28,6 +32,7 @@ jobs:
         run: |
           cp .env.example .env
           docker compose config --quiet
+          DRUG_DATA_DIR=/tmp HIRA_DATA_DIR=/tmp SUPPLEMENT_DATA_DIR=/tmp docker compose -f compose.yaml -f compose.data.yaml -f compose.search.yaml -f compose.supplements.yaml config --quiet
           docker run -d --name medicalinfo-check -p 127.0.0.1:8080:8080 --read-only --tmpfs /tmp --cap-drop ALL medicalinfo:ci
           trap 'docker logs medicalinfo-check; docker rm -f medicalinfo-check' EXIT
           for attempt in {1..30}; do
@@ -37,3 +42,9 @@ jobs:
           curl --fail --silent http://127.0.0.1:8080/ | grep 'Dr.Geo'
           docker exec medicalinfo-check dotnet MedicalInfo.Web.dll --health-check
           test "$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health/ready)" = 503
+  search-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f Dockerfile.elasticsearch -t medicalinfo-search:ci .
+      - run: docker run --rm medicalinfo-search:ci bin/elasticsearch-plugin list | grep '^analysis-nori$'

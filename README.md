@@ -91,3 +91,30 @@ python tools/import_facilities.py --url http://localhost:9200 --index item-hira-
 병원·약국 기본정보, 진료과목, 제공된 기관의 진료시간·휴진 안내 원본을 보존합니다. 좌표가 없거나 국내 범위를 벗어나는 행은 삭제하지 않고 위치 필드 없이 저장하므로 거리 검색에는 나오지 않습니다. 진료시간 원본은 아직 화면에 노출하지 않습니다. 기존 인덱스의 응급실·편의점 자료는 이 심평원 인덱스에 포함되지 않으며 기존 인덱스에 보존됩니다.
 
 검증 후 `.env`의 `ELASTICSEARCH_INDEX`를 새 이름으로 바꾸고 웹 컨테이너를 재생성하세요. 롤백은 이전 이름으로 되돌리면 됩니다. 복구 중인 원본 Elasticsearch 데이터 디렉터리를 직접 덮어쓰지 마세요.
+
+### 새 PC에 Elasticsearch까지 함께 구성
+
+Docker Desktop 또는 Docker Engine + Compose가 설치된 PC에서 `.env.example`을 `.env`로 복사하고 아래 값을 지정합니다. 데이터 경로는 압축을 푼 위치의 절대 경로이며 Windows에서도 `/` 구분자를 사용할 수 있습니다.
+
+```dotenv
+ELASTICSEARCH_URL=http://elasticsearch:9200
+ELASTICSEARCH_INDEX=item-hira-202606
+HIRA_DATA_DIR=C:/MedicalInfo/data/hira-202606
+DRUG_DATA_DIR=C:/MedicalInfo/data/mfds-drugs-20261015-v2
+```
+
+```sh
+docker compose -f compose.yaml -f compose.data.yaml -f compose.search.yaml up -d --build elasticsearch
+docker compose -f compose.yaml -f compose.data.yaml -f compose.search.yaml run --rm import-facilities
+docker compose -f compose.yaml -f compose.data.yaml -f compose.search.yaml up -d --build web
+```
+
+적재 명령은 빈 새 인덱스에 한 번 실행합니다. 이후 웹 재시작에는 마지막 명령만 사용합니다. 웹은 기본 `http://127.0.0.1:8080`, Elasticsearch는 `http://127.0.0.1:19200`에서 접근합니다. 기존 19200 포트 사용 시 `ELASTICSEARCH_LOCAL_PORT`를 변경하세요. 이 단일 노드 구성은 복구 검증과 동일한 Elasticsearch 8.17.3 및 nori 플러그인을 사용합니다. 인증 없는 Elasticsearch 포트를 외부에 공개하지 마세요. 외부 운영 환경에는 인증된 Elasticsearch와 HTTPS 프록시 설정이 필요합니다.
+
+승인된 건강기능식품 상세정보는 같은 수집기로 받을 수 있습니다. 등록일(REGIST_DT)을 최신 수정일로 간주하지 않습니다.
+
+```sh
+python tools/collect_drugs.py --supplements --key-file /private/data-go-kr.key --output /data/mfds-supplements
+```
+
+건강기능식품 화면은 `/supplements.html`입니다. 로컬 실행은 `Supplements__Path`를 `supplements.jsonl` 경로로 지정합니다. Docker 실행에서는 `SUPPLEMENT_DATA_DIR`을 수집 디렉터리로 설정하고 기존 Compose 명령에 `-f compose.supplements.yaml`을 추가하세요. 제품명·업체명·신고번호 검색 및 공식 기능성·섭취방법·주의사항을 표시하며, 의약품과 구분된 화면을 사용합니다.

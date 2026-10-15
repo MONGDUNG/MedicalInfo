@@ -56,3 +56,38 @@
 - 서울대병원: https://www.snuh.org/main.do  
 - 카카오 로그인 구현: https://ddonghyeo.tistory.com/16  
 - 메일 인증 구현: https://every-coding.tistory.com/1
+
+## .NET 의약품 검색 데이터
+
+`tools/collect_drugs.py`는 승인된 식약처 e약은요 API를 수집합니다. Python 3 표준 라이브러리만 필요합니다. 인증키는 저장소 밖의 파일 또는 `DATA_GO_KR_SERVICE_KEY` 환경변수로 전달하세요.
+
+```sh
+python tools/collect_drugs.py --key-file /private/data-go-kr.key --output /data/mfds-drugs
+```
+
+원본 행은 `drugs.jsonl`, 수집 시각·출처·건수·SHA-256은 `manifest.json`에 저장합니다. 같은 품목번호의 중복 행을 보존하며, 전체 건수가 맞지 않으면 완료 파일을 만들지 않습니다. 재수집은 새 디렉터리에서 실행하세요.
+
+로컬 실행에서는 `Drugs__Path`에 `drugs.jsonl`의 절대 경로를 지정합니다. `/drugs.html`에서 제품명·업체명·품목번호 검색과 공식 설명 조회를 지원합니다. 서로 다른 원본 설명은 수정일과 함께 모두 표시합니다. 이 데이터셋은 e약은요 제공 범위이며 모든 전문의약품을 포함하지 않습니다.
+
+집 PC 또는 서버에서는 수집 디렉터리를 복사하고 `.env`에 `DRUG_DATA_DIR`을 해당 디렉터리 경로로 설정한 뒤 실행합니다. 검색 서버에는 공공데이터 API 인증키가 필요하지 않습니다.
+
+```sh
+docker compose -f compose.yaml -f compose.data.yaml up -d --build
+```
+
+데이터는 읽기 전용 볼륨으로 연결됩니다. 데이터 파일이나 인증키를 이미지 또는 Git에 포함하지 마세요. 데이터 파일 변경 후 컨테이너를 재시작하면 새 내용을 읽습니다. 의약품 데이터 경로가 미설정이면 해당 API만 503을 반환하고, 잘못된 파일을 지정하면 시작 시 오류를 반환합니다.
+
+## 심평원 병원·약국 데이터 갱신
+
+공식 분기 자료: https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925 (건강보험심사평가원, 공공누리 제1유형). 공식 ZIP을 내려받은 뒤 실행합니다. 정규화에는 `openpyxl`이 필요합니다.
+
+```sh
+python tools/normalize_hira.py --source /data/hira.zip --output /data/hira-202606 --period 2026-06
+python tools/import_facilities.py --url http://localhost:9200 --index item-hira-202606 --source /data/hira-202606/facilities.jsonl
+```
+
+새 인덱스에만 적재하며 동일 이름의 인덱스가 이미 있으면 중단합니다. Elasticsearch의 analysis-nori 플러그인이 필요합니다. 인증은 선택적으로 `ELASTICSEARCH_API_KEY` 환경변수를 사용합니다. 단일 노드 검증용으로 replica 0을 설정하므로 운영 클러스터 구성에 맞춰 조정하세요.
+
+병원·약국 기본정보, 진료과목, 제공된 기관의 진료시간·휴진 안내 원본을 보존합니다. 좌표가 없거나 국내 범위를 벗어나는 행은 삭제하지 않고 위치 필드 없이 저장하므로 거리 검색에는 나오지 않습니다. 진료시간 원본은 아직 화면에 노출하지 않습니다. 기존 인덱스의 응급실·편의점 자료는 이 심평원 인덱스에 포함되지 않으며 기존 인덱스에 보존됩니다.
+
+검증 후 `.env`의 `ELASTICSEARCH_INDEX`를 새 이름으로 바꾸고 웹 컨테이너를 재생성하세요. 롤백은 이전 이름으로 되돌리면 됩니다. 복구 중인 원본 Elasticsearch 데이터 디렉터리를 직접 덮어쓰지 마세요.

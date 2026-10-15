@@ -15,6 +15,21 @@ void Invalid(Action action, string name)
     catch (SearchInputException) { Check(true, name); }
 }
 Invalid(() => SearchQuery.Keyword("  "), "blank keyword rejected");
+var drugFixture = Path.GetTempFileName();
+try {
+    File.WriteAllText(drugFixture, """
+{"itemSeq":"1","itemName":"시험약","entpName":"제약사","updateDe":"2025-01-01","efcyQesitm":"이전 정보"}
+{"itemSeq":"1","itemName":"시험약","entpName":"제약사","updateDe":"2026-01-01","efcyQesitm":"현재 정보"}
+""");
+    var catalog = new DrugCatalog(drugFixture);
+    Check(catalog.Find("1") is { Length: 2 } records && DrugCatalog.Text(records[0], "updateDe") == "2026-01-01", "conflicting drug records preserved newest first");
+    Check(catalog.Find("missing") is null, "unknown drug not found");
+    var hits = JsonSerializer.SerializeToElement(catalog.Search("시험약 제약사", 1));
+    Check(hits.GetProperty("total").GetInt32() == 1, "drug search returns unique products matching all terms");
+    Invalid(() => catalog.Search(" ", 1), "blank drug search rejected");
+    Invalid(() => catalog.Search("시험", 0), "invalid drug page rejected");
+    Check(!new DrugCatalog(null).Available, "unconfigured drug dataset marked unavailable");
+} finally { File.Delete(drugFixture); }
 Invalid(() => SearchQuery.Keyword(new string('a', 101)), "long keyword rejected");
 Invalid(() => SearchQuery.Nearby(double.NaN, 127, 3, null), "nonfinite coordinate rejected");
 Invalid(() => SearchQuery.Nearby(91, 127, 3, null), "out of range coordinate rejected");
@@ -102,6 +117,17 @@ try {
     using var home = await client.GetAsync("/");
     Check(home.IsSuccessStatusCode && (await home.Content.ReadAsStringAsync()).Contains("병원·약국 찾기"), "search page served");
     Check(home.Headers.Contains("Content-Security-Policy"), "security headers served");
+    using var drugPage = await client.GetAsync("/drugs.html");
+    Check(drugPage.IsSuccessStatusCode, "drug search page served");
+    using var drugSearch = await client.GetAsync("/api/drugs?keyword=" + Uri.EscapeDataString("타이레놀"));
+    if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("Drugs__Path"))) {
+        Check(drugSearch.IsSuccessStatusCode, "live drug search returns success");
+        var drugResult = JsonDocument.Parse(await drugSearch.Content.ReadAsStringAsync());
+        Check(drugResult.RootElement.GetProperty("total").GetInt32() > 0, "live Korean drug name found");
+        var id = drugResult.RootElement.GetProperty("items")[0].GetProperty("id").GetString();
+        using var drugDetail = await client.GetAsync("/api/drugs/" + id);
+        Check(drugDetail.IsSuccessStatusCode && (await drugDetail.Content.ReadAsStringAsync()).Contains("useMethodQesitm"), "live drug detail includes official usage information");
+    } else Check(drugSearch.StatusCode == HttpStatusCode.ServiceUnavailable, "missing drug data returns 503 instead of empty success");
     using var invalid = await client.GetAsync("/map/search/item?keyword=%20");
     Check(invalid.StatusCode == HttpStatusCode.BadRequest, "invalid HTTP input returns 400");
     using var valid = await client.GetAsync("/map/search/item?keyword=test");

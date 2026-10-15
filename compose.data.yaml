@@ -1,0 +1,10 @@
+# docker compose -f compose.yaml -f compose.data.yaml up -d --build
+services:
+  web:
+    environment:
+      Drugs__Path: /data/drugs.jsonl
+    volumes:
+      - type: bind
+        source: ${DRUG_DATA_DIR:?Set DRUG_DATA_DIR to the collected dataset directory}
+        target: /data
+        read_only: true

@@ -23,7 +23,9 @@ public sealed record Facility(
     [property: JsonPropertyName("LAT")] double? Latitude,
     [property: JsonPropertyName("LNG")] double? Longitude,
     [property: JsonPropertyName("CATEGORY_NAME")] string Category,
-    [property: JsonPropertyName("DEPT_NAME")] string[] Departments);
+    [property: JsonPropertyName("DEPT_NAME")] string[] Departments,
+    [property: JsonPropertyName("SOURCE")] string Source = "",
+    [property: JsonPropertyName("SOURCE_PERIOD")] string SourcePeriod = "");
 
 public sealed class SearchInputException(string message) : Exception(message);
 public sealed class SearchUnavailableException(Exception inner) : Exception("Search backend is unavailable.", inner);
@@ -120,6 +122,6 @@ public sealed class FacilitySearch(HttpClient http, IOptions<SearchOptions> opti
                 ? dept.EnumerateArray().Where(v => v.ValueKind == JsonValueKind.String).Select(v => v.GetString()!).ToArray()
                 : dept.ValueKind == JsonValueKind.String ? [dept.GetString()!] : [];
         return new Facility(hit.GetProperty("_id").GetString()!, Text("NAME"), Text("ADDRESS"),
-            Text("PHONE"), Number("LAT"), Number("LNG"), Text("CATEGORY_NAME"), departments);
+            Text("PHONE"), Number("LAT"), Number("LNG"), Text("CATEGORY_NAME"), departments, Text("SOURCE"), Text("SOURCE_PERIOD"));
     }
 }

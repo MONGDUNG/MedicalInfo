@@ -26,6 +26,12 @@ form.addEventListener('submit', async event => {
         if (!value) continue;
         const text = document.createElement('p'); text.textContent = value; li.append(text);
       }
+      if (item.SOURCE === 'HIRA') {
+        const attribution = document.createElement('a');
+        attribution.href = 'https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925';
+        attribution.textContent = `출처: 건강보험심사평가원 · ${item.SOURCE_PERIOD} 기준`;
+        li.append(attribution);
+      }
       results.append(li);
     }
   } catch { status.textContent = '연결이 끊어졌습니다. 다시 시도해주세요.'; }

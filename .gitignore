@@ -66,3 +66,6 @@ replay_pid*
 !.env.example
 **/appsettings.Local.json
 **/TestResults/
+__pycache__/
+*.pyc
+data-go-kr.key

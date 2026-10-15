@@ -13,6 +13,7 @@ if (args is ["--health-check"])
     return;
 }
 var builder = WebApplication.CreateBuilder(args);
+var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"]);
 builder.Services.AddProblemDetails();
 builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteHandlerOptions>(options => options.ThrowOnBadRequest = false);
 builder.Services.AddOptions<SearchOptions>().BindConfiguration("Elasticsearch")
@@ -42,6 +43,16 @@ app.Use(async (context, next) => {
 app.UseRateLimiter();
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.MapGet("/api/drugs", (string? keyword, int? page) => {
+    if (!drugs.Available) return Results.Problem(statusCode: 503, title: "의약품 데이터를 준비 중입니다.");
+    try { return Results.Ok(drugs.Search(keyword, page ?? 1)); }
+    catch (SearchInputException ex) { return Results.Problem(statusCode: 400, title: ex.Message); }
+}).RequireRateLimiting("search");
+app.MapGet("/api/drugs/{id}", (string id) => {
+    if (!drugs.Available) return Results.Problem(statusCode: 503, title: "의약품 데이터를 준비 중입니다.");
+    var variants = drugs.Find(id);
+    return variants is null ? Results.NotFound() : Results.Ok(new { source = "https://www.data.go.kr/data/15075057/openapi.do", variants });
+}).RequireRateLimiting("search");
 app.MapGet("/health/live", () => Results.Ok(new { status = "alive" }));
 app.MapGet("/health/ready", async (FacilitySearch search, CancellationToken ct) =>
     await Run(search, () => new System.Text.Json.Nodes.JsonObject { ["size"] = 0,

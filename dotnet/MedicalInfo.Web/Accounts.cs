@@ -12,6 +12,8 @@ public sealed class Member : IdentityUser
     public string DisplayName { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastLoginAt { get; set; }
+    public DateTime? SuspendedUntil { get; set; }
+    public long? TierId { get; set; }
 }
 
 public sealed class MemberDatabase(DbContextOptions<MemberDatabase> options) : IdentityDbContext<Member>(options)
@@ -22,9 +24,13 @@ public sealed class MemberDatabase(DbContextOptions<MemberDatabase> options) : I
     public DbSet<Inquiry> Inquiries => Set<Inquiry>();
     public DbSet<InquiryAnswer> InquiryAnswers => Set<InquiryAnswer>();
     public DbSet<ContentAttachment> Attachments => Set<ContentAttachment>();
+    public DbSet<MemberTier> MemberTiers => Set<MemberTier>();
+    public DbSet<AdminAudit> AdminAudits => Set<AdminAudit>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         base.OnModelCreating(model);
+        model.Entity<Member>().HasOne<MemberTier>().WithMany().HasForeignKey(x => x.TierId).OnDelete(DeleteBehavior.Restrict);
+        model.Entity<MemberTier>().HasIndex(x => x.Code).IsUnique();
         model.Entity<Inquiry>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.Cascade);
         model.Entity<InquiryAnswer>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.SetNull);
         model.Entity<InquiryAnswer>().HasOne<Inquiry>().WithMany().HasForeignKey(x => x.InquiryId).OnDelete(DeleteBehavior.Cascade);
@@ -78,6 +84,17 @@ public static class Accounts
             options.SlidingExpiration = false;
             options.Events.OnRedirectToLogin = context => { context.Response.StatusCode = 401; return Task.CompletedTask; };
             options.Events.OnRedirectToAccessDenied = context => { context.Response.StatusCode = 403; return Task.CompletedTask; };
+            options.Events.OnValidatePrincipal = async context => {
+                await SecurityStampValidator.ValidatePrincipalAsync(context);
+                if (context.Principal?.Identity?.IsAuthenticated == true) {
+                    var users = context.HttpContext.RequestServices.GetRequiredService<UserManager<Member>>();
+                    var user = await users.GetUserAsync(context.Principal);
+                    if (user?.SuspendedUntil > DateTime.UtcNow) {
+                        context.RejectPrincipal();
+                        await context.HttpContext.RequestServices.GetRequiredService<SignInManager<Member>>().SignOutAsync();
+                    }
+                }
+            };
         });
         builder.Services.AddAntiforgery(options => {
             options.HeaderName = "X-CSRF-TOKEN";
@@ -98,8 +115,8 @@ public static class Accounts
     private static IResult Invalid(string message) => Results.Problem(statusCode: 400, title: message);
     private static bool PasswordLength(string? password) => password?.Length is >= 12 and <= 128;
     private static bool NameValid(string? name) => !string.IsNullOrWhiteSpace(name) && name.Trim().Length <= 50;
-    private static object Profile(Member user) => new { user.Id, username = user.UserName, user.DisplayName,
-        user.Email, user.EmailConfirmed, user.CreatedAt, user.LastLoginAt };
+    private static object Profile(Member user, bool isAdmin = false) => new { user.Id, username = user.UserName, user.DisplayName,
+        user.Email, user.EmailConfirmed, user.CreatedAt, user.LastLoginAt, user.TierId, isAdmin };
 
     public static void MapAccounts(this WebApplication app)
     {
@@ -136,7 +153,7 @@ public static class Accounts
             if (input.Username?.Length is not (>= 3 and <= 40) || input.Password?.Length is not (>= 1 and <= 128))
                 return Results.Unauthorized();
             var user = await users.FindByNameAsync(input.Username);
-            if (user is null) return Results.Unauthorized();
+            if (user is null || user.SuspendedUntil > DateTime.UtcNow) return Results.Unauthorized();
             var result = await signIn.CheckPasswordSignInAsync(user, input.Password, lockoutOnFailure: true);
             if (!result.Succeeded) return Results.Unauthorized();
             user.LastLoginAt = DateTime.UtcNow;
@@ -146,7 +163,7 @@ public static class Accounts
         });
         group.MapGet("/me", async (HttpContext context, UserManager<Member> users) => {
             var user = await users.GetUserAsync(context.User);
-            return user is null ? Results.Unauthorized() : Results.Ok(Profile(user));
+            return user is null ? Results.Unauthorized() : Results.Ok(Profile(user, context.User.IsInRole("Admin")));
         }).RequireAuthorization();
         group.MapPost("/logout", async (SignInManager<Member> signIn) => {
             await signIn.SignOutAsync(); return Results.NoContent();
@@ -168,12 +185,16 @@ public static class Accounts
             await signIn.SignOutAsync();
             return Results.NoContent();
         }).RequireAuthorization();
-        group.MapDelete("/me", async ([Microsoft.AspNetCore.Mvc.FromBody] DeleteMember input, HttpContext context, UserManager<Member> users, SignInManager<Member> signIn) => {
+        group.MapDelete("/me", async ([Microsoft.AspNetCore.Mvc.FromBody] DeleteMember input, HttpContext context, UserManager<Member> users, SignInManager<Member> signIn, MemberDatabase db) => {
+            await using var transaction = await db.Database.BeginTransactionAsync();
             var user = await users.GetUserAsync(context.User);
             if (user is null) return Results.Unauthorized();
             if (input.Password?.Length is not (>= 1 and <= 128) || !await users.CheckPasswordAsync(user, input.Password))
                 return Invalid("탈퇴하려면 현재 비밀번호를 확인해주세요.");
+            if (await users.IsInRoleAsync(user, "Admin") && await Administration.AdminCount(db) <= 1)
+                return Results.Problem(statusCode:409, title:"마지막 관리자는 탈퇴할 수 없습니다. 다른 관리자에게 먼저 권한을 넘겨주세요.");
             if (!(await users.DeleteAsync(user)).Succeeded) return Results.Conflict();
+            await transaction.CommitAsync();
             await signIn.SignOutAsync(); return Results.NoContent();
         }).RequireAuthorization();
     }

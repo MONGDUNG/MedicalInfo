@@ -15,6 +15,7 @@ void Invalid(Action action, string name)
     catch (SearchInputException) { Check(true, name); }
 }
 Invalid(() => SearchQuery.Keyword("  "), "blank keyword rejected");
+await UpgradeChecks.Run(Check);
 var drugFixture = Path.GetTempFileName();
 try {
     File.WriteAllText(drugFixture, """
@@ -174,6 +175,18 @@ try {
     await PersistenceChecks.Run(client.BaseAddress!, Check, async () => {
         process.Kill(entireProcessTree: true); await process.WaitForExitAsync();
         process.Start();
+    });
+    await AdministrationChecks.Run(client.BaseAddress!, accountState, Check, async () => {
+        process.Kill(entireProcessTree: true); await process.WaitForExitAsync(); process.Start();
+    }, async username => {
+        var command = new System.Diagnostics.ProcessStartInfo("dotnet") { UseShellExecute=false, CreateNoWindow=true, RedirectStandardOutput=true, RedirectStandardError=true };
+        command.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory,"MedicalInfo.Web.dll"));
+        command.ArgumentList.Add("--grant-admin"); command.ArgumentList.Add(username);
+        command.ArgumentList.Add("--contentRoot"); command.ArgumentList.Add(webRoot);
+        foreach(var variable in start.Environment) command.Environment[variable.Key]=variable.Value;
+        using var child=System.Diagnostics.Process.Start(command)!;
+        var output=child.StandardOutput.ReadToEndAsync();var errors=child.StandardError.ReadToEndAsync();
+        await child.WaitForExitAsync();await output;await errors;return child.ExitCode;
     });
     await InquiryChecks.Run(client.BaseAddress!, accountState, Check, async () => {
         process.Kill(entireProcessTree: true); await process.WaitForExitAsync();

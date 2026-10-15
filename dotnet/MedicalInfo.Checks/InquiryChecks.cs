@@ -39,7 +39,7 @@ static class InquiryChecks
             if(client==admin){
                 // Seed a role only in this isolated test database; no production test endpoint.
                 await using var connection=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=Path.Combine(state,"members.db")}.ToString());await connection.OpenAsync();
-                using var command=connection.CreateCommand();command.CommandText="INSERT INTO AspNetRoles (Id,Name,NormalizedName,ConcurrencyStamp) VALUES ('test-admin','Admin','ADMIN','test'); INSERT INTO AspNetUserRoles (UserId,RoleId) SELECT Id,'test-admin' FROM AspNetUsers WHERE UserName='inquiry.admin';";await command.ExecuteNonQueryAsync();
+                using var command=connection.CreateCommand();command.CommandText="INSERT OR IGNORE INTO AspNetRoles (Id,Name,NormalizedName,ConcurrencyStamp) VALUES ('test-admin','Admin','ADMIN','test'); INSERT INTO AspNetUserRoles (UserId,RoleId) SELECT u.Id,r.Id FROM AspNetUsers u CROSS JOIN AspNetRoles r WHERE u.UserName='inquiry.admin' AND r.NormalizedName='ADMIN';";await command.ExecuteNonQueryAsync();
             }
             using var login=await Send(client,"/api/account/login",HttpMethod.Post,new{username=name,password});login.EnsureSuccessStatusCode();await Token(client);
         }

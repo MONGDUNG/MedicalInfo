@@ -15,10 +15,12 @@ async function request(path, method='GET', body) {
   return response.status===204?null:response.json();
 }
 async function refresh() {
+  document.querySelector('#admin-link').hidden=true;
   const response=await fetch('/api/account/me',{cache:'no-store'});
   if (response.status===401) {document.querySelector('#anonymous').hidden=false;document.querySelector('#signed-in').hidden=true;return;}
   if (!response.ok) throw new Error('계정 정보를 불러오지 못했습니다. 잠시 후 새로고침해주세요.');
   const user=await response.json();
+  document.querySelector('#admin-link').hidden=!user.isAdmin;
   document.querySelector('#anonymous').hidden=true;document.querySelector('#signed-in').hidden=false;
   document.querySelector('#profile').textContent=`${user.username} · ${user.email} · ${user.emailConfirmed?'인증된 이메일':'이메일 미인증'}`;
   document.querySelector('#profile-form').elements.displayName.value=user.displayName;

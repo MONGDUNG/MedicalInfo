@@ -12,7 +12,8 @@ if (args is ["--health-check"])
     catch (OperationCanceledException) { Environment.Exit(1); }
     return;
 }
-var builder = WebApplication.CreateBuilder(args);
+var bootstrapUser = args.Length >= 2 && args[0] == "--grant-admin" ? args[1] : null;
+var builder = WebApplication.CreateBuilder(bootstrapUser is null ? args : args.Skip(2).ToArray());
 builder.AddAccounts();
 var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"]);
 var supplements = new DrugCatalog(builder.Configuration["Supplements:Path"], supplements: true);
@@ -39,6 +40,10 @@ builder.Services.AddRateLimiter(options => {
 });
 var app = builder.Build();
 await app.InitializeAccounts();
+if (bootstrapUser is not null) {
+    Environment.ExitCode = await Administration.Bootstrap(app, bootstrapUser);
+    return;
+}
 app.UseExceptionHandler();
 app.Use(async (context, next) => {
     context.Response.Headers.XContentTypeOptions = "nosniff";
@@ -50,6 +55,7 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapAccounts();
+app.MapAdministration();
 app.MapCommunity();
 app.MapInquiries();
 app.MapAttachments();

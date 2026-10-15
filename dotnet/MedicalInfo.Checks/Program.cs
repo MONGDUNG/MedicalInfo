@@ -125,6 +125,10 @@ try {
     using var home = await client.GetAsync("/");
     Check(home.IsSuccessStatusCode && (await home.Content.ReadAsStringAsync()).Contains("병원·약국 찾기"), "search page served");
     Check(home.Headers.Contains("Content-Security-Policy"), "security headers served");
+    var mapPolicy = string.Join(";", home.Headers.GetValues("Content-Security-Policy"));
+    Check(mapPolicy.Contains("script-src 'self'") && mapPolicy.Contains("https://tile.openstreetmap.org"), "map images allowed while scripts remain same-origin");
+    using var mapScript = await client.GetAsync("/vendor/leaflet/leaflet.js");
+    Check(mapScript.IsSuccessStatusCode && (await mapScript.Content.ReadAsStringAsync()).Contains("1.9.4"), "bundled map library served without external script dependency");
     using var drugPage = await client.GetAsync("/drugs.html");
     Check(drugPage.IsSuccessStatusCode, "drug search page served");
     using var supplementSearch = await client.GetAsync("/api/supplements?keyword=" + Uri.EscapeDataString("유산균"));

@@ -118,3 +118,23 @@ python tools/collect_drugs.py --supplements --key-file /private/data-go-kr.key -
 ```
 
 건강기능식품 화면은 `/supplements.html`입니다. 로컬 실행은 `Supplements__Path`를 `supplements.jsonl` 경로로 지정합니다. Docker 실행에서는 `SUPPLEMENT_DATA_DIR`을 수집 디렉터리로 설정하고 기존 Compose 명령에 `-f compose.supplements.yaml`을 추가하세요. 제품명·업체명·신고번호 검색 및 공식 기능성·섭취방법·주의사항을 표시하며, 의약품과 구분된 화면을 사용합니다.
+
+## 지도 검색
+
+.NET 첫 화면에서 Leaflet 1.9.4 지도와 병원·약국 위치를 함께 표시합니다. 키워드 검색, 지도 중심 주변 검색, 업종·진료과·반경 필터, 목록에서 위치 보기, 위치 권한을 허용한 사용자의 현재 위치 이동을 지원합니다. 현재 위치는 버튼을 눌렀을 때만 요청하며 운영 환경에서는 HTTPS가 필요합니다.
+
+지도 라이브러리는 소스에 포함되어 별도 지도 API 키가 필요하지 않습니다. 배경 지도는 OpenStreetMap 표준 타일을 사용하고 화면에 저작자 표시를 유지합니다. 타일 연결이 실패해도 목록 검색을 사용할 수 있습니다. 대규모 운영 전에는 [OSM 타일 사용 정책](https://operations.osmfoundation.org/policies/tiles/)에 맞는 제공자를 선택하세요. 표준 타일은 가용성을 보장하지 않으며 오프라인 일괄 다운로드를 지원하지 않습니다.
+
+### 검증된 데이터와 소스 묶음 만들기
+
+소스 변경을 커밋한 뒤 `python tools/package_portable.py --data-root /path/to/collected-data --output /path/to/new-bundle.zip`을 실행합니다. 세 데이터셋의 manifest 해시와 압축 무결성을 확인하며 기존 출력 파일을 덮어쓰지 않습니다. 인증키와 로컬 `.env`는 포함하지 않습니다.
+
+집 PC에서 압축을 푼 뒤 `MedicalInfo` 폴더에서 `python tools/configure_portable.py`를 실행하면 옆의 `data` 폴더 경로를 반영한 `.env`를 생성합니다. 기존 `.env`가 있으면 보존합니다. 이어서 아래 명령을 순서대로 실행합니다.
+
+```sh
+docker compose -f compose.yaml -f compose.data.yaml -f compose.supplements.yaml -f compose.search.yaml up -d --build elasticsearch
+docker compose -f compose.yaml -f compose.data.yaml -f compose.supplements.yaml -f compose.search.yaml run --rm import-facilities
+docker compose -f compose.yaml -f compose.data.yaml -f compose.supplements.yaml -f compose.search.yaml up -d --build web
+```
+
+첫 적재 후에는 마지막 명령으로 재시작합니다. 브라우저에서 `http://127.0.0.1:8080`을 엽니다. 이것은 로컬 실행 구성이며 인터넷 공개 운영은 별도의 HTTPS·도메인 설정 후 진행합니다.

@@ -38,7 +38,7 @@ app.UseExceptionHandler();
 app.Use(async (context, next) => {
     context.Response.Headers.XContentTypeOptions = "nosniff";
     context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
-    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; style-src 'self'; script-src 'self'; frame-ancestors 'none'";
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; script-src 'self'; frame-ancestors 'none'";
     await next();
 });
 app.UseRateLimiter();

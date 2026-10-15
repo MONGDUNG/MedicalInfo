@@ -51,6 +51,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapAccounts();
 app.MapCommunity();
+app.MapInquiries();
+app.MapAttachments();
 app.MapReviews();
 app.UseDefaultFiles();
 app.UseStaticFiles();

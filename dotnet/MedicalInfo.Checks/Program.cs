@@ -175,6 +175,10 @@ try {
         process.Kill(entireProcessTree: true); await process.WaitForExitAsync();
         process.Start();
     });
+    await InquiryChecks.Run(client.BaseAddress!, accountState, Check, async () => {
+        process.Kill(entireProcessTree: true); await process.WaitForExitAsync();
+        process.Start();
+    });
 }
 finally {
     if (!process.HasExited) { process.Kill(entireProcessTree: true); await process.WaitForExitAsync(); }

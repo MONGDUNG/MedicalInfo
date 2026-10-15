@@ -19,9 +19,18 @@ public sealed class MemberDatabase(DbContextOptions<MemberDatabase> options) : I
     public DbSet<CommunityPost> Posts => Set<CommunityPost>();
     public DbSet<CommunityComment> Comments => Set<CommunityComment>();
     public DbSet<FacilityReview> Reviews => Set<FacilityReview>();
+    public DbSet<Inquiry> Inquiries => Set<Inquiry>();
+    public DbSet<InquiryAnswer> InquiryAnswers => Set<InquiryAnswer>();
+    public DbSet<ContentAttachment> Attachments => Set<ContentAttachment>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         base.OnModelCreating(model);
+        model.Entity<Inquiry>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.Cascade);
+        model.Entity<InquiryAnswer>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.SetNull);
+        model.Entity<InquiryAnswer>().HasOne<Inquiry>().WithMany().HasForeignKey(x => x.InquiryId).OnDelete(DeleteBehavior.Cascade);
+        model.Entity<ContentAttachment>().HasOne<Inquiry>().WithMany().HasForeignKey(x => x.InquiryId).OnDelete(DeleteBehavior.Cascade);
+        model.Entity<ContentAttachment>().HasOne<CommunityPost>().WithMany().HasForeignKey(x => x.PostId).OnDelete(DeleteBehavior.Cascade);
+        model.Entity<ContentAttachment>().ToTable(t => t.HasCheckConstraint("CK_Attachment_Parent", "(PostId IS NULL) <> (InquiryId IS NULL)"));
         model.Entity<Member>().HasIndex(x => x.NormalizedEmail).IsUnique();
         model.Entity<Member>().Property(x => x.DisplayName).HasMaxLength(50);
         model.Entity<CommunityPost>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.SetNull);

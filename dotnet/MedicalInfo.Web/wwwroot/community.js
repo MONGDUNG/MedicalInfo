@@ -30,13 +30,13 @@ async function comments(version){
 }
 function cancelPost(){editPost=null;postForm.reset();document.querySelector('#editor-title').textContent='새 글 작성';}
 async function detail(){
-  const version=++detailVersion,id=location.hash.slice(1); document.querySelector('#post-detail').hidden=true;currentPost=null;editComment=null;commentForm.reset();
+  const version=++detailVersion,id=location.hash.slice(1); document.querySelector('#post-detail').hidden=true;currentPost=null;document.querySelector('#attachments').replaceChildren();editComment=null;commentForm.reset();
   if(!/^\d+$/.test(id))return;
   const post=await api('posts/'+id);if(version!==detailVersion)return;currentPost=post;
   document.querySelector('#post-title').textContent=post.title;document.querySelector('#post-meta').textContent=`${post.category} · ${post.author}`;document.querySelector('#post-content').textContent=post.content;
   const actions=document.querySelector('#post-actions');actions.replaceChildren();
   if(post.canEdit)actions.append(action('글 수정',()=>{editPost=post.id;postForm.elements.title.value=post.title;postForm.elements.content.value=post.content;postForm.elements.category.value=post.category;document.querySelector('#editor-title').textContent='글 수정';postForm.elements.title.focus();}),action('글 삭제',async()=>{if(!confirm('글과 댓글을 삭제할까요?'))return;await api('posts/'+post.id,'DELETE');location.hash='';cancelPost();await list();}));
-  document.querySelector('#post-detail').hidden=false;commentPage=1;await comments(version);
+  document.querySelector('#post-detail').hidden=false;commentPage=1;await comments(version);if(version===detailVersion)await showAttachments(document.querySelector('#attachments'),'posts',post.id,post.canEdit);
 }
 function report(work){return async event=>{event?.preventDefault();try{await work();}catch(error){status.textContent=error.message;}};}
 document.querySelector('#filter').addEventListener('submit',report(async()=>{page=1;await list();}));

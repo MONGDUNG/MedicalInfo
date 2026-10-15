@@ -1,0 +1,7 @@
+**
+!dotnet/
+!dotnet/MedicalInfo.Web/
+!dotnet/MedicalInfo.Web/**
+dotnet/**/bin/
+dotnet/**/obj/
+dotnet/**/appsettings.Local.json

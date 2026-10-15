@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${HTTP_BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      AllowedHosts: "${ALLOWED_HOSTS:-localhost;127.0.0.1}"
+      Elasticsearch__Url: "${ELASTICSEARCH_URL:?Set ELASTICSEARCH_URL in .env}"
+      Elasticsearch__Index: "${ELASTICSEARCH_INDEX:-item}"
+      Elasticsearch__ApiKey: "${ELASTICSEARCH_API_KEY:-}"
+      Elasticsearch__TimeoutSeconds: "${ELASTICSEARCH_TIMEOUT_SECONDS:-5}"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

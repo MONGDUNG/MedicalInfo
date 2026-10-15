@@ -1,0 +1,125 @@
+using System.Globalization;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
+
+namespace MedicalInfo;
+
+public sealed class SearchOptions
+{
+    public string Url { get; set; } = "http://localhost:9200";
+    public string Index { get; set; } = "item";
+    public string? ApiKey { get; set; }
+    public int TimeoutSeconds { get; set; } = 5;
+}
+
+public sealed record Facility(
+    [property: JsonPropertyName("ID")] string Id,
+    [property: JsonPropertyName("NAME")] string Name,
+    [property: JsonPropertyName("ADDRESS")] string Address,
+    [property: JsonPropertyName("PHONE")] string Phone,
+    [property: JsonPropertyName("LAT")] double? Latitude,
+    [property: JsonPropertyName("LNG")] double? Longitude,
+    [property: JsonPropertyName("CATEGORY_NAME")] string Category,
+    [property: JsonPropertyName("DEPT_NAME")] string[] Departments);
+
+public sealed class SearchInputException(string message) : Exception(message);
+public sealed class SearchUnavailableException(Exception inner) : Exception("Search backend is unavailable.", inner);
+
+public static class SearchQuery
+{
+    private static JsonNode Node(object value) => JsonSerializer.SerializeToNode(value)!;
+
+    public static JsonObject Keyword(string? keyword)
+    {
+        var text = keyword?.Trim() ?? "";
+        if (text.Length is 0 or > 100)
+            throw new SearchInputException("검색어는 1~100자로 입력해주세요.");
+        var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        var must = new JsonArray();
+        foreach (var word in words)
+            must.Add(Node(new { multi_match = new { query = word,
+                fields = new[] { "NAME", "ADDRESS", "CATEGORY_NAME", "DEPT_NAME" }, @operator = "and" } }));
+        var boolean = new JsonObject { ["must"] = must };
+        if (words.Contains("한의원"))
+            boolean["must_not"] = Node(new object[] {
+                new { term = new { CATEGORY_NAME = "의원" } },
+                new { term = new { CATEGORY_NAME = "치과의원" } }
+            });
+        return new JsonObject { ["size"] = 200, ["track_total_hits"] = false,
+            ["query"] = new JsonObject { ["bool"] = boolean } };
+    }
+
+    public static JsonObject Nearby(double lat, double lng, int level, string? category, string? dept = null)
+    {
+        if (!double.IsFinite(lat) || lat is < -90 or > 90 ||
+            !double.IsFinite(lng) || lng is < -180 or > 180)
+            throw new SearchInputException("유효한 위도와 경도를 입력해주세요.");
+        if (level is < 0 or > 14) throw new SearchInputException("지도 레벨은 0~14여야 합니다.");
+        if (category?.Length > 80 || dept?.Length > 80)
+            throw new SearchInputException("검색 조건은 80자 이하여야 합니다.");
+        var radius = level <= 10 ? 80 * (1 << level) : 300000;
+        var filters = new JsonArray(Node(new { geo_distance = new {
+            distance = radius.ToString(CultureInfo.InvariantCulture) + "m", geoLocation = new { lat, lon = lng } } }));
+        if (!string.IsNullOrWhiteSpace(category))
+            filters.Add(Node(new { match_phrase = new { CATEGORY_NAME = category.Trim() } }));
+        if (!string.IsNullOrWhiteSpace(dept))
+            filters.Add(Node(new { match_phrase = new { DEPT_NAME = dept.Trim() } }));
+        return new JsonObject { ["size"] = 200, ["track_total_hits"] = false,
+            ["query"] = new JsonObject { ["bool"] = new JsonObject { ["filter"] = filters } },
+            ["sort"] = Node(new object[] { new { _geo_distance = new {
+                geoLocation = new { lat, lon = lng }, order = "asc", unit = "m", distance_type = "arc" } } }) };
+    }
+}
+
+public sealed class FacilitySearch(HttpClient http, IOptions<SearchOptions> options)
+{
+    public async Task<IReadOnlyList<Facility>> SearchAsync(JsonObject query, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post,
+                Uri.EscapeDataString(options.Value.Index) + "/_search") { Content = JsonContent.Create(query) };
+            if (!string.IsNullOrEmpty(options.Value.ApiKey))
+                request.Headers.Authorization = new AuthenticationHeaderValue("ApiKey", options.Value.ApiKey);
+            using var response = await http.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+            var root = document.RootElement;
+            if (root.TryGetProperty("timed_out", out var timedOut) && timedOut.GetBoolean())
+                throw new JsonException("Incomplete search response.");
+            if (root.TryGetProperty("_shards", out var shards) &&
+                shards.TryGetProperty("failed", out var failed) && failed.GetInt32() > 0)
+                throw new JsonException("Search shards failed.");
+            return root.GetProperty("hits").GetProperty("hits").EnumerateArray().Select(Parse).ToArray();
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+        catch (Exception ex) when (ex is HttpRequestException or JsonException or InvalidOperationException
+            or KeyNotFoundException or FormatException or OperationCanceledException)
+        { throw new SearchUnavailableException(ex); }
+    }
+
+    private static Facility Parse(JsonElement hit)
+    {
+        var source = hit.GetProperty("_source");
+        string Text(string field) => source.TryGetProperty(field, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()! : "";
+        double? Number(string field)
+        {
+            if (!source.TryGetProperty(field, out var value)) return null;
+            if (value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out var number) && double.IsFinite(number)) return number;
+            if (value.ValueKind == JsonValueKind.String && double.TryParse(value.GetString(), NumberStyles.Float,
+                CultureInfo.InvariantCulture, out number) && double.IsFinite(number)) return number;
+            return null;
+        }
+        var departments = Array.Empty<string>();
+        if (source.TryGetProperty("DEPT_NAME", out var dept))
+            departments = dept.ValueKind == JsonValueKind.Array
+                ? dept.EnumerateArray().Where(v => v.ValueKind == JsonValueKind.String).Select(v => v.GetString()!).ToArray()
+                : dept.ValueKind == JsonValueKind.String ? [dept.GetString()!] : [];
+        return new Facility(hit.GetProperty("_id").GetString()!, Text("NAME"), Text("ADDRESS"),
+            Text("PHONE"), Number("LAT"), Number("LNG"), Text("CATEGORY_NAME"), departments);
+    }
+}

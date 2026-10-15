@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dr.Geo 의약품 검색</title><link rel="stylesheet" href="/site.css"><script src="/drugs.js" defer></script></head>
+<body><main><a href="/">병원·약국 찾기</a><header><h1>의약품 정보 찾기</h1><p>제품명, 제조사 또는 품목번호로 일반의약품 정보를 검색하세요.</p></header>
+<form id="search"><label for="keyword">검색어</label><div class="search"><input id="keyword" required maxlength="100" placeholder="예: 타이레놀"><button>검색</button></div></form>
+<p id="status" role="status" aria-live="polite">검색어를 입력해주세요.</p><ul id="results"></ul>
+<nav aria-label="검색 결과 페이지"><button id="previous" disabled>이전</button><button id="next" disabled>다음</button><a href="/inquiries.html">문의·답변</a></nav>
+<section id="detail" aria-label="의약품 상세정보" tabindex="-1"></section>
+<footer><p>출처: <a href="https://www.data.go.kr/data/15075057/openapi.do">식품의약품안전처 e약은요</a>. 정보는 제품별 수정일 기준이며, 복용 전 제품 설명서를 확인하고 의사·약사와 상담하세요.</p></footer>
+</main></body></html>

@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dr.Geo 병원 검색</title><link rel="stylesheet" href="/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="/site.css"><script src="/vendor/leaflet/leaflet.js" defer></script><script src="/search.js" defer></script></head>
+<body><main>
+<nav><a href="/drugs.html">의약품 정보 찾기</a><a href="/supplements.html">건강기능식품 정보 찾기</a><a href="/account.html">회원 계정</a><a href="/community.html">게시판</a><a href="/inquiries.html">문의·답변</a></nav>
+<header><p>Dr.Geo</p><h1>병원·약국 찾기</h1><p>지역, 병원 이름 또는 진료과로 검색하세요.</p></header>
+<form id="search"><label for="keyword">검색어</label><div class="search"><input id="keyword" name="keyword" required maxlength="100" placeholder="예: 서울 내과" autocomplete="off"><button type="submit">검색</button></div></form>
+<p id="status" role="status" aria-live="polite">검색어를 입력해주세요.</p>
+<section aria-label="지도 검색"><div class="map-controls"><label>업종<select id="category"><option value="">전체</option><option>의원</option><option>병원</option><option>종합병원</option><option>상급종합</option><option>약국</option><option>치과의원</option><option>한의원</option></select></label><label>진료과<input id="department" maxlength="80" placeholder="예: 내과"></label><label>검색 반경<select id="radius"><option value="3">640m</option><option value="4">1.28km</option><option value="5" selected>2.56km</option><option value="6">5.12km</option><option value="7">10.24km</option></select></label></div>
+<div class="map-actions"><button id="nearby" type="button">이 지도 중심 주변 검색</button><button id="locate" type="button">내 위치</button></div><p id="map-status" role="status" aria-live="polite">초기 지도는 서울시청입니다. 지도를 움직인 뒤 주변 검색을 누르세요.</p><div id="map" role="region" aria-label="병원과 약국 지도"></div></section>
+<ul id="results" aria-label="검색 결과"></ul>
+</main></body></html>

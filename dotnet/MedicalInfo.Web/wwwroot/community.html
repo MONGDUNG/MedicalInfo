@@ -1,0 +1,10 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>게시판 · Dr.Geo</title><link rel="stylesheet" href="/site.css"><script src="/attachments.js" defer></script><script src="/community.js" defer></script></head>
+<body><main><nav><a href="/">병원·약국 찾기</a><a href="/account.html">회원 계정</a><a href="/inquiries.html">문의·답변</a></nav><h1>게시판</h1><p id="community-status" role="status"></p>
+<form id="filter"><label>게시글 검색<input name="keyword" maxlength="100"></label><label>분류<select name="category"><option value="">전체</option><option>자유</option><option>질문</option><option>공지사항</option></select></label><button>검색</button></form>
+<ul id="posts"></ul><button id="previous" type="button">이전 페이지</button> <span id="page"></span> <button id="next" type="button">다음 페이지</button>
+<section id="post-detail" hidden><h2 id="post-title"></h2><p id="post-meta"></p><p id="post-content" class="drug-text"></p><div id="post-actions"></div>
+<div id="attachments"></div><h3>댓글</h3><ul id="comments"></ul><button id="more-comments" type="button" hidden>댓글 더 보기</button>
+<form id="comment-form"><label>댓글 내용<textarea name="content" required maxlength="2000" rows="3"></textarea></label><button>댓글 저장</button><button id="cancel-comment" type="button">수정 취소</button></form></section>
+<section><h2 id="editor-title">새 글 작성</h2><p>로그인한 회원만 작성할 수 있습니다. 공지사항은 관리자만 작성할 수 있습니다.</p>
+<form id="post-form"><label>분류<select name="category"><option>자유</option><option>질문</option><option>공지사항</option></select></label><label>제목<input name="title" required maxlength="200"></label><label>본문<textarea name="content" required maxlength="4000" rows="8"></textarea></label><button>글 저장</button><button id="cancel-edit" type="button">수정 취소</button></form></section>
+</main></body></html>

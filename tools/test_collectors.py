@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import urllib.parse
 from unittest.mock import patch
 import collect_drugs
 
@@ -10,6 +11,18 @@ def response(items, total):
     return io.BytesIO(json.dumps({'header':{'resultCode':'00'},'body':{'totalCount':total,'items':items}}).encode())
 
 class CollectorChecks(unittest.TestCase):
+    def test_prefetched_pages_are_written_in_order(self):
+        def page_response(url, **kwargs):
+            page = int(urllib.parse.parse_qs(urllib.parse.urlparse(url).query)['pageNo'][0])
+            start = (page - 1) * 100
+            return response([{'itemSeq':str(i)} for i in range(start, min(start + 100, 201))], 201)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            with patch.object(collect_drugs.urllib.request, 'urlopen', side_effect=page_response):
+                self.assertEqual(collect_drugs.collect('fixture', path), 201)
+            identifiers = [json.loads(line)['itemSeq'] for line in (path/'drugs.jsonl').read_text(encoding='utf-8').splitlines()]
+            self.assertEqual(identifiers, [str(i) for i in range(201)])
+
     def test_duplicate_official_rows_are_preserved(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)

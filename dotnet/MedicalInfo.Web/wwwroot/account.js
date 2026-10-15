@@ -10,7 +10,7 @@ async function request(path, method='GET', body) {
   const response=await fetch('/api/account/'+path,{method,headers,body:body?JSON.stringify(body):undefined,cache:'no-store'});
   if (!response.ok) {
     let detail; try {detail=await response.json();} catch {}
-    throw new Error(detail?.title || (response.status===401?'아이디·비밀번호 또는 로그인 상태를 확인해주세요. 반복 실패 시 15분 후 다시 시도해주세요.':response.status===429?'요청이 많습니다. 잠시 후 다시 시도해주세요.':'요청을 처리하지 못했습니다.'));
+    throw new Error(detail?.title || (response.status===401?'아이디·비밀번호·이메일 인증 여부 또는 로그인 상태를 확인해주세요. 반복 실패 시 15분 후 다시 시도해주세요.':response.status===429?'요청이 많습니다. 잠시 후 다시 시도해주세요.':'요청을 처리하지 못했습니다.'));
   }
   return response.status===204?null:response.json();
 }
@@ -38,7 +38,7 @@ function bind(id,path,method,success) {
   });
 }
 bind('#login','login','POST','로그인했습니다.');
-bind('#register','register','POST','가입했습니다. 로그인해주세요.');
+bind('#register','register','POST','가입했습니다. 이메일 인증이 필요한 경우 인증 후 로그인해주세요.');
 bind('#profile-form','profile','PUT','표시 이름을 저장했습니다.');
 bind('#password-form','password','POST','비밀번호를 변경했습니다. 다시 로그인해주세요.');
 bind('#delete-form','me','DELETE','탈퇴했습니다.');

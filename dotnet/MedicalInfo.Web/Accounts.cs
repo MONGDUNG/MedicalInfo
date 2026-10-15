@@ -26,9 +26,13 @@ public sealed class MemberDatabase(DbContextOptions<MemberDatabase> options) : I
     public DbSet<ContentAttachment> Attachments => Set<ContentAttachment>();
     public DbSet<MemberTier> MemberTiers => Set<MemberTier>();
     public DbSet<AdminAudit> AdminAudits => Set<AdminAudit>();
+    public DbSet<AccountLink> AccountLinks => Set<AccountLink>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         base.OnModelCreating(model);
+        model.Entity<AccountLink>().HasKey(x => x.Hash);
+        model.Entity<AccountLink>().HasOne<Member>().WithMany().HasForeignKey(x => x.MemberId).OnDelete(DeleteBehavior.Cascade);
+        model.Entity<AccountLink>().HasIndex(x => new { x.MemberId, x.Purpose });
         model.Entity<Member>().HasOne<MemberTier>().WithMany().HasForeignKey(x => x.TierId).OnDelete(DeleteBehavior.Restrict);
         model.Entity<MemberTier>().HasIndex(x => x.Code).IsUnique();
         model.Entity<Inquiry>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.Cascade);
@@ -71,6 +75,7 @@ public static class Accounts
             options.Password.RequireUppercase = false;
             options.Password.RequireNonAlphanumeric = false;
             options.User.RequireUniqueEmail = true;
+            options.SignIn.RequireConfirmedEmail = builder.Configuration.GetValue<bool>("Mail:RequireConfirmedEmail");
             options.Lockout.MaxFailedAccessAttempts = 5;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
         }).AddEntityFrameworkStores<MemberDatabase>().AddDefaultTokenProviders();
@@ -89,7 +94,8 @@ public static class Accounts
                 if (context.Principal?.Identity?.IsAuthenticated == true) {
                     var users = context.HttpContext.RequestServices.GetRequiredService<UserManager<Member>>();
                     var user = await users.GetUserAsync(context.Principal);
-                    if (user?.SuspendedUntil > DateTime.UtcNow) {
+                    if (user?.SuspendedUntil > DateTime.UtcNow ||
+                        (user is not null && !user.EmailConfirmed && builder.Configuration.GetValue<bool>("Mail:RequireConfirmedEmail"))) {
                         context.RejectPrincipal();
                         await context.HttpContext.RequestServices.GetRequiredService<SignInManager<Member>>().SignOutAsync();
                     }

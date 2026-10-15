@@ -16,6 +16,7 @@ void Invalid(Action action, string name)
 }
 Invalid(() => SearchQuery.Keyword("  "), "blank keyword rejected");
 await UpgradeChecks.Run(Check);
+MailConfigurationChecks.Run(Check);
 var drugFixture = Path.GetTempFileName();
 try {
     File.WriteAllText(drugFixture, """
@@ -190,6 +191,14 @@ try {
     });
     await InquiryChecks.Run(client.BaseAddress!, accountState, Check, async () => {
         process.Kill(entireProcessTree: true); await process.WaitForExitAsync();
+        process.Start();
+    });
+    await RecoveryChecks.Run(client.BaseAddress!, accountState, Check, async enabled => {
+        process.Kill(entireProcessTree:true); await process.WaitForExitAsync();
+        start.Environment["Mail__Mode"]=enabled?"Pickup":"Disabled";
+        start.Environment["Mail__From"]="test@example.invalid";
+        start.Environment["Mail__RequireConfirmedEmail"]=enabled?"true":"false";
+        start.Environment["Mail__PublicUrl"]=client.BaseAddress!.ToString().TrimEnd('/');
         process.Start();
     });
 }

@@ -17,6 +17,40 @@ namespace MedicalInfo.Web.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.21");
 
+            modelBuilder.Entity("MedicalInfo.AccountLink", b =>
+                {
+                    b.Property<string>("Hash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MemberId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Stamp")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Hash");
+
+                    b.HasIndex("MemberId", "Purpose");
+
+                    b.ToTable("AccountLinks");
+                });
+
             modelBuilder.Entity("MedicalInfo.AdminAudit", b =>
                 {
                     b.Property<long>("Id")
@@ -490,6 +524,15 @@ namespace MedicalInfo.Web.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("MedicalInfo.AccountLink", b =>
+                {
+                    b.HasOne("MedicalInfo.Member", null)
+                        .WithMany()
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MedicalInfo.CommunityComment", b =>

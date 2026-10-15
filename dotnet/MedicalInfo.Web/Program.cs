@@ -15,6 +15,7 @@ if (args is ["--health-check"])
 var bootstrapUser = args.Length >= 2 && args[0] == "--grant-admin" ? args[1] : null;
 var builder = WebApplication.CreateBuilder(bootstrapUser is null ? args : args.Skip(2).ToArray());
 builder.AddAccounts();
+builder.AddAccountRecovery();
 var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"]);
 var supplements = new DrugCatalog(builder.Configuration["Supplements:Path"], supplements: true);
 builder.Services.AddProblemDetails();
@@ -31,6 +32,9 @@ builder.Services.AddHttpClient<FacilitySearch>((services, client) => {
 });
 builder.Services.AddRateLimiter(options => {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("recovery", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.AddPolicy("account", context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
@@ -55,6 +59,7 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapAccounts();
+app.MapAccountRecovery();
 app.MapAdministration();
 app.MapCommunity();
 app.MapInquiries();

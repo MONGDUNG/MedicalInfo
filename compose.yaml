@@ -6,6 +6,14 @@ services:
       - "${HTTP_BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8080}:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      Mail__Mode: "${MAIL_MODE:-Disabled}"
+      Mail__PublicUrl: "${MAIL_PUBLIC_URL:-}"
+      Mail__From: "${MAIL_FROM:-}"
+      Mail__Host: "${MAIL_HOST:-}"
+      Mail__Port: "${MAIL_PORT:-587}"
+      Mail__Username: "${MAIL_USERNAME:-}"
+      Mail__Password: "${MAIL_PASSWORD:-}"
+      Mail__RequireConfirmedEmail: "${MAIL_REQUIRE_CONFIRMED_EMAIL:-false}"
       AllowedHosts: "${ALLOWED_HOSTS:-localhost;127.0.0.1}"
       Elasticsearch__Url: "${ELASTICSEARCH_URL:?Set ELASTICSEARCH_URL in .env}"
       Elasticsearch__Index: "${ELASTICSEARCH_INDEX:-item}"

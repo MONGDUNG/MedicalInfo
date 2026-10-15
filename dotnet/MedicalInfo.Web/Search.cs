@@ -40,10 +40,21 @@ public static class SearchQuery
         if (text.Length is 0 or > 100)
             throw new SearchInputException("검색어는 1~100자로 입력해주세요.");
         var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        var regions = new Dictionary<string, string> {
+            ["서울"] = "서울특별시", ["부산"] = "부산광역시", ["대구"] = "대구광역시",
+            ["인천"] = "인천광역시", ["광주"] = "광주광역시", ["대전"] = "대전광역시",
+            ["울산"] = "울산광역시", ["세종"] = "세종특별자치시", ["경기"] = "경기도",
+            ["충북"] = "충청북도", ["충남"] = "충청남도", ["전남"] = "전라남도",
+            ["경북"] = "경상북도", ["경남"] = "경상남도", ["제주"] = "제주특별자치도"
+        };
         var must = new JsonArray();
-        foreach (var word in words)
-            must.Add(Node(new { multi_match = new { query = word,
+        for (var i = 0; i < words.Length; i++) {
+            var word = words[i];
+            if (i == 0 && words.Length > 1 && regions.TryGetValue(word, out var address))
+                must.Add(Node(new { match_phrase = new { ADDRESS = address } }));
+            else must.Add(Node(new { multi_match = new { query = word,
                 fields = new[] { "NAME", "ADDRESS", "CATEGORY_NAME", "DEPT_NAME" }, @operator = "and" } }));
+        }
         var boolean = new JsonObject { ["must"] = must };
         if (words.Contains("한의원"))
             boolean["must_not"] = Node(new object[] {

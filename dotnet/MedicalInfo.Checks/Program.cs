@@ -36,6 +36,7 @@ Invalid(() => SearchQuery.Nearby(91, 127, 3, null), "out of range coordinate rej
 Invalid(() => SearchQuery.Nearby(37, 127, -1, null), "invalid map level rejected");
 var keyword = SearchQuery.Keyword("서울 한의원");
 Check(keyword["query"]!["bool"]!["must"]!.AsArray().Count == 2, "all search words required");
+Check(keyword["query"]!["bool"]!["must"]![0]!["match_phrase"]!["ADDRESS"]!.GetValue<string>() == "서울특별시", "leading region applies to address instead of facility name");
 Check(keyword["query"]!["bool"]!["must_not"]!.AsArray().Count == 2, "Korean medicine exclusions retained");
 var near = SearchQuery.Nearby(37.5, 127, 3, "의원", "내과");
 Check(near["query"]!["bool"]!["filter"]![0]!["geo_distance"]!["distance"]!.GetValue<string>() == "640m", "distance has explicit meter units");
@@ -157,6 +158,7 @@ if (!string.IsNullOrWhiteSpace(liveUrl))
     }));
     var hospitals = await liveSearch.SearchAsync(SearchQuery.Keyword("서울 내과"), default);
     Check(hospitals.Count is > 0 and <= 200, "live Korean keyword search returns bounded results");
+    Check(hospitals.All(x => x.Address.StartsWith("서울특별시", StringComparison.Ordinal)), "live Seoul search excludes namesakes in other regions");
     var koreanMedicine = await liveSearch.SearchAsync(SearchQuery.Keyword("서울 한의원"), default);
     Check(koreanMedicine.Count > 0 && koreanMedicine.All(x => x.Category != "의원" && x.Category != "치과의원"), "live Korean medicine exclusions work");
     var nearby = await liveSearch.SearchAsync(SearchQuery.Nearby(37.5665, 126.978, 5, "약국"), default);

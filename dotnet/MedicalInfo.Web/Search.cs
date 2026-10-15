@@ -33,6 +33,11 @@ public sealed class SearchUnavailableException(Exception inner) : Exception("Sea
 
 public static class SearchQuery
 {
+    public static JsonObject ById(string? id)
+    {
+        if (string.IsNullOrWhiteSpace(id) || id.Length > 512) throw new SearchInputException("유효한 기관 식별자가 필요합니다.");
+        return new JsonObject { ["size"] = 1, ["query"] = Node(new { ids = new { values = new[] { id } } }) };
+    }
     private static JsonNode Node(object value) => JsonSerializer.SerializeToNode(value)!;
 
     public static JsonObject Keyword(string? keyword)

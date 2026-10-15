@@ -13,6 +13,7 @@ if (args is ["--health-check"])
     return;
 }
 var builder = WebApplication.CreateBuilder(args);
+builder.AddAccounts();
 var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"]);
 var supplements = new DrugCatalog(builder.Configuration["Supplements:Path"], supplements: true);
 builder.Services.AddProblemDetails();
@@ -29,11 +30,15 @@ builder.Services.AddHttpClient<FacilitySearch>((services, client) => {
 });
 builder.Services.AddRateLimiter(options => {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("account", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.AddPolicy("search", context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 });
 var app = builder.Build();
+await app.InitializeAccounts();
 app.UseExceptionHandler();
 app.Use(async (context, next) => {
     context.Response.Headers.XContentTypeOptions = "nosniff";
@@ -42,6 +47,11 @@ app.Use(async (context, next) => {
     await next();
 });
 app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapAccounts();
+app.MapCommunity();
+app.MapReviews();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapGet("/api/supplements", (string? keyword, int? page) => {

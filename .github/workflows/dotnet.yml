@@ -33,7 +33,7 @@ jobs:
           cp .env.example .env
           docker compose config --quiet
           DRUG_DATA_DIR=/tmp HIRA_DATA_DIR=/tmp SUPPLEMENT_DATA_DIR=/tmp docker compose -f compose.yaml -f compose.data.yaml -f compose.search.yaml -f compose.supplements.yaml config --quiet
-          docker run -d --name medicalinfo-check -p 127.0.0.1:8080:8080 --read-only --tmpfs /tmp --cap-drop ALL medicalinfo:ci
+          docker run -d --name medicalinfo-check -p 127.0.0.1:8080:8080 --read-only --tmpfs /tmp --tmpfs /state:uid=1654,gid=1654,mode=0700 --cap-drop ALL medicalinfo:ci
           trap 'docker logs medicalinfo-check; docker rm -f medicalinfo-check' EXIT
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:8080/health/live; then break; fi

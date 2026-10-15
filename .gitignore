@@ -69,3 +69,4 @@ replay_pid*
 __pycache__/
 *.pyc
 data-go-kr.key
+**/App_Data/

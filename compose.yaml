@@ -12,6 +12,8 @@ services:
       Elasticsearch__ApiKey: "${ELASTICSEARCH_API_KEY:-}"
       Elasticsearch__TimeoutSeconds: "${ELASTICSEARCH_TIMEOUT_SECONDS:-5}"
     read_only: true
+    volumes:
+      - member-state:/state
     tmpfs:
       - /tmp
     cap_drop:
@@ -23,3 +25,5 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+volumes:
+  member-state:

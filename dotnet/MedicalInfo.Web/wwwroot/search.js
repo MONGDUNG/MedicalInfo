@@ -52,6 +52,7 @@ async function search(url, center = null, radius = null) {
       const li = node('li',''); li.tabIndex = -1; li.append(node('h2',item.NAME));
       for (const text of [item.CATEGORY_NAME,item.ADDRESS,item.PHONE,item.DEPT_NAME.join(' · ')]) if (text) li.append(node('p',text));
       li.append(facilityDetails(item));
+      const reviews=node('a','리뷰 보기·작성'); reviews.href='/reviews.html?'+new URLSearchParams({facilityId:item.ID}); li.append(reviews);
       if (item.SOURCE === 'HIRA') { const a = node('a',`출처: 건강보험심사평가원 · ${item.SOURCE_PERIOD} 기준`); a.href='https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925'; li.append(a); }
       if (map && coordinate(item)) {
         const position=[item.LAT,item.LNG]; points.push(position);

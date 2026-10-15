@@ -5,3 +5,4 @@
 dotnet/**/bin/
 dotnet/**/obj/
 dotnet/**/appsettings.Local.json
+dotnet/**/App_Data/

@@ -98,13 +98,17 @@ var backendTask = Task.Run(async () => {
             var context = await backend.GetContextAsync();
             context.Response.StatusCode = Volatile.Read(ref backendStatus);
             context.Response.ContentType = "application/json";
-            var bytes = System.Text.Encoding.UTF8.GetBytes("{\"hits\":{\"hits\":[]}}");
+            var requestBody = await new StreamReader(context.Request.InputStream).ReadToEndAsync();
+            var fixture = requestBody.Contains("\"test-facility\"", StringComparison.Ordinal)
+                ? "{\"hits\":{\"hits\":[{\"_id\":\"test-facility\",\"_source\":{\"NAME\":\"테스트 기관\"}}]}}" : "{\"hits\":{\"hits\":[]}}";
+            var bytes = System.Text.Encoding.UTF8.GetBytes(fixture);
             await context.Response.OutputStream.WriteAsync(bytes);
             context.Response.Close();
         }
     } catch (Exception ex) when (ex is HttpListenerException or ObjectDisposedException) { }
 });
 var appPort = FreePort();
+var accountState = Path.Combine(Path.GetTempPath(), "medicalinfo-checks-" + Guid.NewGuid());
 var webRoot = Path.GetFullPath("../../../../MedicalInfo.Web", AppContext.BaseDirectory);
 var start = new System.Diagnostics.ProcessStartInfo("dotnet") { UseShellExecute = false, CreateNoWindow = true };
 start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "MedicalInfo.Web.dll"));
@@ -113,6 +117,7 @@ start.Environment["ASPNETCORE_URLS"] = $"http://localhost:{appPort}";
 start.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
 start.Environment["Elasticsearch__Url"] = $"http://localhost:{backendPort}";
 start.Environment["Logging__LogLevel__Default"] = "Error";
+start.Environment["State__Path"] = accountState;
 using var process = System.Diagnostics.Process.Start(start)!;
 try {
     using var client = new HttpClient { BaseAddress = new Uri($"http://localhost:{appPort}"), Timeout = TimeSpan.FromSeconds(3) };
@@ -121,10 +126,13 @@ try {
         if (process.HasExited) throw new Exception("Web process exited during startup.");
         try { using var health = await client.GetAsync("/health/live"); ready = health.IsSuccessStatusCode; }
         catch (HttpRequestException) { }
+        catch (TaskCanceledException) { }
         if (ready) break;
         await Task.Delay(250);
     }
     Check(ready, "HTTP app starts without production data");
+    await AccountChecks.Run(client.BaseAddress!, Check);
+    await CommunityChecks.Run(client.BaseAddress!, Check);
     using var home = await client.GetAsync("/");
     Check(home.IsSuccessStatusCode && (await home.Content.ReadAsStringAsync()).Contains("병원·약국 찾기"), "search page served");
     Check(home.Headers.Contains("Content-Security-Policy"), "security headers served");
@@ -163,6 +171,10 @@ try {
     HttpStatusCode last = HttpStatusCode.OK;
     for (var i = 0; i < 65; i++) { using var response = await client.GetAsync("/map/search/item?keyword=%20"); last = response.StatusCode; }
     Check(last == HttpStatusCode.TooManyRequests, "HTTP search rate limit enforced");
+    await PersistenceChecks.Run(client.BaseAddress!, Check, async () => {
+        process.Kill(entireProcessTree: true); await process.WaitForExitAsync();
+        process.Start();
+    });
 }
 finally {
     if (!process.HasExited) { process.Kill(entireProcessTree: true); await process.WaitForExitAsync(); }

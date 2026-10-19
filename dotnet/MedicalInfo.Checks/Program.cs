@@ -37,6 +37,7 @@ try {
     Check(JsonSerializer.SerializeToElement(catalog.Search(" ", 1)).GetProperty("total").GetInt32()==1, "blank catalog search lists all products");
     Invalid(() => catalog.Search("시험", 0), "invalid drug page rejected");
     Check(!new DrugCatalog(null).Available, "unconfigured drug dataset marked unavailable");
+    DrugPermitChecks.Run(drugFixture, Check);
     File.WriteAllText(drugFixture, """
 {"STTEMNT_NO":"123","PRDUCT":"유산균","ENTRPS":"제조사","REGIST_DT":"20200101","MAIN_FNCTN":"공식 기능성"}
 """);
@@ -209,7 +210,7 @@ try {
         start.Environment["Mail__PublicUrl"]=client.BaseAddress!.ToString().TrimEnd('/');
         process.Start();
     });
-    var productDrugs=Path.Combine(accountState,"test-drugs.jsonl");var productSupplements=Path.Combine(accountState,"test-supplements.jsonl");
+    var productDrugs=Path.Combine(accountState,"test-drugs.jsonl");var productSupplements=Path.Combine(accountState,"test-supplements.jsonl");var productPermits=Path.Combine(accountState,"test-permits.jsonl");
     await File.WriteAllTextAsync(productDrugs,"""
 {"itemSeq":"one","itemName":"시험약","entpName":"시험업체","efcyQesitm":"해열"}
 """);
@@ -217,9 +218,17 @@ try {
 {"STTEMNT_NO":"one","PRDUCT":"zeta","ENTRPS":"alpha","MAIN_FNCTN":"눈 건강"}
 {"STTEMNT_NO":"two","PRDUCT":"alpha","ENTRPS":"beta","MAIN_FNCTN":"장 건강"}
 """);
+    await File.WriteAllTextAsync(productPermits,"""
+{"ITEM_SEQ":"one","ITEM_NAME":"시험약","ENTP_NAME":"시험업체","SPCLTY_PBLC":"일반의약품","ITEM_INGR_NAME":"시험 주성분"}
+{"ITEM_SEQ":"permit-only","ITEM_NAME":"허가목록 시험약","ENTP_NAME":"시험업체","SPCLTY_PBLC":"일반의약품","ITEM_INGR_NAME":"다른 주성분","ITEM_PERMIT_DATE":"20200101","CANCEL_NAME":"취하"}
+""");
+    var productPermitDetails=Path.Combine(accountState,"permit-details.jsonl");
+    await File.WriteAllTextAsync(productPermitDetails,JsonSerializer.Serialize(new{ITEM_SEQ="permit-only",ITEM_NAME="허가목록 시험약",ETC_OTC_CODE="일반의약품",MAIN_ITEM_INGR="한글시험성분",EE_DOC_DATA="<DOC><PARAGRAPH><![CDATA[공식원문 시험효능]]></PARAGRAPH></DOC>"}));
+    await File.WriteAllTextAsync(Path.Combine(accountState,"manifest.json"),JsonSerializer.Serialize(new{status="complete",sha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(await File.ReadAllBytesAsync(productPermits))),collectedAt="2026-10-19T00:00:00Z",detailsSha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(await File.ReadAllBytesAsync(productPermitDetails))),detailCollectedAt="2026-10-19T01:00:00Z"}));
     await ProductChecks.Run(client.BaseAddress!,Check,async enabled=>{
         process.Kill(entireProcessTree:true);await process.WaitForExitAsync();
         start.Environment["Drugs__Path"]=enabled?productDrugs:"";start.Environment["Supplements__Path"]=enabled?productSupplements:"";
+        start.Environment["DrugPermits__Path"]=enabled?productPermits:"";
         process.Start();
     });
     Volatile.Write(ref backendStatus, 200);

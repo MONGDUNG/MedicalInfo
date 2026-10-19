@@ -22,7 +22,7 @@ builder.Services.AddSingleton<ViewDeduplication>();
 builder.Services.AddSingleton(_ => new NewsFeed(new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) {
     Timeout = TimeSpan.FromSeconds(8), MaxResponseContentBufferSize = 2_000_000
 }, TimeProvider.System));
-var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"]);
+var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"], permitsPath: builder.Configuration["DrugPermits:Path"]);
 var supplements = new DrugCatalog(builder.Configuration["Supplements:Path"], supplements: true);
 builder.Services.AddProblemDetails();
 builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteHandlerOptions>(options => options.ThrowOnBadRequest = false);
@@ -93,15 +93,18 @@ app.MapGet("/api/supplements/{id}", (string id) => {
     var variants = supplements.Find(id);
     return variants is null ? Results.NotFound() : Results.Ok(new { source = "https://apis.data.go.kr/1471000/HtfsInfoService03", variants });
 }).RequireRateLimiting("search");
-app.MapGet("/api/drugs", (string? keyword, int? page, string? effect) => {
+app.MapGet("/api/drugs", (string? keyword, int? page, string? effect, string? ingredient) => {
     if (!drugs.Available) return Results.Problem(statusCode: 503, title: "의약품 데이터를 준비 중입니다.");
-    try { return Results.Ok(drugs.Search(keyword, page ?? 1,effect)); }
+    if (!string.IsNullOrWhiteSpace(ingredient) && !drugs.PermitDataAvailable) return Results.Problem(statusCode: 503, title: "주성분 데이터를 준비 중입니다.");
+    try { return Results.Ok(drugs.Search(keyword, page ?? 1,effect,ingredient:ingredient)); }
     catch (SearchInputException ex) { return Results.Problem(statusCode: 400, title: ex.Message); }
 }).RequireRateLimiting("search");
 app.MapGet("/api/drugs/{id}", (string id) => {
     if (!drugs.Available) return Results.Problem(statusCode: 503, title: "의약품 데이터를 준비 중입니다.");
     var variants = drugs.Find(id);
-    return variants is null ? Results.NotFound() : Results.Ok(new { source = "https://www.data.go.kr/data/15075057/openapi.do", variants });
+    return variants is null ? Results.NotFound() : Results.Ok(new { source = "https://www.data.go.kr/data/15075057/openapi.do", variants,
+        permitSource="https://www.data.go.kr/data/15095677/openapi.do", permits=drugs.FindPermits(id), permitDataAvailable=drugs.PermitDataAvailable, permitCollectedAt=drugs.PermitCollectedAt,
+        permitDetails=drugs.FindPermitDetails(id), permitDetailsCollectedAt=drugs.PermitDetailsCollectedAt });
 }).RequireRateLimiting("search");
 app.MapGet("/health/live", () => Results.Ok(new { status = "alive" }));
 app.MapGet("/health/ready", async (FacilitySearch search, CancellationToken ct) =>

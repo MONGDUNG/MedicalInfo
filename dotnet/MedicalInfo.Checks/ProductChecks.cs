@@ -20,6 +20,15 @@ static class ProductChecks
         var filtered=await Get(guest,"/api/supplements?effect="+Uri.EscapeDataString("장 건강"));check(filtered.GetProperty("total").GetInt32()==1&&filtered.GetProperty("items")[0].GetProperty("id").GetString()=="two","official functionality filter and count agree");
         check((await Get(guest,"/api/supplements?keyword=zeta&effect="+Uri.EscapeDataString("장 건강"))).GetProperty("total").GetInt32()==0,"keyword and functionality filters intersect");
         check((await Get(guest,"/api/drugs?effect="+Uri.EscapeDataString("해열"))).GetProperty("total").GetInt32()==1,"drug efficacy filter searches official text");
+        var permitSearch=await Get(guest,"/api/drugs?ingredient="+Uri.EscapeDataString("다른 주성분"));
+        check(permitSearch.GetProperty("total").GetInt32()==1&&permitSearch.GetProperty("items")[0].GetProperty("id").GetString()=="permit-only","API ingredient filter finds products absent from easy catalog");
+        check((await Get(guest,"/api/drugs?ingredient="+Uri.EscapeDataString("다른 주성분")+"&effect="+Uri.EscapeDataString("해열"))).GetProperty("total").GetInt32()==0,"API ingredient and efficacy filters do not cross product identities");
+        var permitDetail=await Get(guest,"/api/drugs/permit-only");
+        check(permitDetail.GetProperty("permitDetails")[0].GetProperty("MAIN_ITEM_INGR").GetString()=="한글시험성분"&&(await Get(guest,"/api/drugs?effect="+Uri.EscapeDataString("공식원문 시험효능"))).GetProperty("total").GetInt32()==1,"API serves official permit documents and searches their efficacy without easy description");
+        check((await Get(guest,"/api/drugs?ingredient="+Uri.EscapeDataString("한글시험성분"))).GetProperty("items")[0].GetProperty("id").GetString()=="permit-only","API searches Korean active ingredient source fields");
+        check(permitDetail.GetProperty("variants").GetArrayLength()==0&&permitDetail.GetProperty("permits")[0].GetProperty("CANCEL_NAME").GetString()=="취하","permit-only detail preserves source status without fabricated easy information");
+        await Status(owner,"/api/products/drugs/permit-only/comments",HttpMethod.Post,new{content="permit lookup discussion"},HttpStatusCode.OK,"official permit-only product supports existing product comments");
+        await Status(guest,"/api/drugs?ingredient="+new string('x',101),HttpMethod.Get,null,HttpStatusCode.BadRequest,"ingredient filter length bounded");
         await Status(guest,"/api/supplements?sort=unsafe",HttpMethod.Get,null,HttpStatusCode.BadRequest,"unsupported ranking rejected");
         await Status(guest,"/api/supplements?page=100001",HttpMethod.Get,null,HttpStatusCode.BadRequest,"catalog pagination bounded");
         await Status(guest,product+"/comments",HttpMethod.Post,new{content="anonymous"},HttpStatusCode.Unauthorized,"anonymous product comment denied");

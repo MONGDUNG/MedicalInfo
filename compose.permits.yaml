@@ -1,0 +1,10 @@
+# Optional approved OTC permit dataset; add -f compose.permits.yaml to the web commands.
+services:
+  web:
+    environment:
+      DrugPermits__Path: /drug-permits/permits.jsonl
+    volumes:
+      - type: bind
+        source: ${DRUG_PERMIT_DATA_DIR:?Set DRUG_PERMIT_DATA_DIR to the verified OTC permit dataset directory}
+        target: /drug-permits
+        read_only: true

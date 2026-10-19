@@ -77,6 +77,31 @@ docker compose -f compose.yaml -f compose.data.yaml up -d --build
 
 데이터는 읽기 전용 볼륨으로 연결됩니다. 데이터 파일이나 인증키를 이미지 또는 Git에 포함하지 마세요. 데이터 파일 변경 후 컨테이너를 재시작하면 새 내용을 읽습니다. 의약품 데이터 경로가 미설정이면 해당 API만 503을 반환하고, 잘못된 파일을 지정하면 시작 시 오류를 반환합니다.
 
+### 일반의약품 허가 목록·유효성분·허가 원문
+
+기존 일반의약품 목록과 대조해 [식약처 의약품 제품 허가정보](https://www.data.go.kr/data/15095677/openapi.do)를 추가했습니다. 목록·상세 조회 활용 권한이 필요하며 Python 3.11 이상 표준 라이브러리만 사용합니다. 수집은 기존 출력물을 덮어쓰지 않습니다.
+
+```sh
+python tools/collect_drug_permits.py --key-file /private/data-go-kr.key --output /data/mfds-drug-permits-20261019
+python tools/enrich_drug_permits.py --source /data/mfds-drug-permits-20261019 --key-file /private/data-go-kr.key --output /data/mfds-drug-permits-full-20261019
+```
+
+2026-10-19 목록 수집본은 전체 허가 42,704행 중 일반의약품으로 명시된 10,776품목입니다. e약은요 4,729품목과 정확히 일치하는 품목번호 4,720개만 연결합니다. 허가 목록에 없는 기존 9품목도 보존하며 합계 10,785품목을 조회합니다. 같은 이름의 다른 품목번호는 합치지 않고 기존 댓글의 품목 연결도 유지합니다. 주성분이 비어 있는 68품목은 임의로 보충하지 않습니다.
+
+상세 수집은 전체 공식 페이지를 검증하며 해당 일반의약품 식별자의 원본만 `permit-details.jsonl`에 저장합니다. 10,776품목 모두 상세정보와 효능·용법·주의사항 원문 32,328건을 연결했습니다. 한글 유효성분은 10,723품목에 제공됩니다. 한글 유효성분·영문 주성분, 효능·효과 원문을 검색할 수 있고, 용법·용량·사용상 주의사항·원료약품 및 분량·저장 방법을 상세에서 확인합니다. e약은요 설명과 허가 원문은 출처별로 구분합니다. 없는 설명은 없는 상태로 표시합니다. 원문 제목·문단·표·셀 병합을 표시하되 공급자 스크립트·이벤트·외부 리소스는 삽입하지 않습니다. 이미지·도표는 식약처의 공식 원문 링크에서도 확인할 수 있습니다.
+
+취소·취하·폐업·유효기간만료 등 상태를 삭제하거나 정상으로 바꾸지 않고 원본대로 표시합니다. 허가일, 원본 변경일, 목록/상세 수집 시각은 서로 다릅니다. 허가 상태만으로 현재 판매·공급 여부를 판단하지 않습니다. 상세파일은 목록에 있는 일반의약품 식별자로만 연결하며, 앱 시작 시 manifest가 있으면 SHA-256·완료 상태·수집 시각을 검증합니다. 상세파일은 유효한 manifest가 필요합니다.
+
+상세 수집은 완료 페이지마다 부분 파일을 flush하고 해시·바이트 수·진행 상태를 기록합니다. 중단되면 같은 명령에 `--resume`을 추가합니다. 원본 목록 해시·현재 건수·첫 페이지·이전 페이지·부분 파일 해시와 페이지 경계가 일치할 때만 이어갑니다. 기록 중 파일이 손상되거나 공급자 페이지가 바뀌면 중단하므로 새 출력 디렉터리에서 수집하세요. 완료본·기존 검색 데이터는 덮어쓰지 않습니다.
+
+로컬 실행은 `DrugPermits__Path`에 `permits.jsonl`의 절대 경로를 지정합니다. 상세파일과 manifest는 같은 디렉터리에 둡니다. Docker에서는 `.env`의 `DRUG_PERMIT_DATA_DIR`에 해당 디렉터리를 지정하고 기존 웹 실행 명령에 `-f compose.permits.yaml`을 추가합니다. 데이터는 읽기 전용이며 웹 서버에 API 키는 필요하지 않습니다. 허가 데이터가 미설정이면 기존 e약은요 범위로 동작하고, 주성분 필터 요청은 503으로 명확하게 알립니다.
+
+이동용 ZIP에는 아래처럼 `--permits-dir`을 추가합니다. 목록·상세 해시를 검증하고 선택한 허가 파일도 포함합니다. 압축을 푼 PC에서 `configure_portable.py`가 `DRUG_PERMIT_DATA_DIR` 경로를 생성합니다. 이 묶음의 웹 실행에는 `-f compose.permits.yaml`도 추가하세요.
+
+```sh
+python tools/package_portable.py --data-root /path/to/collected-data --facilities-dir facilities-20261019 --facilities-index item-facilities-20261019 --permits-dir mfds-drug-permits-full-20261019 --output /path/to/new-bundle.zip
+```
+
 ## 심평원 병원·약국 데이터 갱신
 
 공식 분기 자료: https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925 (건강보험심사평가원, 공공누리 제1유형). 공식 ZIP을 내려받은 뒤 실행합니다. 정규화에는 `openpyxl`이 필요합니다.

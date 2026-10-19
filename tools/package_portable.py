@@ -13,7 +13,7 @@ def digest(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
-def package(root, data_root, output, facilities_dir='hira-202606', facilities_index='item-hira-202606'):
+def package(root, data_root, output, facilities_dir='hira-202606', facilities_index='item-hira-202606', permits_dir=None):
     if output.exists():
         raise ValueError('Output already exists; choose a new filename')
     if not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,99}',facilities_dir) or not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,127}',facilities_index):
@@ -23,6 +23,12 @@ def package(root, data_root, output, facilities_dir='hira-202606', facilities_in
         'mfds-drugs-20261015-v2': 'drugs.jsonl',
         'mfds-supplements-20261015-v2': 'supplements.jsonl',
     }
+    metadata = {'facilitiesDirectory': facilities_dir, 'elasticsearchIndex': facilities_index}
+    if permits_dir is not None:
+        if not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,99}', permits_dir) or permits_dir in datasets:
+            raise ValueError('Invalid or duplicate permit directory')
+        datasets[permits_dir] = 'permits.jsonl'
+        metadata['permitsDirectory'] = permits_dir
     inputs = []
     for directory, filename in datasets.items():
         source = data_root / directory
@@ -30,6 +36,10 @@ def package(root, data_root, output, facilities_dir='hira-202606', facilities_in
         if digest(source / filename) != manifest['sha256']:
             raise ValueError(f'Dataset checksum mismatch: {directory}')
         inputs.extend((source / name, f'data/{directory}/{name}') for name in (filename, 'manifest.json'))
+        if filename == 'permits.jsonl' and 'detailsSha256' in manifest:
+            if digest(source/'permit-details.jsonl') != manifest['detailsSha256']:
+                raise ValueError('Permit detail checksum mismatch')
+            inputs.append((source/'permit-details.jsonl', f'data/{directory}/permit-details.jsonl'))
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for relative in filter(None, tracked):
         path = Path(relative)
@@ -43,7 +53,7 @@ def package(root, data_root, output, facilities_dir='hira-202606', facilities_in
     with zipfile.ZipFile(temporary, 'x', compression=zipfile.ZIP_DEFLATED) as archive:
         for source, destination in inputs:
             archive.write(source, destination)
-        archive.writestr('MedicalInfo/portable-data.json',json.dumps({'facilitiesDirectory':facilities_dir,'elasticsearchIndex':facilities_index}))
+        archive.writestr('MedicalInfo/portable-data.json',json.dumps(metadata))
     with zipfile.ZipFile(temporary) as archive:
         if archive.testzip():
             raise ValueError('Bundle checksum verification failed')
@@ -60,5 +70,6 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--facilities-dir',default='hira-202606')
     parser.add_argument('--facilities-index',default='item-hira-202606')
+    parser.add_argument('--permits-dir', help='Optional approved OTC permit dataset directory under data-root')
     args = parser.parse_args()
-    package(Path(__file__).resolve().parents[1], args.data_root.resolve(), args.output.resolve(),args.facilities_dir,args.facilities_index)
+    package(Path(__file__).resolve().parents[1], args.data_root.resolve(), args.output.resolve(),args.facilities_dir,args.facilities_index,args.permits_dir)

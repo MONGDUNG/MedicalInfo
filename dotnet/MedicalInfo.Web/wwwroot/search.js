@@ -1,6 +1,7 @@
 const form = document.querySelector('#search');
 const status = document.querySelector('#status');
 const mapStatus = document.querySelector('#map-status');
+const mapZoom = document.querySelector('#map-zoom');
 const results = document.querySelector('#results');
 const emptyState = document.querySelector('#result-empty');
 let map, markers, boundary, requestId = 0, controller;
@@ -16,7 +17,7 @@ function selectFacility(li) {
   document.querySelector('.selected-facility')?.classList.remove('selected-facility');
   li.classList.add('selected-facility');
 }
-function scrollTo(element) {
+function scrollToElement(element) {
   element?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'center'});
 }
 function time(value) {
@@ -51,7 +52,22 @@ function facilityDetails(item) {
 try {
   map = L.map('map').setView([37.5665, 126.978], 13);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).on('tileerror', () => { mapStatus.textContent = '배경 지도를 불러오지 못했습니다. 목록 검색은 계속 사용할 수 있습니다.'; }).addTo(map);
-  markers = L.layerGroup().addTo(map);
+  markers = L.markerClusterGroup({
+    maxClusterRadius: 44,
+    showCoverageOnHover: false,
+    animate: false,
+    spiderfyDistanceMultiplier: 1.5,
+    spiderLegPolylineOptions: {weight: 1.5, color: '#2563eb', opacity: 0.7},
+    iconCreateFunction(cluster) {
+      const count = cluster.getChildCount();
+      return L.divIcon({className: 'facility-cluster', iconSize: [44,44],
+        html: '<span aria-hidden="true">'+count+'<small>곳</small></span><span class="sr-only">'+count+'개 기관 모음. 클릭하면 확대하거나 겹친 위치를 펼칩니다.</span>'});
+    }
+  }).addTo(map);
+  markers.on('spiderfied', () => { mapStatus.textContent = '겹친 마커를 펼쳤습니다. 연결선은 제공기관의 원래 좌표를 가리킵니다. 각 핀을 눌러 기관을 선택하세요.'; });
+  markers.on('unspiderfied', () => { mapStatus.textContent = '원형 마커의 ‘곳’은 모인 기관 수입니다. 클릭하면 확대하거나 겹친 위치를 펼칩니다.'; });
+  const updateZoom = () => { mapZoom.textContent = '확대 '+map.getZoom()+' / '+map.getMaxZoom(); };
+  map.on('zoomend', updateZoom); updateZoom();
   map.on('moveend', () => { mapStatus.textContent = '현재 지도 중심을 기준으로 주변 검색할 수 있습니다.'; });
 } catch { map = null; mapStatus.textContent = '지도를 불러오지 못했습니다. 목록 검색을 이용해주세요.'; document.querySelector('#nearby').disabled = true; }
 async function search(url, center = null, radius = null) {
@@ -91,11 +107,19 @@ async function search(url, center = null, radius = null) {
       if (map && coordinate(item)) {
         const position=[item.LAT,item.LNG]; points.push(position);
         const popup=node('div',''); popup.append(node('strong',item.NAME),node('p',item.ADDRESS),node('p',item.PHONE));
-        const marker=L.marker(position,{title:item.NAME,alt:item.NAME,icon:L.divIcon({className:'facility-marker',html:String(index+1),iconSize:[30,30],iconAnchor:[15,30]})}).bindPopup(popup).addTo(markers);
-        marker.getElement().setAttribute('aria-label',(index+1)+'. '+item.NAME);
+        const locationNote=node('p','제공기관의 좌표로 표시합니다. 건물 대표 위치일 수 있으니 주소도 확인해주세요.'); locationNote.className='location-note'; popup.append(locationNote);
+        const marker=L.marker(position,{title:item.NAME,alt:item.NAME,icon:L.divIcon({className:'facility-marker',html:String(index+1),iconSize:[30,30],iconAnchor:[15,30]})}).bindPopup(popup);
+        marker.on('add',()=>marker.getElement()?.setAttribute('aria-label',(index+1)+'. '+item.NAME));
+        marker.addTo(markers);
         marker.on('click',()=>{ selectFacility(li); li.focus({preventScroll:true}); li.scrollIntoView({behavior:'instant',block:'nearest'}); });
         const select=node('button','지도에서 보기'); select.type='button';
-        select.addEventListener('click',()=>{ selectFacility(li); map.setView(position,Math.max(map.getZoom(),15)); marker.openPopup(); scrollTo(document.querySelector('#map')); });
+        select.addEventListener('click',()=>{
+          selectFacility(li); map.setView(position,Math.max(map.getZoom(),17),{animate:false});
+          const visible = markers.getVisibleParent(marker);
+          if (visible && visible !== marker) visible.spiderfy();
+          marker.openPopup();
+          scrollToElement(document.querySelector('#map'));
+        });
         actions.append(select);
       } else { missing++; li.append(node('p',coordinate(item)?'지도를 불러오지 못해 목록으로 표시합니다.':'좌표 정보가 없어 지도에 표시되지 않습니다.')); }
       li.append(actions);

@@ -22,7 +22,21 @@ const supplements = document.body.dataset.catalog === 'supplements';
 const base = supplements ? '/api/supplements' : '/api/drugs';
 const fields = supplements ? {MAIN_FNCTN:'기능성',SRV_USE:'섭취량 및 섭취방법',INTAKE_HINT1:'섭취 시 주의사항',PRSRV_PD:'보관 방법',DISTB_PD:'유통기한',SUNGSANG:'성상',BASE_STANDARD:'기준 및 규격'} : {efcyQesitm:'효능',useMethodQesitm:'사용법',atpnWarnQesitm:'주의사항 경고',atpnQesitm:'주의사항',intrcQesitm:'상호작용',seQesitm:'부작용',depositMethodQesitm:'보관법'};
 function element(tag, text) { const node = document.createElement(tag); node.textContent = text; return node; }
-async function request(url) { const response = await fetch(url); const data = await response.json(); if (!response.ok) throw new Error(data.title || '정보를 불러오지 못했습니다.'); return data; }
+async function request(url) {
+  let response;
+  try { response = await fetch(url); }
+  catch { throw new Error('서버에 연결할 수 없습니다. 연결을 확인한 뒤 다시 시도해주세요.'); }
+  let data;
+  try { data = await response.json(); } catch {}
+  if (!response.ok) {
+    const message = response.status === 429 ? '요청이 많습니다. 잠시 후 다시 검색해주세요.'
+      : response.status === 503 ? '검색 서비스를 일시적으로 이용할 수 없습니다. 잠시 후 다시 시도해주세요.'
+      : '정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.';
+    throw new Error(data?.title || message);
+  }
+  if (!data || typeof data !== 'object') throw new Error('응답을 확인할 수 없습니다. 잠시 후 다시 시도해주세요.');
+  return data;
+}
 async function search() {
   const version = ++generation;
   resetDetail(); selectedButton = null;
@@ -44,7 +58,7 @@ async function search() {
         if(item.permitStatuses?.length)li.append(element('p','허가 상태 원본: '+item.permitStatuses.join(' / ')));
         if(item.hasEasyInformation===false)li.append(element('p','허가 목록 수록 품목 · e약은요 설명 미제공'));
       }
-      if(supplements)li.append(element('p',`회원 추천 ${item.recommendations}개`));
+      if(supplements){const count=element('p',`회원 추천 ${item.recommendations}개`);count.className='recommendation-count';li.append(count);}
     }
     if (!data.items.length) {
       const empty = element('li', '검색 결과가 없습니다. 검색어를 바꾸거나 검색 조건을 줄여보세요.');
@@ -95,7 +109,11 @@ async function show(id, button) {
       }
     }
     const community=element('section','');detail.append(community);
-    try { await window.productCommunity(community,supplements?'supplements':'drugs',id); }
+    try { await window.productCommunity(community,supplements?'supplements':'drugs',id,data=>{
+      if(version!==generation || !button.isConnected)return;
+      const count=button.closest('li').querySelector('.recommendation-count');
+      if(count)count.textContent=`회원 추천 ${data.total}개`;
+    }); }
     catch(error) { community.replaceChildren(element('p','회원 의견을 불러오지 못했습니다. '+error.message)); }
     if(version===generation){
       detail.focus({preventScroll:true});

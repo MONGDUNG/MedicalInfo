@@ -1,0 +1,301 @@
+{
+  "date": "2026-10-19",
+  "sourceBaseline": "010820e111286b721c6676558e4c96d685a3699d",
+  "environment": {
+    "localFramework": "net9.0 compatibility override",
+    "productionTarget": "net10.0",
+    "browserState": "isolated SQLite with synthetic members",
+    "facilityRecords": 148116
+  },
+  "checks": {
+    "dotnetWithLiveData": 406,
+    "python": 16,
+    "javascript": 7,
+    "browser": 61
+  },
+  "fixes": [
+    "recommendation count synchronized between selected list row and detail",
+    "empty/non-JSON rate-limit or outage response and network failure show Korean retry guidance"
+  ],
+  "browserCases": [
+    {
+      "name": "브라우저 로그인",
+      "passed": true
+    },
+    {
+      "name": "회원 표시 이름 저장",
+      "passed": true
+    },
+    {
+      "name": "게시글 첫 페이지 10건",
+      "passed": true
+    },
+    {
+      "name": "게시글 두 번째 페이지",
+      "passed": true
+    },
+    {
+      "name": "타인 글 수정 버튼 숨김",
+      "passed": true
+    },
+    {
+      "name": "게시글 스크립트 문자열은 글자로 표시",
+      "passed": true
+    },
+    {
+      "name": "브라우저 글 작성",
+      "passed": true
+    },
+    {
+      "name": "게시글 제목·분류 수정",
+      "passed": true
+    },
+    {
+      "name": "댓글 작성",
+      "passed": true
+    },
+    {
+      "name": "댓글 수정",
+      "passed": true
+    },
+    {
+      "name": "게시글 이미지 첨부",
+      "passed": true
+    },
+    {
+      "name": "게시판 키워드·분류 복합 검색",
+      "passed": true
+    },
+    {
+      "name": "타인 비공개 문의 목록 제외",
+      "passed": true
+    },
+    {
+      "name": "비공개 문의 작성",
+      "passed": true
+    },
+    {
+      "name": "비공개 문의 본인 답변",
+      "passed": true
+    },
+    {
+      "name": "문의 답변 수정",
+      "passed": true
+    },
+    {
+      "name": "비공개 문의 수정",
+      "passed": true
+    },
+    {
+      "name": "실제 기관 한글 검색",
+      "passed": true
+    },
+    {
+      "name": "기관 리뷰에 검색 기관 식별자 연결",
+      "passed": true
+    },
+    {
+      "name": "리뷰 작성·평균 집계",
+      "passed": true
+    },
+    {
+      "name": "리뷰 수정·평균 재계산",
+      "passed": true
+    },
+    {
+      "name": "기관당 한 리뷰 중복 차단",
+      "passed": true
+    },
+    {
+      "name": "의약품 한글 제품명 검색",
+      "passed": true
+    },
+    {
+      "name": "의약품 e약·허가 품목번호 연결",
+      "passed": true
+    },
+    {
+      "name": "허가 원문의 표 표시",
+      "passed": true
+    },
+    {
+      "name": "의약품 댓글 작성",
+      "passed": true
+    },
+    {
+      "name": "의약품 댓글 수정",
+      "passed": true
+    },
+    {
+      "name": "제품명·한글 성분 복합 검색",
+      "passed": true
+    },
+    {
+      "name": "의약품 성분 검색 페이지 이동",
+      "passed": true
+    },
+    {
+      "name": "건강기능식품 검색",
+      "passed": true
+    },
+    {
+      "name": "건강기능식품 추천",
+      "passed": true
+    },
+    {
+      "name": "건강기능식품 댓글 작성",
+      "passed": true
+    },
+    {
+      "name": "추천 취소",
+      "passed": true
+    },
+    {
+      "name": "추천 후 목록·상세 수 즉시 동기화",
+      "passed": true
+    },
+    {
+      "name": "추천 취소 후 목록·상세 수 동기화",
+      "passed": true
+    },
+    {
+      "name": "회원 추천순 실제 순위 변경",
+      "passed": true
+    },
+    {
+      "name": "회원 표시 이름 영속화",
+      "passed": true
+    },
+    {
+      "name": "이메일 인증 토큰 주소에서 제거",
+      "passed": true
+    },
+    {
+      "name": "개발용 인증 메일 링크 사용",
+      "passed": true
+    },
+    {
+      "name": "인증 링크 재사용 차단",
+      "passed": true
+    },
+    {
+      "name": "인증 링크 사용 후 회원 이메일 인증 완료",
+      "passed": true
+    },
+    {
+      "name": "일반 회원 관리자 화면 접근 차단",
+      "passed": true
+    },
+    {
+      "name": "브라우저 로그아웃",
+      "passed": true
+    },
+    {
+      "name": "관리자 회원 목록",
+      "passed": true
+    },
+    {
+      "name": "관리자 등급 생성",
+      "passed": true
+    },
+    {
+      "name": "관리자 회원 검색",
+      "passed": true
+    },
+    {
+      "name": "회원 등급 배정과 관리 이력 기록",
+      "passed": true
+    },
+    {
+      "name": "관리자 공지 작성",
+      "passed": true
+    },
+    {
+      "name": "관리자 비공개 문의 열람",
+      "passed": true
+    },
+    {
+      "name": "관리자 비공개 문의 답변",
+      "passed": true
+    },
+    {
+      "name": "복원 후 비공개 문의·답변 보존",
+      "passed": true
+    },
+    {
+      "name": "새 경로 복원 후 기존 로그인 유지",
+      "passed": true
+    },
+    {
+      "name": "복원 후 관리자 권한 유지",
+      "passed": true
+    },
+    {
+      "name": "복원 후 게시글·댓글·첨부 표시",
+      "passed": true
+    },
+    {
+      "name": "공식 뉴스 더 보기",
+      "passed": true
+    },
+    {
+      "name": "누적 조회 인기 기관 표시",
+      "passed": true
+    },
+    {
+      "name": "응급기관 일반 진료시간 원문 표시",
+      "passed": true
+    },
+    {
+      "name": "응급기관 일반 시간과 실시간 수용 여부 구분",
+      "passed": true
+    },
+    {
+      "name": "요청 제한 시 한국어 안내",
+      "passed": true
+    },
+    {
+      "name": "오류 후 검색 버튼 재시도 가능",
+      "passed": true
+    },
+    {
+      "name": "요청 제한 후 정상 재검색 회복",
+      "passed": true
+    }
+  ],
+  "restore": {
+    "allDatabaseRowsMatch": true,
+    "authenticationKeysMatch": true,
+    "attachmentExactBytesMatch": true,
+    "counts": {
+      "AccountLinks": 0,
+      "AdminAudits": 3,
+      "AspNetRoleClaims": 0,
+      "AspNetRoles": 1,
+      "AspNetUserClaims": 0,
+      "AspNetUserLogins": 0,
+      "AspNetUserRoles": 1,
+      "AspNetUserTokens": 0,
+      "AspNetUsers": 3,
+      "Attachments": 1,
+      "Comments": 1,
+      "FacilityPopularities": 1,
+      "Inquiries": 3,
+      "InquiryAnswers": 2,
+      "MemberTiers": 1,
+      "Posts": 14,
+      "ProductComments": 2,
+      "ProductVotes": 1,
+      "Reviews": 1,
+      "__EFMigrationsHistory": 9,
+      "__EFMigrationsLock": 0
+    }
+  },
+  "notVerified": [
+    "actual Kakao/Naver provider applications and production callbacks",
+    "actual SMTP delivery and domain authentication",
+    "production HTTPS and trusted proxy configuration",
+    "home PC execution",
+    "disease API approval, permitted use and disease/symptom data connection"
+  ]
+}

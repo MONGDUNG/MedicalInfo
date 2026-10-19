@@ -14,6 +14,7 @@ public sealed class Member : IdentityUser
     public DateTime? LastLoginAt { get; set; }
     public DateTime? SuspendedUntil { get; set; }
     public long? TierId { get; set; }
+    public string? ProtectedDetails { get; set; }
 }
 
 public sealed class MemberDatabase(DbContextOptions<MemberDatabase> options) : IdentityDbContext<Member>(options)
@@ -116,6 +117,7 @@ public static class Accounts
             options.Cookie.HttpOnly = true;
         });
         builder.Services.AddAuthorization();
+        builder.Services.AddSingleton<MemberDetailsStore>();
     }
 
     public static async Task InitializeAccounts(this WebApplication app)
@@ -128,6 +130,13 @@ public static class Accounts
     private static IResult Invalid(string message) => Results.Problem(statusCode: 400, title: message);
     private static bool PasswordLength(string? password) => password?.Length is >= 12 and <= 128;
     private static bool NameValid(string? name) => !string.IsNullOrWhiteSpace(name) && name.Trim().Length <= 50;
+    public static string? RegistrationError(RegisterMember input) {
+        if(input.Username?.Length is not (>=3 and <=40) || !System.Text.RegularExpressions.Regex.IsMatch(input.Username,"^[a-zA-Z0-9._-]+$"))return "아이디는 영문·숫자·점·밑줄·하이픈 3~40자로 입력해주세요.";
+        if(!PasswordLength(input.Password))return "비밀번호는 12~128자로 입력해주세요.";
+        if(!NameValid(input.DisplayName))return "표시 이름은 1~50자로 입력해주세요.";
+        if(string.IsNullOrWhiteSpace(input.Email)||input.Email.Length>254||!System.Net.Mail.MailAddress.TryCreate(input.Email,out var email)||email.Address!=input.Email)return "올바른 이메일 주소를 입력해주세요.";
+        return null;
+    }
     private static object Profile(Member user, bool isAdmin = false) => new { user.Id, username = user.UserName, user.DisplayName,
         user.Email, user.EmailConfirmed, user.CreatedAt, user.LastLoginAt, user.TierId, isAdmin };
 
@@ -144,15 +153,9 @@ public static class Accounts
         });
         group.MapGet("/csrf", (HttpContext context, IAntiforgery antiforgery) =>
             Results.Ok(new { token = antiforgery.GetAndStoreTokens(context).RequestToken }));
+        group.MapMemberDetails();
         group.MapPost("/register", async (RegisterMember input, UserManager<Member> users) => {
-            if (input.Username?.Length is not (>= 3 and <= 40) ||
-                !System.Text.RegularExpressions.Regex.IsMatch(input.Username, "^[a-zA-Z0-9._-]+$"))
-                return Invalid("아이디는 영문·숫자·점·밑줄·하이픈 3~40자로 입력해주세요.");
-            if (!PasswordLength(input.Password)) return Invalid("비밀번호는 12~128자로 입력해주세요.");
-            if (!NameValid(input.DisplayName)) return Invalid("표시 이름은 1~50자로 입력해주세요.");
-            if (string.IsNullOrWhiteSpace(input.Email) || input.Email.Length > 254 ||
-                !System.Net.Mail.MailAddress.TryCreate(input.Email, out var email) || email.Address != input.Email)
-                return Invalid("올바른 이메일 주소를 입력해주세요.");
+            var error=RegistrationError(input);if(error is not null)return Invalid(error);
             var user = new Member { UserName = input.Username, Email = input.Email, DisplayName = input.DisplayName!.Trim() };
             try {
                 var result = await users.CreateAsync(user, input.Password!);

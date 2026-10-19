@@ -9,6 +9,11 @@ void Check(bool condition, string message)
     if (!condition) throw new Exception(message);
     Console.WriteLine("PASS " + message); passed++;
 }
+if (args is ["--social-only"]) {
+    await SocialProtocolChecks.Run(Check);
+    Console.WriteLine($"{passed} social checks passed.");
+    return;
+}
 void Invalid(Action action, string name)
 {
     try { action(); throw new Exception("Expected input rejection: " + name); }
@@ -219,6 +224,11 @@ try {
     await PopularityChecks.Run(client.BaseAddress!, Check, async () => {
         process.Kill(entireProcessTree:true); await process.WaitForExitAsync(); process.Start();
     });
+    await MemberDetailsChecks.Run(client.BaseAddress!,accountState,Check,async()=>{
+        process.Kill(entireProcessTree:true);await process.WaitForExitAsync();
+        start.Environment["Mail__Mode"]="Disabled";start.Environment["Mail__RequireConfirmedEmail"]="false";
+        process.Start();
+    });
 }
 finally {
     if (!process.HasExited) { process.Kill(entireProcessTree: true); await process.WaitForExitAsync(); }
@@ -252,6 +262,7 @@ if (!string.IsNullOrWhiteSpace(liveUrl))
     var department = await liveSearch.SearchAsync(SearchQuery.Nearby(37.5665, 126.978, 5, "의원", "내과"), default);
     Check(department.Count > 0 && department.All(x => x.Departments.Any(d => d.Contains("내과"))), "live department filter works");
 }
+await SocialProtocolChecks.Run(Check);
 Console.WriteLine($"{passed} checks passed.");
 
 sealed class StubHandler : HttpMessageHandler

@@ -52,13 +52,16 @@ public static class Administration
     public static void MapAdministration(this WebApplication app) {
         var group=Inquiries.Protect(app.MapGroup("/api/admin"));
         group.RequireAuthorization(policy=>policy.RequireRole("Admin"));
-        group.MapGet("/members",async(string? keyword,int? page,MemberDatabase db)=>{
+        group.MapGet("/members",async(string? keyword,int? page,bool? inactive,MemberDatabase db)=>{
             var current=page??1;if(current is <1 or >100000 || keyword?.Length>100)return Results.BadRequest();
             var query=db.Users.AsNoTracking();
+            var cutoff=DateTime.UtcNow.AddMonths(-6);
+            if(inactive==true)query=query.Where(x=>(x.LastLoginAt??x.CreatedAt)<cutoff);
             if(!string.IsNullOrWhiteSpace(keyword)){var term=keyword.Trim().ToUpperInvariant();query=query.Where(x=>x.NormalizedUserName!.Contains(term)||x.NormalizedEmail!.Contains(term)||x.DisplayName.Contains(keyword.Trim()));}
             var total=await query.CountAsync();
             var items=await query.OrderByDescending(x=>x.CreatedAt).ThenBy(x=>x.Id).Skip((current-1)*10).Take(10)
                 .Select(x=>new {x.Id,username=x.UserName,x.DisplayName,x.Email,x.EmailConfirmed,x.CreatedAt,x.LastLoginAt,x.SuspendedUntil,x.TierId,
+                    inactive=(x.LastLoginAt??x.CreatedAt)<cutoff,
                     roles=(from link in db.UserRoles join role in db.Roles on link.RoleId equals role.Id where link.UserId==x.Id select role.Name).ToArray()}).ToArrayAsync();
             return Results.Ok(new {total,page=current,pageSize=10,items});
         });

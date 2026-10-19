@@ -86,5 +86,13 @@ static class AdministrationChecks
         await Login(member,"admin.member");check(true,"expired suspension permits normal login without manual unban");
         await Reset();
         check((await Get(admin,root+"audit")).GetProperty("total").GetInt32()==audit.GetProperty("total").GetInt32(),"audit survives restart");
+        using(var database=new SqliteConnection("Data Source="+Path.Combine(state,"members.db"))) {
+            await database.OpenAsync();using var command=database.CreateCommand();command.CommandText="UPDATE AspNetUsers SET LastLoginAt=$last WHERE Id=$id";
+            command.Parameters.AddWithValue("$last",DateTime.UtcNow.AddMonths(-7));command.Parameters.AddWithValue("$id",memberId);await command.ExecuteNonQueryAsync();
+        }
+        var inactive=await Get(admin,root+"members?inactive=true&keyword=admin.member");
+        check(inactive.GetProperty("total").GetInt32()==1 && inactive.GetProperty("items")[0].GetProperty("inactive").GetBoolean(),"administrator can filter inactive members without exposing private profile");
+        await Login(member,"admin.member");
+        check((await Get(admin,root+"members?inactive=true&keyword=admin.member")).GetProperty("total").GetInt32()==0,"successful password login clears derived inactivity without manual unlock");
     }
 }

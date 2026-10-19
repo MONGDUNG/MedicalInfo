@@ -215,6 +215,10 @@ try {
         start.Environment["Drugs__Path"]=enabled?productDrugs:"";start.Environment["Supplements__Path"]=enabled?productSupplements:"";
         process.Start();
     });
+    Volatile.Write(ref backendStatus, 200);
+    await PopularityChecks.Run(client.BaseAddress!, Check, async () => {
+        process.Kill(entireProcessTree:true); await process.WaitForExitAsync(); process.Start();
+    });
 }
 finally {
     if (!process.HasExited) { process.Kill(entireProcessTree: true); await process.WaitForExitAsync(); }

@@ -191,6 +191,19 @@ namespace MedicalInfo.Web.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MedicalInfo.FacilityPopularity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("Views")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FacilityPopularities");
+                });
+
             modelBuilder.Entity("MedicalInfo.FacilityReview", b =>
                 {
                     b.Property<long>("Id")

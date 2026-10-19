@@ -29,6 +29,7 @@ public sealed class MemberDatabase(DbContextOptions<MemberDatabase> options) : I
     public DbSet<AccountLink> AccountLinks => Set<AccountLink>();
     public DbSet<ProductComment> ProductComments => Set<ProductComment>();
     public DbSet<ProductVote> ProductVotes => Set<ProductVote>();
+    public DbSet<FacilityPopularity> FacilityPopularities => Set<FacilityPopularity>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         base.OnModelCreating(model);

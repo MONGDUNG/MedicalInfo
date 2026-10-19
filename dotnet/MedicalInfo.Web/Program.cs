@@ -17,6 +17,7 @@ var bootstrapUser = args.Length >= 2 && args[0] == "--grant-admin" ? args[1] : n
 var builder = WebApplication.CreateBuilder(bootstrapUser is null ? args : args.Skip(2).ToArray());
 builder.AddAccounts();
 builder.AddAccountRecovery();
+builder.Services.AddSingleton<ViewDeduplication>();
 builder.Services.AddSingleton(_ => new NewsFeed(new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) {
     Timeout = TimeSpan.FromSeconds(8), MaxResponseContentBufferSize = 2_000_000
 }, TimeProvider.System));
@@ -69,6 +70,7 @@ app.MapCommunity();
 app.MapInquiries();
 app.MapAttachments();
 app.MapReviews();
+app.MapPopularity();
 app.MapProductCommunity(drugs,supplements);
 app.MapGet("/api/news", async (NewsFeed news, CancellationToken ct) => {
     var result = await news.Read(ct);

@@ -17,6 +17,9 @@ var bootstrapUser = args.Length >= 2 && args[0] == "--grant-admin" ? args[1] : n
 var builder = WebApplication.CreateBuilder(bootstrapUser is null ? args : args.Skip(2).ToArray());
 builder.AddAccounts();
 builder.AddAccountRecovery();
+builder.Services.AddSingleton(_ => new NewsFeed(new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) {
+    Timeout = TimeSpan.FromSeconds(8), MaxResponseContentBufferSize = 2_000_000
+}, TimeProvider.System));
 var drugs = new DrugCatalog(builder.Configuration["Drugs:Path"]);
 var supplements = new DrugCatalog(builder.Configuration["Supplements:Path"], supplements: true);
 builder.Services.AddProblemDetails();
@@ -67,6 +70,10 @@ app.MapInquiries();
 app.MapAttachments();
 app.MapReviews();
 app.MapProductCommunity(drugs,supplements);
+app.MapGet("/api/news", async (NewsFeed news, CancellationToken ct) => {
+    var result = await news.Read(ct);
+    return result is null ? Results.Problem(statusCode: 503, title: "보건복지부 소식을 불러올 수 없습니다.") : Results.Ok(result);
+}).RequireRateLimiting("search");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapGet("/api/supplements", async (string? keyword, int? page, string? effect, string? sort, MemberDatabase db) => {

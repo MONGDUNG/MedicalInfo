@@ -9,4 +9,6 @@
 <section aria-label="지도 검색"><div class="map-controls"><label>업종<select id="category"><option value="">전체</option><option>의원</option><option>병원</option><option>종합병원</option><option>상급종합</option><option>약국</option><option>치과의원</option><option>한의원</option></select></label><label>진료과<input id="department" maxlength="80" placeholder="예: 내과"></label><label>검색 반경<select id="radius"><option value="3">640m</option><option value="4">1.28km</option><option value="5" selected>2.56km</option><option value="6">5.12km</option><option value="7">10.24km</option></select></label></div>
 <div class="map-actions"><button id="nearby" type="button">이 지도 중심 주변 검색</button><button id="locate" type="button">내 위치</button></div><p id="map-status" role="status" aria-live="polite">초기 지도는 서울시청입니다. 지도를 움직인 뒤 주변 검색을 누르세요.</p><div id="map" role="region" aria-label="병원과 약국 지도"></div></section>
 <ul id="results" aria-label="검색 결과"></ul>
+<section aria-labelledby="news-heading"><h2 id="news-heading">보건복지부 소식</h2><p id="news-status" role="status">소식을 불러오는 중입니다.</p><ul id="news-items"></ul><a href="https://www.mohw.go.kr/board.es?mid=a10503000000&amp;bid=0027" target="_blank" rel="noopener noreferrer">보건복지부에서 전체 소식 보기</a></section>
+<script src="/news.js" defer></script>
 </main></body></html>

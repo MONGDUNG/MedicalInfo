@@ -17,6 +17,7 @@ void Invalid(Action action, string name)
 Invalid(() => SearchQuery.Keyword("  "), "blank keyword rejected");
 await UpgradeChecks.Run(Check);
 MailConfigurationChecks.Run(Check);
+await NewsChecks.Run(Check);
 var drugFixture = Path.GetTempFileName();
 try {
     File.WriteAllText(drugFixture, """

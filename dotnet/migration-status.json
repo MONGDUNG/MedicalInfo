@@ -1,5 +1,5 @@
 {
-  "design": "deferred until functional migration is complete",
+  "design": "shared responsive design applied to 10 existing pages; disease views await functional implementation",
   "areas": [
     {
       "feature": "병원·약국 검색, 거리·진료과 필터, 지도, 진료시간",

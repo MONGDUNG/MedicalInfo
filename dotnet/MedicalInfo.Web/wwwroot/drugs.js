@@ -31,6 +31,10 @@ async function search() {
       }
       if(supplements)li.append(element('p',`회원 추천 ${item.recommendations}개`));
     }
+    if (!data.items.length) {
+      const empty = element('li', '검색 결과가 없습니다. 검색어를 바꾸거나 효능·성분 필터를 줄여보세요.');
+      empty.className = 'empty-state'; results.append(empty);
+    }
     previous.disabled = page <= 1; next.disabled = page * data.pageSize >= data.total;
   } catch (error) { if (version === generation) status.textContent = error.message; }
 }

@@ -1,10 +1,16 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>게시판 · Dr.Geo</title><link rel="stylesheet" href="/site.css"><script src="/attachments.js" defer></script><script src="/community.js" defer></script></head>
-<body><main><nav><a href="/">병원·약국 찾기</a><a href="/account.html">회원 계정</a><a href="/inquiries.html">문의·답변</a></nav><h1>게시판</h1><p id="community-status" role="status"></p>
-<form id="filter"><label>게시글 검색<input name="keyword" maxlength="100"></label><label>분류<select name="category"><option value="">전체</option><option>자유</option><option>질문</option><option>공지사항</option></select></label><button>검색</button></form>
-<ul id="posts"></ul><button id="previous" type="button">이전 페이지</button> <span id="page"></span> <button id="next" type="button">다음 페이지</button>
-<section id="post-detail" hidden><h2 id="post-title"></h2><p id="post-meta"></p><p id="post-content" class="drug-text"></p><div id="post-actions"></div>
-<div id="attachments"></div><h3>댓글</h3><ul id="comments"></ul><button id="more-comments" type="button" hidden>댓글 더 보기</button>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>게시판 · Dr.Geo</title><link rel="stylesheet" href="/site.css?v=20261019-design"><script src="/attachments.js" defer></script><script src="/community.js?v=20261019-design" defer></script><link rel="icon" href="/brand.svg" type="image/svg+xml"><script src="/ui.js?v=20261019-design" defer></script></head>
+<body><a class="skip-link" href="#main-content">본문으로 바로가기</a>
+<header class="site-header"><div class="header-inner">
+<a class="brand" href="/" aria-label="닥터지오 Dr.Geo 홈"><img src="/brand.svg" alt="" width="39" height="43"><span><strong>닥터지오</strong><small>Dr.Geo</small></span></a>
+<nav class="site-nav" id="site-nav" aria-label="주 메뉴"><a href="/">병원·약국</a><a href="/drugs.html">의약품</a><a href="/supplements.html">건강기능식품</a><a href="/community.html" aria-current="page">커뮤니티</a><a href="/inquiries.html">문의·답변</a></nav>
+<a class="account-link" href="/account.html">회원 계정</a>
+<button class="menu-toggle" id="menu-toggle" type="button" aria-label="메뉴 열기·닫기" aria-expanded="false" aria-controls="site-nav"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+</div></header><main id="main-content" tabindex="-1" class="content-main"><header class="page-heading"><span class="eyebrow">OUR COMMUNITY</span><h1>게시판</h1></header><p id="community-status" role="status"></p>
+<form id="filter" class="panel"><label>게시글 검색<input name="keyword" maxlength="100"></label><label>분류<select name="category"><option value="">전체</option><option>자유</option><option>질문</option><option>공지사항</option></select></label><button>검색</button></form>
+<ul id="posts" class="record-list"></ul><nav class="pagination" aria-label="목록 페이지"><button id="previous" type="button">이전 페이지</button> <span id="page"></span> <button id="next" type="button">다음 페이지</button></nav>
+<section class="panel detail-panel" id="post-detail" hidden><h2 id="post-title"></h2><p id="post-meta"></p><p id="post-content" class="drug-text"></p><div id="post-actions"></div>
+<div id="attachments"></div><h3>댓글</h3><ul id="comments" class="record-list"></ul><button id="more-comments" type="button" hidden>댓글 더 보기</button>
 <form id="comment-form"><label>댓글 내용<textarea name="content" required maxlength="2000" rows="3"></textarea></label><button>댓글 저장</button><button id="cancel-comment" type="button">수정 취소</button></form></section>
-<section><h2 id="editor-title">새 글 작성</h2><p>로그인한 회원만 작성할 수 있습니다. 공지사항은 관리자만 작성할 수 있습니다.</p>
+<section class="panel form-section"><h2 id="editor-title">새 글 작성</h2><p>로그인한 회원만 작성할 수 있습니다. 공지사항은 관리자만 작성할 수 있습니다.</p>
 <form id="post-form"><label>분류<select name="category"><option>자유</option><option>질문</option><option>공지사항</option></select></label><label>제목<input name="title" required maxlength="200"></label><label>본문<textarea name="content" required maxlength="4000" rows="8"></textarea></label><button>글 저장</button><button id="cancel-edit" type="button">수정 취소</button></form></section>
-</main></body></html>
+</main><footer class="site-footer"><div class="footer-inner"><div><strong>닥터지오 <small>Dr.Geo</small></strong><p>우리 동네 의료기관과 공식 건강 정보를 더 가까이.<br>제공되는 정보는 진료를 대신하지 않으며, 방문·복용 전 해당 기관이나 의사·약사에게 확인해주세요.</p></div><div class="footer-links"><a href="/community.html">커뮤니티</a><a href="/inquiries.html">문의·답변</a></div></div></footer></body></html>

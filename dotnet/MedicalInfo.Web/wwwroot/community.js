@@ -17,6 +17,10 @@ async function list(){
   const version=++listVersion, params=new URLSearchParams(new FormData(document.querySelector('#filter')));params.set('page',page);
   const data=await api('posts?'+params);if(version!==listVersion)return;
   const container=document.querySelector('#posts');container.replaceChildren();
+  if (!data.items.length) {
+    const empty=node('li','아직 게시글이 없습니다. 첫 이야기를 남겨보세요.');
+    empty.className='empty-state';container.append(empty);
+  }
   for(const item of data.items){const li=node('li',''),link=node('a',`[${item.category}] ${item.title}`);link.href='#'+item.id;li.append(link,node('p',item.author));container.append(li);}
   document.querySelector('#page').textContent=`${data.page}페이지 · ${data.total}개`;
   document.querySelector('#previous').disabled=page<=1;document.querySelector('#next').disabled=page*data.pageSize>=data.total;

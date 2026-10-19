@@ -108,10 +108,17 @@ async function search(url, center = null, radius = null) {
         const position=[item.LAT,item.LNG]; points.push(position);
         const popup=node('div',''); popup.append(node('strong',item.NAME),node('p',item.ADDRESS),node('p',item.PHONE));
         const locationNote=node('p','제공기관의 좌표로 표시합니다. 건물 대표 위치일 수 있으니 주소도 확인해주세요.'); locationNote.className='location-note'; popup.append(locationNote);
-        const marker=L.marker(position,{title:item.NAME,alt:item.NAME,icon:L.divIcon({className:'facility-marker',html:String(index+1),iconSize:[30,30],iconAnchor:[15,30]})}).bindPopup(popup);
+        const marker=L.marker(position,{title:item.NAME,alt:item.NAME,icon:L.divIcon({className:'facility-marker',html:String(index+1),iconSize:[30,30],iconAnchor:[15,30],popupAnchor:[0,-30]})}).bindPopup(popup,{
+          maxWidth: Math.min(300,Math.max(160,map.getSize().x-100)),
+          autoPanPaddingTopLeft: [50,10], autoPanPaddingBottomRight: [10,10]
+        });
         marker.on('add',()=>marker.getElement()?.setAttribute('aria-label',(index+1)+'. '+item.NAME));
         marker.addTo(markers);
-        marker.on('click',()=>{ selectFacility(li); li.focus({preventScroll:true}); li.scrollIntoView({behavior:'instant',block:'nearest'}); });
+        marker.on('click',()=>{
+          selectFacility(li); li.focus({preventScroll:true});
+          const column=li.closest('.results-column');
+          column.scrollTop += li.getBoundingClientRect().top-column.getBoundingClientRect().top;
+        });
         const select=node('button','지도에서 보기'); select.type='button';
         select.addEventListener('click',()=>{
           selectFacility(li); map.setView(position,Math.max(map.getZoom(),17),{animate:false});

@@ -56,6 +56,8 @@ Check(keyword["query"]!["bool"]!["must_not"]!.AsArray().Count == 2, "Korean medi
 var near = SearchQuery.Nearby(37.5, 127, 3, "의원", "내과");
 Check(near["query"]!["bool"]!["filter"]![0]!["geo_distance"]!["distance"]!.GetValue<string>() == "640m", "distance has explicit meter units");
 Check(near["sort"]![0]!["_geo_distance"]!["order"]!.GetValue<string>() == "asc", "nearest first ordering");
+Check(SearchQuery.Keyword("서울 편의점")["query"]!["bool"]!["must"]![1]!["match_phrase"]!["CATEGORY_NAME"]!.GetValue<string>()=="안전상비의약품 판매업소","convenience-store keyword resolves licensed OTC stores");
+Check(SearchQuery.Nearby(37.5,127,5,"응급실")["query"]!["bool"]!["filter"]![1]!["match_phrase"]!["CATEGORY_NAME"]!.GetValue<string>()=="응급의료기관","legacy emergency category resolves current official institution directory");
 
 var handler = new StubHandler();
 using var http = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:9200/") };

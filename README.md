@@ -92,16 +92,39 @@ python tools/import_facilities.py --url http://localhost:9200 --index item-hira-
 
 검증 후 `.env`의 `ELASTICSEARCH_INDEX`를 새 이름으로 바꾸고 웹 컨테이너를 재생성하세요. 롤백은 이전 이름으로 되돌리면 됩니다. 복구 중인 원본 Elasticsearch 데이터 디렉터리를 직접 덮어쓰지 마세요.
 
+### 전국 응급의료기관·안전상비의약품 판매업소 연결
+
+국립중앙의료원 [전국 응급의료기관 정보](https://www.data.go.kr/data/15000563/openapi.do)의 목록·기본정보와 행정안전부 [전국 안전상비의약품 판매업소](https://www.data.go.kr/data/15154791/openapi.do)를 사용합니다. 두 API 활용 승인이 필요하며 인증키는 저장소 밖에 보관합니다. 제공되는 이용허락범위는 제한 없음입니다. 판매업소 좌표 변환에는 Python 3.11 이상과 `pyproj`가 필요합니다.
+
+```sh
+python -m pip install -r tools/requirements-data.txt
+python tools/collect_facilities.py --kind stores --key-file /private/data-go-kr.key --output /data/mois-stores-20261019 --collected-on 2026-10-19
+python tools/collect_facilities.py --kind emergency --key-file /private/data-go-kr.key --output /data/nmc-emergency-20261019 --collected-on 2026-10-19
+python tools/enrich_emergency.py --source /data/nmc-emergency-20261019 --output /data/nmc-emergency-full-20261019 --key-file /private/data-go-kr.key
+python tools/merge_facilities.py --source /data/hira-202606 --source /data/mois-stores-20261019 --source /data/nmc-emergency-full-20261019 --output /data/facilities-20261019
+python tools/import_facilities.py --url http://localhost:9200 --index item-facilities-20261019 --source /data/facilities-20261019/facilities.jsonl
+```
+
+2026-10-19 수집본은 병원·약국 105,532건, 영업 상태 코드 `01`인 판매업소 42,054건, 응급의료기관 530건으로 합계 148,116건입니다. 응급의료기관은 530건 모두 기본정보를 연결했습니다. 판매업소의 EPSG:5174 좌표를 WGS84로 변환하며 좌표가 없거나 유효하지 않은 2,774건은 목록에 보존합니다. 심평원 자료의 11건을 포함해 좌표 없는 2,785건은 지도·거리 검색에서 제외됩니다. 수집일은 원본 전체가 그날 갱신됐다는 의미가 아닙니다.
+
+수집 도중 중단되면 완료 파일을 만들지 않습니다. `official.jsonl.partial`에 완전한 페이지가 남아 있으면 같은 수집 명령에 `--resume`을 추가할 수 있습니다. 첫 페이지·현재 전체 건수·페이지 경계를 대조하고 이어서 수집하지만, 공급자가 수집 중 같은 건수로 행 순서를 바꾸는 것까지 보장하는 스냅샷은 아닙니다. 정규화는 중복 식별자와 건수 불일치를 거부합니다. 완료본 갱신에는 새 출력 디렉터리를 사용합니다. 병합 전 각 파일의 SHA-256을 검증하고 기존 데이터와 색인을 덮어쓰지 않습니다.
+
+심평원 식별자는 유지하고 다른 출처는 `nmc-emergency:`·`mois-store:` 식별자를 사용합니다. 같은 병원이 심평원·응급의료기관 자료에 함께 있어도 이름만으로 합치지 않습니다. 검색 결과에 출처를 표시하며 기존 리뷰의 기관 연결을 유지합니다. `서울 응급실`·`편의점`·`상비약` 검색과 지도 업종 필터를 지원합니다. 상비약 판매점을 선택하면 진료과 필터를 해제합니다.
+
+응급의료기관 상세의 시간은 기관 일반 진료시간이며 응급환자 수용 가능 여부나 실시간 가용 병상이 아닙니다. 판매업소는 등록 자료이며 현재 영업·재고·24시간 운영을 보장하지 않습니다. 해당 안내를 상세 화면에도 표시합니다. 원본 기본정보·수집 메타데이터는 보존하고 가용 병상 등 스냅샷 값을 현재 상태로 노출하지 않습니다. 서울 지역 CSV 대체 수집은 `tools/normalize_stores.py`를 사용하며 전국 자료와 중복 병합하지 않습니다.
+
 ### 새 PC에 Elasticsearch까지 함께 구성
 
 Docker Desktop 또는 Docker Engine + Compose가 설치된 PC에서 `.env.example`을 `.env`로 복사하고 아래 값을 지정합니다. 데이터 경로는 압축을 푼 위치의 절대 경로이며 Windows에서도 `/` 구분자를 사용할 수 있습니다.
 
 ```dotenv
 ELASTICSEARCH_URL=http://elasticsearch:9200
-ELASTICSEARCH_INDEX=item-hira-202606
-HIRA_DATA_DIR=C:/MedicalInfo/data/hira-202606
+ELASTICSEARCH_INDEX=item-facilities-20261019
+HIRA_DATA_DIR=C:/MedicalInfo/data/facilities-20261019
 DRUG_DATA_DIR=C:/MedicalInfo/data/mfds-drugs-20261015-v2
 ```
+
+`HIRA_DATA_DIR`은 기존 설정과의 호환을 위해 유지한 이름이며, 응급의료기관·판매업소까지 병합한 디렉터리도 지정할 수 있습니다.
 
 ```sh
 docker compose -f compose.yaml -f compose.data.yaml -f compose.search.yaml up -d --build elasticsearch
@@ -127,9 +150,13 @@ python tools/collect_drugs.py --supplements --key-file /private/data-go-kr.key -
 
 ### 검증된 데이터와 소스 묶음 만들기
 
-소스 변경을 커밋한 뒤 `python tools/package_portable.py --data-root /path/to/collected-data --output /path/to/new-bundle.zip`을 실행합니다. 세 데이터셋의 manifest 해시와 압축 무결성을 확인하며 기존 출력 파일을 덮어쓰지 않습니다. 인증키와 로컬 `.env`는 포함하지 않습니다.
+소스 변경을 커밋한 뒤 아래 명령으로 묶습니다. 세 데이터셋의 manifest 해시와 압축 무결성을 확인하며 기존 출력 파일을 덮어쓰지 않습니다. 인증키와 로컬 `.env`는 포함하지 않습니다.
 
-집 PC에서 압축을 푼 뒤 `MedicalInfo` 폴더에서 `python tools/configure_portable.py`를 실행하면 옆의 `data` 폴더 경로를 반영한 `.env`를 생성합니다. 기존 `.env`가 있으면 보존합니다. 이어서 아래 명령을 순서대로 실행합니다.
+```sh
+python tools/package_portable.py --data-root /path/to/collected-data --facilities-dir facilities-20261019 --facilities-index item-facilities-20261019 --output /path/to/new-bundle.zip
+```
+
+집 PC에서 압축을 푼 뒤 `MedicalInfo` 폴더에서 `python tools/configure_portable.py`를 실행하면 생성된 `portable-data.json`의 색인·시설 디렉터리와 옆의 `data` 폴더 경로를 반영한 `.env`를 생성합니다. 세 데이터 파일의 해시를 다시 확인하며 기존 `.env`가 있으면 보존합니다. 이 단계와 이후 실행에는 API 인증키·좌표 변환 라이브러리가 필요하지 않습니다. 이어서 아래 명령을 순서대로 실행합니다.
 
 ```sh
 docker compose -f compose.yaml -f compose.data.yaml -f compose.supplements.yaml -f compose.search.yaml up -d --build elasticsearch
@@ -143,7 +170,7 @@ docker compose -f compose.yaml -f compose.data.yaml -f compose.supplements.yaml 
 
 디자인 개편은 기능 이전 이후 진행합니다. 기능별 원본 대조 현황과 미완료 항목은 `dotnet/migration-status.json`에서 관리합니다.
 
-- `/account.html`: 아이디 가입, 로그인·로그아웃, 표시 이름 수정, 현재 비밀번호를 확인한 변경·탈퇴. ASP.NET Identity로 비밀번호를 해시 저장하고, 5회 로그인 실패 시 15분 잠금, 변경 후 다른 세션 즉시 무효화, CSRF 검사를 적용합니다. 가입 요청으로 관리자 권한을 지정할 수 없습니다. 이메일 인증/복구는 아래 메일 설정 후 사용할 수 있습니다. 소셜 로그인과 추가 프로필은 아직 이전 중입니다. 관리자 회원·등급 관리는 아래 운영 절차를 사용합니다.
+- `/account.html`: 아이디 가입, 로그인·로그아웃, 표시 이름 수정, 현재 비밀번호를 확인한 변경·탈퇴. ASP.NET Identity로 비밀번호를 해시 저장하고, 5회 로그인 실패 시 15분 잠금, 변경 후 다른 세션 즉시 무효화, CSRF 검사를 적용합니다. 가입 요청으로 관리자 권한을 지정할 수 없습니다. 이메일 인증/복구와 소셜 로그인은 아래 운영 설정 후 사용할 수 있습니다. 선택 프로필은 본인만 조회·수정하고 암호화 저장합니다. 관리자 회원·등급 관리는 아래 운영 절차를 사용합니다.
 - `/community.html`: 자유/질문/공지 목록·검색·페이징, 글과 댓글 작성·수정·삭제. 서버가 작성자 권한을 확인하며 공지사항 작성은 Admin 역할만 허용합니다. 글을 저장한 뒤 상세 화면에서 이미지를 첨부·삭제할 수 있습니다.
 - 검색 결과의 리뷰 링크: 별점 1~5점, 기관당 회원 1개, 작성자 수정·삭제, 전체 건수와 평균을 지원합니다. 기관 식별자를 검색 서버에서 확인하며 수정으로 기관을 바꿀 수 없습니다. 리뷰가 0개이면 평균은 null입니다.
 
@@ -177,7 +204,7 @@ docker compose exec web dotnet MedicalInfo.Web.dll --grant-admin YOUR_USERNAME
 
 관리 이력은 DB에 처리자·대상 식별자, 변경 내역, 사유를 저장합니다. API로 이력을 수정·삭제하는 기능은 제공하지 않습니다. DB 자체에 접근할 수 있는 운영자까지 막는 위변조 방지 로그는 아닙니다. 사유에 비밀번호·의료정보 등 민감한 내용을 입력하지 마세요. 이력도 회원 DB 백업에 포함됩니다.
 
-원본의 6개월 미접속 자동 휴면 전환은 계정 복구 정책과 함께 별도로 이전할 예정입니다. 현재는 미접속만으로 계정을 잠그지 않습니다. 이메일 인증·아이디 찾기·비밀번호 복구는 아래 설정을 사용합니다. 소셜 로그인은 아직 미완료입니다.
+6개월 이상 미접속 회원은 관리자 필터로 확인하며 미접속만으로 계정을 잠그지 않습니다. 이메일 인증·아이디 찾기·비밀번호 복구와 카카오·네이버 로그인은 아래 운영 설정 절차를 사용합니다.
 
 ## 이메일 인증·아이디 찾기·비밀번호 복구
 

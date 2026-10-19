@@ -33,6 +33,10 @@ public sealed class SearchUnavailableException(Exception inner) : Exception("Sea
 
 public static class SearchQuery
 {
+    private static string Category(string value) => value switch {
+        "편의점" or "상비약" or "안전상비약" => "안전상비의약품 판매업소",
+        "응급" or "응급실" or "응급센터" => "응급의료기관", _ => value
+    };
     public static JsonObject ById(string? id)
     {
         if (string.IsNullOrWhiteSpace(id) || id.Length > 512) throw new SearchInputException("유효한 기관 식별자가 필요합니다.");
@@ -58,6 +62,8 @@ public static class SearchQuery
             var word = words[i];
             if (i == 0 && words.Length > 1 && regions.TryGetValue(word, out var address))
                 must.Add(Node(new { match_phrase = new { ADDRESS = address } }));
+            else if(Category(word)!=word || word is "응급의료기관" or "안전상비의약품 판매업소")
+                must.Add(Node(new {match_phrase=new {CATEGORY_NAME=Category(word)}}));
             else must.Add(Node(new { multi_match = new { query = word,
                 fields = new[] { "NAME", "ADDRESS", "CATEGORY_NAME", "DEPT_NAME" }, @operator = "and" } }));
         }
@@ -83,7 +89,7 @@ public static class SearchQuery
         var filters = new JsonArray(Node(new { geo_distance = new {
             distance = radius.ToString(CultureInfo.InvariantCulture) + "m", geoLocation = new { lat, lon = lng } } }));
         if (!string.IsNullOrWhiteSpace(category))
-            filters.Add(Node(new { match_phrase = new { CATEGORY_NAME = category.Trim() } }));
+            filters.Add(Node(new { match_phrase = new { CATEGORY_NAME = Category(category.Trim()) } }));
         if (!string.IsNullOrWhiteSpace(dept))
             filters.Add(Node(new { match_phrase = new { DEPT_NAME = dept.Trim() } }));
         return new JsonObject { ["size"] = 200, ["track_total_hits"] = false,

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 import zipfile
+import re
 
 
 def digest(path):
@@ -12,11 +13,13 @@ def digest(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
-def package(root, data_root, output):
+def package(root, data_root, output, facilities_dir='hira-202606', facilities_index='item-hira-202606'):
     if output.exists():
         raise ValueError('Output already exists; choose a new filename')
+    if not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,99}',facilities_dir) or not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,127}',facilities_index):
+        raise ValueError('Invalid facilities directory/index')
     datasets = {
-        'hira-202606': 'facilities.jsonl',
+        facilities_dir: 'facilities.jsonl',
         'mfds-drugs-20261015-v2': 'drugs.jsonl',
         'mfds-supplements-20261015-v2': 'supplements.jsonl',
     }
@@ -40,12 +43,13 @@ def package(root, data_root, output):
     with zipfile.ZipFile(temporary, 'x', compression=zipfile.ZIP_DEFLATED) as archive:
         for source, destination in inputs:
             archive.write(source, destination)
+        archive.writestr('MedicalInfo/portable-data.json',json.dumps({'facilitiesDirectory':facilities_dir,'elasticsearchIndex':facilities_index}))
     with zipfile.ZipFile(temporary) as archive:
         if archive.testzip():
             raise ValueError('Bundle checksum verification failed')
     temporary.rename(output)
     report = {'file': output.name, 'sourceCommit': commit, 'bytes': output.stat().st_size,
-              'sha256': digest(output), 'datasets': datasets}
+              'sha256': digest(output), 'datasets': datasets, 'elasticsearchIndex': facilities_index}
     output.with_suffix('.sha256.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(json.dumps(report))
 
@@ -54,5 +58,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--data-root', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--facilities-dir',default='hira-202606')
+    parser.add_argument('--facilities-index',default='item-hira-202606')
     args = parser.parse_args()
-    package(Path(__file__).resolve().parents[1], args.data_root.resolve(), args.output.resolve())
+    package(Path(__file__).resolve().parents[1], args.data_root.resolve(), args.output.resolve(),args.facilities_dir,args.facilities_index)

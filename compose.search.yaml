@@ -35,7 +35,7 @@ services:
         condition: service_healthy
     volumes:
       - ./tools:/tools:ro
-      - ${HIRA_DATA_DIR:?Set HIRA_DATA_DIR to the normalized HIRA directory}:/data:ro
+      - ${HIRA_DATA_DIR:?Set HIRA_DATA_DIR to the normalized or combined facilities directory}:/data:ro
     entrypoint: ['python', '/tools/import_facilities.py']
     command: ['--url', 'http://elasticsearch:9200', '--index', '${ELASTICSEARCH_INDEX:-item-hira-202606}', '--source', '/data/facilities.jsonl']
 volumes:

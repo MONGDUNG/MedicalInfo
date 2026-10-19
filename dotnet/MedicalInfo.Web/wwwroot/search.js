@@ -12,12 +12,15 @@ function time(value) {
   return `${value} (원본 표기)`;
 }
 function facilityDetails(item) {
-  const section=node('details',''); section.append(node('summary','진료시간·이용 안내'));
+  const isStore=['SEOUL_OTC','MOIS_OTC'].includes(item.SOURCE);
+  const section=node('details',''); section.append(node('summary',isStore?'판매점 이용 안내':item.SOURCE==='NMC'?'기관 진료시간·이용 안내':'진료시간·이용 안내'));
+  if(item.SOURCE==='NMC')section.append(node('p','기관의 일반 진료시간 자료입니다. 응급환자 수용 가능 여부·실시간 가용 병상은 제공하지 않습니다. 이용 전 기관에 확인해주세요.'));
+  if(['SEOUL_OTC','MOIS_OTC'].includes(item.SOURCE))section.append(node('p','안전상비의약품 판매 등록 정보입니다. 현재 영업 여부·약품 재고·24시간 운영을 보장하지 않습니다. 방문 전 판매점에 확인해주세요.'));
   const data=item.DETAILS || {};
-  if (!Object.keys(data).length) { section.append(node('p','제공된 진료시간·이용 안내가 없습니다. 방문 전 기관에 문의해주세요.')); return section; }
-  section.append(node('p',`${item.SOURCE_PERIOD || '제공 자료'} 기준 정보입니다. 임시 휴진이나 변경 사항은 방문 전 기관에 확인해주세요.`));
-  const table=node('table',''); table.append(node('caption','요일별 진료시간'));
-  for (const day of ['월요일','화요일','수요일','목요일','금요일','토요일','일요일']) {
+  if (!Object.keys(data).length) { section.append(node('p',isStore?'판매점 영업시간 자료가 없습니다.':'제공된 진료시간·이용 안내가 없습니다. 방문 전 기관에 문의해주세요.')); return section; }
+  section.append(node('p',`${item.SOURCE_PERIOD || '제공 자료'} ${item.SOURCE==='NMC'?'수집':'기준'} 정보입니다. 임시 휴진이나 변경 사항은 방문 전 기관에 확인해주세요.`));
+  const table=node('table',''); table.append(node('caption',item.SOURCE==='NMC'?'기관 일반 진료시간':'요일별 진료시간'));
+  for (const day of ['월요일','화요일','수요일','목요일','금요일','토요일','일요일','공휴일']) {
     const tr=node('tr',''), th=node('th',day); th.scope='row';
     const start=data['진료시작시간_'+day], end=data['진료종료시간_'+day];
     tr.append(th,node('td',start || end ? `${time(start)} ~ ${time(end)}` : data['휴진안내_'+day] || '정보 없음')); table.append(tr);
@@ -54,6 +57,8 @@ async function search(url, center = null, radius = null) {
       li.append(facilityDetails(item));
       const reviews=node('a','리뷰 보기·작성'); reviews.href='/reviews.html?'+new URLSearchParams({facilityId:item.ID}); li.append(reviews);
       if (item.SOURCE === 'HIRA') { const a = node('a',`출처: 건강보험심사평가원 · ${item.SOURCE_PERIOD} 기준`); a.href='https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925'; li.append(a); }
+      const sources={SEOUL_OTC:['서울특별시 · 서울 지역 자료','https://data.seoul.go.kr/dataList/OA-16483/S/1/datasetView.do'],MOIS_OTC:['행정안전부 · 전국 자료','https://www.data.go.kr/data/15154791/openapi.do'],NMC:['국립중앙의료원 · 전국 기관 목록','https://www.data.go.kr/data/15000563/openapi.do']};
+      if(sources[item.SOURCE]){const [label,url]=sources[item.SOURCE],a=node('a',`출처: ${label} · ${item.SOURCE_PERIOD} 수집`);a.href=url;li.append(a);}
       if (map && coordinate(item)) {
         const position=[item.LAT,item.LNG]; points.push(position);
         const popup=node('div',''); popup.append(node('strong',item.NAME),node('p',item.ADDRESS),node('p',item.PHONE));
@@ -72,6 +77,10 @@ form.addEventListener('submit',event=>{ event.preventDefault(); const keyword=fo
 document.querySelector('#nearby').addEventListener('click',()=>{
   if(!map)return; const center=map.getCenter(),level=Number(document.querySelector('#radius').value);
   search('/map/medicalFacilityByDept?'+new URLSearchParams({lat:center.lat,lng:center.lng,level,category:document.querySelector('#category').value,dept:document.querySelector('#department').value.trim()}),center,80*(1<<level));
+});
+document.querySelector('#category').addEventListener('change',event=>{
+  const store=event.target.value==='안전상비의약품 판매업소',department=document.querySelector('#department');
+  department.disabled=store;if(store)department.value='';
 });
 document.querySelector('#locate').addEventListener('click',()=>{
   if(!map || !navigator.geolocation){mapStatus.textContent='현재 위치를 사용할 수 없습니다. 지도를 직접 이동해주세요.';return;}

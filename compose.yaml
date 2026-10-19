@@ -1,0 +1,44 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${HTTP_BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Mail__Mode: "${MAIL_MODE:-Disabled}"
+      Mail__PublicUrl: "${MAIL_PUBLIC_URL:-}"
+      Mail__From: "${MAIL_FROM:-}"
+      Mail__Host: "${MAIL_HOST:-}"
+      Mail__Port: "${MAIL_PORT:-587}"
+      Mail__Username: "${MAIL_USERNAME:-}"
+      Mail__Password: "${MAIL_PASSWORD:-}"
+      Mail__RequireConfirmedEmail: "${MAIL_REQUIRE_CONFIRMED_EMAIL:-false}"
+      Social__PublicUrl: "${SOCIAL_PUBLIC_URL:-}"
+      Social__Kakao__Enabled: "${SOCIAL_KAKAO_ENABLED:-false}"
+      Social__Kakao__ClientId: "${SOCIAL_KAKAO_CLIENT_ID:-}"
+      Social__Kakao__ClientSecret: "${SOCIAL_KAKAO_CLIENT_SECRET:-}"
+      Social__Naver__Enabled: "${SOCIAL_NAVER_ENABLED:-false}"
+      Social__Naver__ClientId: "${SOCIAL_NAVER_CLIENT_ID:-}"
+      Social__Naver__ClientSecret: "${SOCIAL_NAVER_CLIENT_SECRET:-}"
+      AllowedHosts: "${ALLOWED_HOSTS:-localhost;127.0.0.1}"
+      Elasticsearch__Url: "${ELASTICSEARCH_URL:?Set ELASTICSEARCH_URL in .env}"
+      Elasticsearch__Index: "${ELASTICSEARCH_INDEX:-item}"
+      Elasticsearch__ApiKey: "${ELASTICSEARCH_API_KEY:-}"
+      Elasticsearch__TimeoutSeconds: "${ELASTICSEARCH_TIMEOUT_SECONDS:-5}"
+    read_only: true
+    volumes:
+      - member-state:/state
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  member-state:

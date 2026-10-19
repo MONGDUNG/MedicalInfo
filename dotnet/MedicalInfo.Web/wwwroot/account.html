@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>회원 계정 · Dr.Geo</title><link rel="stylesheet" href="/site.css?v=20261019-portal"><script src="/account.js?v=20261019-portal" defer></script><link rel="icon" href="/brand.svg" type="image/svg+xml"><script src="/ui.js?v=20261019-portal" defer></script></head>
+<body><a class="skip-link" href="#main-content">본문으로 바로가기</a>
+<header class="site-header"><div class="header-inner">
+<a class="brand" href="/" aria-label="닥터지오 Dr.Geo 홈"><img src="/brand.svg" alt="" width="39" height="43"><span><strong>닥터지오</strong><small>Dr.Geo</small></span></a>
+<nav class="site-nav" id="site-nav" aria-label="주 메뉴"><a href="/">병원·약국</a><a href="/drugs.html">의약품</a><a href="/supplements.html">건강기능식품</a><a href="/community.html">커뮤니티</a><a href="/inquiries.html">문의·답변</a></nav>
+<a class="account-link" href="/account.html">회원 계정</a>
+<button class="menu-toggle" id="menu-toggle" type="button" aria-label="메뉴 열기·닫기" aria-expanded="false" aria-controls="site-nav"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+</div></header><main id="main-content" tabindex="-1" class="account-main"><header class="page-heading"><span class="eyebrow">나의 닥터지오</span><h1>회원 계정</h1></header>
+<p id="account-status" role="status" aria-live="polite"></p>
+<section id="anonymous" class="auth-layout">
+<aside class="auth-welcome"><span class="eyebrow">나의 닥터지오</span><h2>건강한 일상을<br>함께 시작해요.</h2><p>궁금한 건강 정보를 찾고,<br>나의 경험과 이야기를 나눠보세요.</p><ul class="auth-benefits"><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>가까운 의료기관 살펴보기</span></li><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 15 6-6M5.5 18.5a5 5 0 0 1 0-7l6-6a5 5 0 0 1 7 7l-6 6a5 5 0 0 1-7 0Z"/></svg><span>의약품 공식 정보 확인하기</span></li><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-2 2V11a9.5 9.5 0 0 1 19 0Z"/><path d="M7 10h9m-9 4h6"/></svg><span>이용 경험과 궁금한 점 나누기</span></li></ul><div class="auth-mascot"><img src="/mascot.jpg" alt="닥터지오 캐릭터" width="430" height="430"></div></aside>
+<div class="panel auth-card"><div class="auth-tabs" role="tablist" aria-label="회원 계정" hidden><button type="button" id="login-tab" role="tab" data-auth-tab="login" aria-controls="login-panel" aria-selected="true">로그인</button><button type="button" id="register-tab" role="tab" data-auth-tab="register" aria-controls="register-panel" aria-selected="false">회원가입</button></div>
+<div id="login-panel" data-auth-panel="login" role="tabpanel" aria-labelledby="login-tab"><h2>로그인</h2><p class="hint">닥터지오에 오신 것을 환영합니다.</p><form id="login">
+<label>아이디<input name="username" autocomplete="username" required maxlength="40"></label>
+<label>비밀번호<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label>
+<button>로그인</button></form><p class="hint"><a href="/recover.html">아이디 찾기 · 비밀번호 재설정 · 이메일 인증</a></p><div id="social-login"></div></div>
+<div id="register-panel" data-auth-panel="register" role="tabpanel" aria-labelledby="register-tab"><h2>회원가입</h2><p class="hint">내 계정을 만들고 이야기를 함께해보세요.</p><form id="register">
+<label>새 아이디<input name="username" autocomplete="username" required minlength="3" maxlength="40" pattern="[a-zA-Z0-9._\-]+"></label>
+<label>표시 이름<input name="displayName" autocomplete="nickname" required maxlength="50"></label>
+<label>이메일<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+<label>새 비밀번호 (12~128자)<input name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label>
+<label>비밀번호 확인<input name="confirmation" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label>
+<button>가입하기</button></form></div></div></section>
+<section id="signed-in" class="panel" hidden><div class="panel-head"><h2>내 정보</h2><a id="admin-link" href="/admin.html" class="text-link" hidden>회원 관리</a></div><p id="profile"></p><a href="/recover.html">이메일 인증·계정 복구</a>
+<form id="profile-form"><label>표시 이름<input name="displayName" required maxlength="50" autocomplete="nickname"></label><button>정보 저장</button></form>
+<button id="logout" type="button">로그아웃</button>
+<h2>소셜 계정 연결</h2><p>연결 후에는 비밀번호 입력 대신 연결된 소셜 계정으로 로그인할 수 있습니다. 연결·해제에는 현재 비밀번호 확인이 필요합니다.</p><div id="social-links"></div><div id="social-connect"></div>
+<h2>추가 개인정보 (선택)</h2><p>본인만 조회할 수 있습니다. 건강정보는 추천·진단에 사용하지 않습니다. 비워서 저장하면 해당 정보가 삭제됩니다.</p>
+<p id="details-status" role="status"></p><form id="details-form">
+<label>이름<input name="fullName" maxlength="100" autocomplete="name"></label>
+<label>주소<input name="address" maxlength="300" autocomplete="address-line1"></label>
+<label>상세 주소<input name="detailAddress" maxlength="200" autocomplete="address-line2"></label>
+<label>우편번호<input name="postcode" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code"></label>
+<label>생년월일<input name="birthDate" type="date" min="1900-01-01" autocomplete="bday"></label>
+<label>성별<select name="sex"><option value="">선택하지 않음</option><option value="female">여성</option><option value="male">남성</option><option value="other">기타</option></select></label>
+<details><summary>주소 좌표 직접 입력 (선택)</summary><p>좌표를 알고 있을 때만 두 값을 함께 입력하세요.</p>
+<label>위도<input name="latitude" type="number" min="-90" max="90" step="any"></label><label>경도<input name="longitude" type="number" min="-180" max="180" step="any"></label></details>
+<label>기저질환 메모<textarea name="underlyingCondition" maxlength="2000" autocomplete="off"></textarea></label>
+<label><input name="healthConsent" type="checkbox">선택한 건강정보를 계정에 저장하는 데 동의합니다. 동의를 철회하면 메모도 함께 삭제합니다.</label>
+<button>추가 정보 저장</button></form>
+<h2>비밀번호 변경</h2><p>변경 후 모든 기기에서 다시 로그인해야 합니다.</p>
+<form id="password-form"><label>현재 비밀번호<input name="currentPassword" type="password" autocomplete="current-password" required maxlength="128"></label>
+<label>변경할 비밀번호<input name="newPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label><button>비밀번호 변경</button></form>
+<details><summary>회원 탈퇴</summary><p>계정이 삭제되며 복구할 수 없습니다. 공개 게시글·제품 댓글·리뷰는 작성자가 ‘탈퇴 회원’으로 표시되어 남습니다. 본인이 작성한 문의는 공개 여부와 관계없이 답변·첨부파일과 함께 삭제됩니다. 건강기능식품 추천은 함께 삭제됩니다. 그 외 삭제할 글은 탈퇴 전에 직접 삭제해주세요.</p>
+<form id="delete-form"><label>탈퇴 확인용 비밀번호<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label><label><input name="confirmed" type="checkbox" required>계정 삭제에 동의합니다.</label><button>내 계정 삭제</button></form></details>
+</section></main><footer class="site-footer"><div class="footer-inner"><div><strong>닥터지오 <small>Dr.Geo</small></strong><p>우리 동네 의료기관과 공식 건강 정보를 더 가까이.<br>제공되는 정보는 진료를 대신하지 않으며, 방문·복용 전 해당 기관이나 의사·약사에게 확인해주세요.</p></div><div class="footer-links"><a href="/community.html">커뮤니티</a><a href="/inquiries.html">문의·답변</a></div></div></footer></body></html>

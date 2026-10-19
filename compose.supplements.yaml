@@ -1,0 +1,9 @@
+services:
+  web:
+    environment:
+      Supplements__Path: /supplements/supplements.jsonl
+    volumes:
+      - type: bind
+        source: ${SUPPLEMENT_DATA_DIR:?Set SUPPLEMENT_DATA_DIR to the collected supplement directory}
+        target: /supplements
+        read_only: true

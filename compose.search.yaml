@@ -1,0 +1,42 @@
+# Optional local Elasticsearch for a new home-PC installation.
+services:
+  web:
+    environment:
+      Elasticsearch__Url: http://elasticsearch:9200
+      Elasticsearch__Index: ${ELASTICSEARCH_INDEX:-item-hira-202606}
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: Dockerfile.elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: 'false'
+      xpack.ml.enabled: 'false'
+      ingest.geoip.downloader.enabled: 'false'
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - '127.0.0.1:${ELASTICSEARCH_LOCAL_PORT:-19200}:9200'
+    volumes:
+      - search-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail --silent http://localhost:9200/_cluster/health >/dev/null']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+  import-facilities:
+    image: python:3.13-slim
+    profiles: [tools]
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./tools:/tools:ro
+      - ${HIRA_DATA_DIR:?Set HIRA_DATA_DIR to the normalized or combined facilities directory}:/data:ro
+    entrypoint: ['python', '/tools/import_facilities.py']
+    command: ['--url', 'http://elasticsearch:9200', '--index', '${ELASTICSEARCH_INDEX:-item-hira-202606}', '--source', '/data/facilities.jsonl']
+volumes:
+  search-data:

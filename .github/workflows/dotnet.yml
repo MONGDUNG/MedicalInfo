@@ -1,0 +1,56 @@
+name: .NET migration checks
+on:
+  push:
+    paths: ['dotnet/**', 'tools/**', 'compose*.yaml', 'Dockerfile*', '.dockerignore', '.github/workflows/dotnet.yml']
+  pull_request:
+    paths: ['dotnet/**', 'tools/**', 'compose*.yaml', 'Dockerfile*', '.dockerignore', '.github/workflows/dotnet.yml']
+permissions:
+  contents: read
+jobs:
+  checks:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet run --project dotnet/MedicalInfo.Checks --configuration Release
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r tools/requirements-data.txt
+      - run: python -m unittest discover -s tools -p "test_*.py"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tools/test_frontend_requests.cjs
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t medicalinfo:ci .
+      - name: Smoke test container and Compose configuration
+        shell: bash
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          DRUG_DATA_DIR=/tmp HIRA_DATA_DIR=/tmp SUPPLEMENT_DATA_DIR=/tmp docker compose -f compose.yaml -f compose.data.yaml -f compose.search.yaml -f compose.supplements.yaml config --quiet
+          DRUG_PERMIT_DATA_DIR=/tmp docker compose -f compose.yaml -f compose.permits.yaml config --quiet
+          docker run -d --name medicalinfo-check -p 127.0.0.1:8080:8080 --read-only --tmpfs /tmp --tmpfs /state:uid=1654,gid=1654,mode=0700 --cap-drop ALL medicalinfo:ci
+          trap 'docker logs medicalinfo-check; docker rm -f medicalinfo-check' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/health/live; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8080/ | grep 'Dr.Geo'
+          docker exec medicalinfo-check dotnet MedicalInfo.Web.dll --health-check
+          test "$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health/ready)" = 503
+  search-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f Dockerfile.elasticsearch -t medicalinfo-search:ci .
+      - run: docker run --rm medicalinfo-search:ci bin/elasticsearch-plugin list | grep '^analysis-nori$'

@@ -14,13 +14,14 @@ async function search() {
   const version = ++generation;
   results.replaceChildren(); detail.replaceChildren(); previous.disabled = next.disabled = true; status.textContent = '검색 중입니다.';
   try {
-    const data = await request(`${base}?keyword=${encodeURIComponent(keyword)}&page=${page}`);
+    const data = await request(`${base}?`+new URLSearchParams({keyword,page,effect:document.querySelector('#effect').value.trim(),sort:document.querySelector('#sort')?.value||'name'}));
     if (version !== generation) return;
     status.textContent = `${data.total}개 품목 · ${page}페이지`;
     for (const item of data.items) {
       const li = element('li', ''); const button = element('button', item.name); button.type = 'button';
       button.addEventListener('click', () => show(item.id));
       li.append(button, element('p', `${item.company} · ${item.dateLabel} ${item.date || '미제공'}`)); results.append(li);
+      if(supplements)li.append(element('p',`회원 추천 ${item.recommendations}개`));
     }
     previous.disabled = page <= 1; next.disabled = page * data.pageSize >= data.total;
   } catch (error) { if (version === generation) status.textContent = error.message; }
@@ -39,7 +40,10 @@ async function show(id) {
         detail.append(element('h3', label), text);
       }
     }
-    detail.focus();
+    const community=element('section','');detail.append(community);
+    try { await window.productCommunity(community,supplements?'supplements':'drugs',id); }
+    catch(error) { community.replaceChildren(element('p','회원 의견을 불러오지 못했습니다. '+error.message)); }
+    if(version===generation)detail.focus();
   } catch (error) { if (version === generation) detail.replaceChildren(element('p', error.message)); }
 }
 form.addEventListener('submit', event => { event.preventDefault(); keyword = document.querySelector('#keyword').value.trim(); page = 1; search(); });

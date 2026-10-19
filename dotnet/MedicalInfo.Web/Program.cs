@@ -1,6 +1,7 @@
 using System.Threading.RateLimiting;
 using MedicalInfo;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 if (args is ["--health-check"])
 {
@@ -65,11 +66,15 @@ app.MapCommunity();
 app.MapInquiries();
 app.MapAttachments();
 app.MapReviews();
+app.MapProductCommunity(drugs,supplements);
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.MapGet("/api/supplements", (string? keyword, int? page) => {
+app.MapGet("/api/supplements", async (string? keyword, int? page, string? effect, string? sort, MemberDatabase db) => {
     if (!supplements.Available) return Results.Problem(statusCode: 503, title: "건강기능식품 데이터를 준비 중입니다.");
-    try { return Results.Ok(supplements.Search(keyword, page ?? 1)); }
+    try {
+        var votes=await db.ProductVotes.GroupBy(x=>x.ProductId).Select(x=>new{Id=x.Key,Count=x.Count()}).ToDictionaryAsync(x=>x.Id,x=>x.Count);
+        return Results.Ok(supplements.Search(keyword, page ?? 1,effect,sort,votes));
+    }
     catch (SearchInputException ex) { return Results.Problem(statusCode: 400, title: ex.Message); }
 }).RequireRateLimiting("search");
 app.MapGet("/api/supplements/{id}", (string id) => {
@@ -77,9 +82,9 @@ app.MapGet("/api/supplements/{id}", (string id) => {
     var variants = supplements.Find(id);
     return variants is null ? Results.NotFound() : Results.Ok(new { source = "https://apis.data.go.kr/1471000/HtfsInfoService03", variants });
 }).RequireRateLimiting("search");
-app.MapGet("/api/drugs", (string? keyword, int? page) => {
+app.MapGet("/api/drugs", (string? keyword, int? page, string? effect) => {
     if (!drugs.Available) return Results.Problem(statusCode: 503, title: "의약품 데이터를 준비 중입니다.");
-    try { return Results.Ok(drugs.Search(keyword, page ?? 1)); }
+    try { return Results.Ok(drugs.Search(keyword, page ?? 1,effect)); }
     catch (SearchInputException ex) { return Results.Problem(statusCode: 400, title: ex.Message); }
 }).RequireRateLimiting("search");
 app.MapGet("/api/drugs/{id}", (string id) => {

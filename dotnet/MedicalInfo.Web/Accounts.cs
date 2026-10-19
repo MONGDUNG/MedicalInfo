@@ -27,9 +27,15 @@ public sealed class MemberDatabase(DbContextOptions<MemberDatabase> options) : I
     public DbSet<MemberTier> MemberTiers => Set<MemberTier>();
     public DbSet<AdminAudit> AdminAudits => Set<AdminAudit>();
     public DbSet<AccountLink> AccountLinks => Set<AccountLink>();
+    public DbSet<ProductComment> ProductComments => Set<ProductComment>();
+    public DbSet<ProductVote> ProductVotes => Set<ProductVote>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         base.OnModelCreating(model);
+        model.Entity<ProductComment>().HasOne(x=>x.Author).WithMany().HasForeignKey(x=>x.AuthorId).OnDelete(DeleteBehavior.SetNull);
+        model.Entity<ProductComment>().HasIndex(x=>new{x.Catalog,x.ProductId,x.Id});
+        model.Entity<ProductVote>().HasKey(x=>new{x.ProductId,x.MemberId});
+        model.Entity<ProductVote>().HasOne<Member>().WithMany().HasForeignKey(x=>x.MemberId).OnDelete(DeleteBehavior.Cascade);
         model.Entity<AccountLink>().HasKey(x => x.Hash);
         model.Entity<AccountLink>().HasOne<Member>().WithMany().HasForeignKey(x => x.MemberId).OnDelete(DeleteBehavior.Cascade);
         model.Entity<AccountLink>().HasIndex(x => new { x.MemberId, x.Purpose });

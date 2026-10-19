@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ko">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dr.Geo 건강기능식품 검색</title><link rel="stylesheet" href="/site.css"><script src="/drugs.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dr.Geo 건강기능식품 검색</title><link rel="stylesheet" href="/site.css"><script src="/product-community.js" defer></script><script src="/drugs.js" defer></script></head>
 <body data-catalog="supplements"><main><nav><a href="/">병원·약국 찾기</a><a href="/drugs.html">의약품 정보</a><a href="/inquiries.html">문의·답변</a></nav><header><h1>건강기능식품 정보 찾기</h1><p>제품명, 업체명 또는 품목신고번호로 공식 정보를 검색하세요.</p></header>
-<form id="search"><label for="keyword">검색어</label><div class="search"><input id="keyword" required maxlength="100" placeholder="예: 유산균"><button>검색</button></div></form>
-<p id="status" role="status" aria-live="polite">검색어를 입력해주세요.</p><ul id="results"></ul>
+<form id="search"><label for="keyword">검색어</label><div class="search"><input id="keyword" maxlength="100" placeholder="예: 유산균"><button>검색</button></div><label>공식 기능성 내용으로 좁히기<input id="effect" maxlength="100" placeholder="원문에 포함된 단어"></label><label>정렬<select id="sort"><option value="name">이름순</option><option value="popular">회원 추천순</option></select></label></form>
+<p id="status" role="status" aria-live="polite">검색어 또는 효능·기능성 필터를 입력하세요. 비워두고 검색하면 전체 목록을 볼 수 있습니다.</p><ul id="results"></ul>
 <nav aria-label="검색 결과 페이지"><button id="previous" disabled>이전</button><button id="next" disabled>다음</button></nav>
 <section id="detail" aria-label="건강기능식품 상세정보" tabindex="-1"></section>
 <footer><p>출처: 식품의약품안전처 건강기능식품정보 API. 표시된 등록일은 최종 수정일이 아닙니다. 원료용 제품도 포함될 수 있으므로 섭취방법과 주의사항을 확인하세요. 건강기능식품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.</p></footer>

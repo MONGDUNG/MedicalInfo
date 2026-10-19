@@ -28,7 +28,7 @@ try {
     Check(catalog.Find("missing") is null, "unknown drug not found");
     var hits = JsonSerializer.SerializeToElement(catalog.Search("시험약 제약사", 1));
     Check(hits.GetProperty("total").GetInt32() == 1, "drug search returns unique products matching all terms");
-    Invalid(() => catalog.Search(" ", 1), "blank drug search rejected");
+    Check(JsonSerializer.SerializeToElement(catalog.Search(" ", 1)).GetProperty("total").GetInt32()==1, "blank catalog search lists all products");
     Invalid(() => catalog.Search("시험", 0), "invalid drug page rejected");
     Check(!new DrugCatalog(null).Available, "unconfigured drug dataset marked unavailable");
     File.WriteAllText(drugFixture, """
@@ -199,6 +199,19 @@ try {
         start.Environment["Mail__From"]="test@example.invalid";
         start.Environment["Mail__RequireConfirmedEmail"]=enabled?"true":"false";
         start.Environment["Mail__PublicUrl"]=client.BaseAddress!.ToString().TrimEnd('/');
+        process.Start();
+    });
+    var productDrugs=Path.Combine(accountState,"test-drugs.jsonl");var productSupplements=Path.Combine(accountState,"test-supplements.jsonl");
+    await File.WriteAllTextAsync(productDrugs,"""
+{"itemSeq":"one","itemName":"시험약","entpName":"시험업체","efcyQesitm":"해열"}
+""");
+    await File.WriteAllTextAsync(productSupplements,"""
+{"STTEMNT_NO":"one","PRDUCT":"zeta","ENTRPS":"alpha","MAIN_FNCTN":"눈 건강"}
+{"STTEMNT_NO":"two","PRDUCT":"alpha","ENTRPS":"beta","MAIN_FNCTN":"장 건강"}
+""");
+    await ProductChecks.Run(client.BaseAddress!,Check,async enabled=>{
+        process.Kill(entireProcessTree:true);await process.WaitForExitAsync();
+        start.Environment["Drugs__Path"]=enabled?productDrugs:"";start.Environment["Supplements__Path"]=enabled?productSupplements:"";
         process.Start();
     });
 }

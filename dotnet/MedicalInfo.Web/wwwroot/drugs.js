@@ -4,7 +4,20 @@ const results = document.querySelector('#results');
 const detail = document.querySelector('#detail');
 const previous = document.querySelector('#previous');
 const next = document.querySelector('#next');
-let page = 1, keyword = '', generation = 0;
+let page = 1, keyword = '', generation = 0, selectedButton = null;
+const catalogPlaceholder = document.querySelector('#catalog-placeholder');
+const backToResults = document.querySelector('#back-to-results');
+function resetDetail() {
+  document.body.classList.remove('has-product-detail');
+  catalogPlaceholder.hidden = false; backToResults.hidden = true;
+  document.querySelector('.selected-product')?.classList.remove('selected-product');
+  selectedButton?.removeAttribute('aria-current');
+  detail.replaceChildren();
+}
+backToResults.addEventListener('click', () => {
+  generation++; resetDetail();
+  (selectedButton || document.querySelector('#keyword')).focus();
+});
 const supplements = document.body.dataset.catalog === 'supplements';
 const base = supplements ? '/api/supplements' : '/api/drugs';
 const fields = supplements ? {MAIN_FNCTN:'기능성',SRV_USE:'섭취량 및 섭취방법',INTAKE_HINT1:'섭취 시 주의사항',PRSRV_PD:'보관 방법',DISTB_PD:'유통기한',SUNGSANG:'성상',BASE_STANDARD:'기준 및 규격'} : {efcyQesitm:'효능',useMethodQesitm:'사용법',atpnWarnQesitm:'주의사항 경고',atpnQesitm:'주의사항',intrcQesitm:'상호작용',seQesitm:'부작용',depositMethodQesitm:'보관법'};
@@ -12,7 +25,9 @@ function element(tag, text) { const node = document.createElement(tag); node.tex
 async function request(url) { const response = await fetch(url); const data = await response.json(); if (!response.ok) throw new Error(data.title || '정보를 불러오지 못했습니다.'); return data; }
 async function search() {
   const version = ++generation;
-  results.replaceChildren(); detail.replaceChildren(); previous.disabled = next.disabled = true; status.textContent = '검색 중입니다.';
+  resetDetail(); selectedButton = null;
+  document.querySelector('.search-refine').open = Boolean(document.querySelector('#effect').value.trim() || document.querySelector('#ingredient')?.value.trim() || document.querySelector('#sort')?.value === 'popular');
+  results.replaceChildren(); previous.disabled = next.disabled = true; status.textContent = '검색 중입니다.';
   try {
     const data = await request(`${base}?`+new URLSearchParams({keyword,page,effect:document.querySelector('#effect').value.trim(),sort:document.querySelector('#sort')?.value||'name',ingredient:document.querySelector('#ingredient')?.value.trim()||''}));
     if (version !== generation) return;
@@ -21,7 +36,7 @@ async function search() {
     if(!supplements&&data.permitCollectedAt)status.textContent+=' · 허가자료 수집: '+new Date(data.permitCollectedAt).toLocaleString('ko-KR');
     for (const item of data.items) {
       const li = element('li', ''); const button = element('button', item.name); button.type = 'button';
-      button.addEventListener('click', () => show(item.id));
+      button.addEventListener('click', () => show(item.id, button));
       li.append(button, element('p', `${item.company} · ${item.dateLabel} ${item.date || '미제공'}`)); results.append(li);
       if(!supplements){
         if(item.koreanIngredients?.length)li.append(element('p','유효성분 원문: '+item.koreanIngredients.join(' / ')));
@@ -32,13 +47,18 @@ async function search() {
       if(supplements)li.append(element('p',`회원 추천 ${item.recommendations}개`));
     }
     if (!data.items.length) {
-      const empty = element('li', '검색 결과가 없습니다. 검색어를 바꾸거나 효능·성분 필터를 줄여보세요.');
+      const empty = element('li', '검색 결과가 없습니다. 검색어를 바꾸거나 검색 조건을 줄여보세요.');
       empty.className = 'empty-state'; results.append(empty);
     }
     previous.disabled = page <= 1; next.disabled = page * data.pageSize >= data.total;
   } catch (error) { if (version === generation) status.textContent = error.message; }
 }
-async function show(id) {
+async function show(id, button) {
+  document.querySelector('.selected-product')?.classList.remove('selected-product');
+  selectedButton?.removeAttribute('aria-current');
+  selectedButton = button; button.setAttribute('aria-current', 'true'); button.closest('li').classList.add('selected-product');
+  document.body.classList.add('has-product-detail');
+  catalogPlaceholder.hidden = true; backToResults.hidden = false;
   const version = ++generation; detail.replaceChildren(element('p', '상세정보를 불러오는 중입니다.'));
   try {
     const data = await request(`${base}/${encodeURIComponent(id)}`);
@@ -77,7 +97,10 @@ async function show(id) {
     const community=element('section','');detail.append(community);
     try { await window.productCommunity(community,supplements?'supplements':'drugs',id); }
     catch(error) { community.replaceChildren(element('p','회원 의견을 불러오지 못했습니다. '+error.message)); }
-    if(version===generation)detail.focus();
+    if(version===generation){
+      detail.focus({preventScroll:true});
+      document.querySelector('.catalog-workspace').scrollIntoView({block:'start',behavior:'instant'});
+    }
   } catch (error) { if (version === generation) detail.replaceChildren(element('p', error.message)); }
 }
 form.addEventListener('submit', event => { event.preventDefault(); keyword = document.querySelector('#keyword').value.trim(); page = 1; search(); });

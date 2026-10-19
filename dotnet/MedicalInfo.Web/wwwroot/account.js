@@ -74,13 +74,27 @@ document.querySelector('#details-form').addEventListener('submit',async event=>{
 async function loadSocial(signedIn) {
   const login=document.querySelector('#social-login'),connect=document.querySelector('#social-connect'),links=document.querySelector('#social-links');
   login.replaceChildren();connect.replaceChildren();links.replaceChildren();
-  const response=await fetch('/api/social/providers',{cache:'no-store'});if(!response.ok)return;
+  const response=await fetch('/api/social/providers',{cache:'no-store'});
+  if(!response.ok){const note=document.createElement('p');note.className='social-note';note.textContent='소셜 로그인 정보를 불러오지 못했습니다. 잠시 후 다시 확인해주세요.';(signedIn?connect:login).append(note);return;}
   const providers=await response.json();
-  if(!providers.length){const p=document.createElement('p');p.textContent='소셜 로그인은 운영 설정 후 사용할 수 있습니다.';(signedIn?connect:login).append(p);return;}
+  if(!providers.length){
+    if(!signedIn){
+      const heading=document.createElement('strong');heading.className='social-heading';heading.textContent='간편 로그인';
+      const buttons=document.createElement('div');buttons.className='social-buttons';
+      for(const name of ['카카오','네이버']){
+        const button=document.createElement('button');button.type='button';button.disabled=true;
+        button.textContent=name+' · 준비 중';button.setAttribute('aria-describedby','social-pending-note');buttons.append(button);
+      }
+      const note=document.createElement('p');note.className='social-note';note.id='social-pending-note';
+      note.textContent='간편 로그인은 준비 중이에요. 지금은 아이디로 로그인해주세요.';
+      login.append(heading,buttons,note);
+    }else{const note=document.createElement('p');note.className='social-note';note.textContent='소셜 계정 연결은 준비 중입니다.';connect.append(note);}
+    return;
+  }
   let connected=[];
   if(signedIn){const r=await fetch('/api/social/links',{cache:'no-store'});if(r.ok)connected=await r.json();}
   for(const provider of providers){
-    const form=document.createElement('form'),button=document.createElement('button');
+    const form=document.createElement('form'),button=document.createElement('button');form.className='social-provider-form';
     const linked=connected.some(x=>x.provider===provider.provider);
     form.method='post';form.action='/api/social/start';
     for(const [name,value]of Object.entries({provider:provider.provider,intent:signedIn?'link':'login'})){const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input);}

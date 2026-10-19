@@ -1,5 +1,5 @@
 {
-  "design": "shared responsive design applied to 10 existing pages; disease views await functional implementation",
+  "design": "white-blue portal design applied to 10 pages, with adjacent catalog details and explicit unavailable social login states; disease views await functional implementation",
   "areas": [
     {
       "feature": "병원·약국 검색, 거리·진료과 필터, 지도, 진료시간",

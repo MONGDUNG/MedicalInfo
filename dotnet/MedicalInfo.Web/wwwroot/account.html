@@ -1,21 +1,21 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>회원 계정 · Dr.Geo</title><link rel="stylesheet" href="/site.css?v=20261019-design"><script src="/account.js" defer></script><link rel="icon" href="/brand.svg" type="image/svg+xml"><script src="/ui.js?v=20261019-design" defer></script></head>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>회원 계정 · Dr.Geo</title><link rel="stylesheet" href="/site.css?v=20261019-portal"><script src="/account.js?v=20261019-portal" defer></script><link rel="icon" href="/brand.svg" type="image/svg+xml"><script src="/ui.js?v=20261019-portal" defer></script></head>
 <body><a class="skip-link" href="#main-content">본문으로 바로가기</a>
 <header class="site-header"><div class="header-inner">
 <a class="brand" href="/" aria-label="닥터지오 Dr.Geo 홈"><img src="/brand.svg" alt="" width="39" height="43"><span><strong>닥터지오</strong><small>Dr.Geo</small></span></a>
 <nav class="site-nav" id="site-nav" aria-label="주 메뉴"><a href="/">병원·약국</a><a href="/drugs.html">의약품</a><a href="/supplements.html">건강기능식품</a><a href="/community.html">커뮤니티</a><a href="/inquiries.html">문의·답변</a></nav>
 <a class="account-link" href="/account.html">회원 계정</a>
 <button class="menu-toggle" id="menu-toggle" type="button" aria-label="메뉴 열기·닫기" aria-expanded="false" aria-controls="site-nav"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-</div></header><main id="main-content" tabindex="-1" class="account-main"><header class="page-heading"><span class="eyebrow">MY Dr.Geo</span><h1>회원 계정</h1></header>
+</div></header><main id="main-content" tabindex="-1" class="account-main"><header class="page-heading"><span class="eyebrow">나의 닥터지오</span><h1>회원 계정</h1></header>
 <p id="account-status" role="status" aria-live="polite"></p>
 <section id="anonymous" class="auth-layout">
-<aside class="auth-welcome"><span class="eyebrow">WELCOME TO Dr.Geo</span><h2>나의 건강한 일상,<br>닥터지오와 함께해요.</h2><p>회원으로 참여해 의료기관 이용 경험을 나누고,<br>궁금했던 건강 이야기를 함께해보세요.</p><img src="/mascot.jpg" width="230" height="230" alt="닥터지오 캐릭터"></aside>
+<aside class="auth-welcome"><span class="eyebrow">나의 닥터지오</span><h2>건강한 일상을<br>함께 시작해요.</h2><p>궁금한 건강 정보를 찾고,<br>나의 경험과 이야기를 나눠보세요.</p><ul class="auth-benefits"><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>가까운 의료기관 살펴보기</span></li><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 15 6-6M5.5 18.5a5 5 0 0 1 0-7l6-6a5 5 0 0 1 7 7l-6 6a5 5 0 0 1-7 0Z"/></svg><span>의약품 공식 정보 확인하기</span></li><li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-2 2V11a9.5 9.5 0 0 1 19 0Z"/><path d="M7 10h9m-9 4h6"/></svg><span>이용 경험과 궁금한 점 나누기</span></li></ul><div class="auth-mascot"><img src="/mascot.jpg" alt="닥터지오 캐릭터" width="430" height="430"></div></aside>
 <div class="panel auth-card"><div class="auth-tabs" role="tablist" aria-label="회원 계정" hidden><button type="button" id="login-tab" role="tab" data-auth-tab="login" aria-controls="login-panel" aria-selected="true">로그인</button><button type="button" id="register-tab" role="tab" data-auth-tab="register" aria-controls="register-panel" aria-selected="false">회원가입</button></div>
-<div id="login-panel" data-auth-panel="login" role="tabpanel" aria-labelledby="login-tab"><h2>다시 만나 반가워요</h2><p class="hint">아이디와 비밀번호로 로그인해주세요.</p><form id="login">
+<div id="login-panel" data-auth-panel="login" role="tabpanel" aria-labelledby="login-tab"><h2>로그인</h2><p class="hint">닥터지오에 오신 것을 환영합니다.</p><form id="login">
 <label>아이디<input name="username" autocomplete="username" required maxlength="40"></label>
 <label>비밀번호<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label>
 <button>로그인</button></form><p class="hint"><a href="/recover.html">아이디 찾기 · 비밀번호 재설정 · 이메일 인증</a></p><div id="social-login"></div></div>
-<div id="register-panel" data-auth-panel="register" role="tabpanel" aria-labelledby="register-tab"><h2>처음 오셨나요?</h2><p class="hint">기본 정보를 입력하고 시작해보세요.</p><form id="register">
+<div id="register-panel" data-auth-panel="register" role="tabpanel" aria-labelledby="register-tab"><h2>회원가입</h2><p class="hint">내 계정을 만들고 이야기를 함께해보세요.</p><form id="register">
 <label>새 아이디<input name="username" autocomplete="username" required minlength="3" maxlength="40" pattern="[a-zA-Z0-9._\-]+"></label>
 <label>표시 이름<input name="displayName" autocomplete="nickname" required maxlength="50"></label>
 <label>이메일<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
